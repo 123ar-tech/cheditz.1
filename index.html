@@ -1351,7 +1351,6 @@ if (FIREBASE_ENABLED && firebaseDb) {
       applyContent();
       applyServices();
       applyContact();
-      renderWorksList();
       renderWorks();
     }
   }).catch(e => console.warn('Firebase initial fetch failed:', e));
@@ -1374,7 +1373,6 @@ if (FIREBASE_ENABLED && firebaseDb) {
     applyContent();
     applyServices();
     applyContact();
-    renderWorksList();
     renderWorks();
   });
 }
