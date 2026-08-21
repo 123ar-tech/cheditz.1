@@ -497,6 +497,7 @@ function loadAllEditors(){
   document.getElementById('ct-instaUrl').value=ct.instaUrl;
   document.getElementById('ct-hours').value=ct.hours;
   document.getElementById('ct-reply').value=ct.reply;
+  selectedColor=cfg.accent;
   buildColorPickers(cfg.accent);
   renderWorksList();
 }
@@ -649,15 +650,15 @@ function buildColorPickers(active){
   const el=document.getElementById('colorPickers');
   el.innerHTML=COLORS.map(c=>`<div class="color-swatch ${c===active?'on':''}" style="background:${c}" onclick="pickColor('${c}',this)"></div>`).join('');
 }
+let selectedColor='#9333ea';
 function pickColor(c,el){
   document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('on'));
   el.classList.add('on');
+  selectedColor=c;
 }
 function saveColor(){
-  const on=document.querySelector('.color-swatch.on');
-  if(!on)return;
   const cfg=getConfig();
-  cfg.accent=on.getAttribute('style').match(/background:([^;]+)/)[1];
+  cfg.accent=selectedColor;
   saveConfig(cfg);
   applyColor();
   showSaved();
