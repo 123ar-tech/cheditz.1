@@ -657,7 +657,7 @@ function saveColor(){
   const on=document.querySelector('.color-swatch.on');
   if(!on)return;
   const cfg=getConfig();
-  cfg.accent=on.style.background;
+  cfg.accent=on.getAttribute('style').match(/background:([^;]+)/)[1];
   saveConfig(cfg);
   applyColor();
   showSaved();
