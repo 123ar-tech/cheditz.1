@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Cheditz — Photo, Video & Document Editing</title>
 <meta name="description" content="Cheditz — cinematic photo, video, and document editing on demand." />
-<link rel="icon" type="image/png" href="favicon-64.png?v=2" />
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=2" />
+<link rel="icon" type="image/png" href="favicon-64.png?v=6" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=6" />
 <meta property="og:title" content="Cheditz — Photo, Video & Document Editing" />
 <meta property="og:description" content="Cinematic photo, video, and document editing on demand. Professional editing services starting at ₹20." />
 <meta property="og:type" content="website" />
@@ -382,13 +382,6 @@
   /* Social Proof Toast */
   /* ... */
 
-  /* Stats Counter */
-  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin:3rem 0;padding:2rem 0;border-top:1px solid var(--edge);border-bottom:1px solid var(--edge)}
-  @media(max-width:768px){.stats-row{grid-template-columns:repeat(2,1fr);gap:1rem}}
-  .stat-item{text-align:center}
-  .stat-num{font-family:'Crimson Pro',serif;font-size:clamp(2rem,4vw,3rem);font-weight:700;color:var(--acc);line-height:1}
-  .stat-label{font-family:'Fira Code',monospace;font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-top:0.5rem}
-
   /* How It Works */
   .process-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;margin-top:2.5rem}
   @media(max-width:768px){.process-grid{grid-template-columns:1fr;gap:1.5rem}}
@@ -562,18 +555,6 @@
       <a href="#works" class="btn btn-ghost">See the work</a>
     </div>
 
-  </div>
-</section>
-
-<!-- STATS COUNTER -->
-<section style="padding:0 0 2rem">
-  <div class="wrap">
-    <div class="stats-row rv">
-      <div class="stat-item"><div class="stat-num" data-target="500">0</div><div class="stat-label">Projects Done</div></div>
-      <div class="stat-item"><div class="stat-num" data-target="120">0</div><div class="stat-label">Happy Clients</div></div>
-      <div class="stat-item"><div class="stat-num" data-target="4">0</div><div class="stat-label">Years Experience</div></div>
-      <div class="stat-item"><div class="stat-num" data-target="98">0</div><div class="stat-label">% Satisfaction</div></div>
-    </div>
   </div>
 </section>
 
@@ -1645,10 +1626,6 @@ function toggleTheme(){
   }
 }
 
-
-// ===== SCROLL COUNTER ANIMATION =====
-const counterObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const el=e.target;const target=parseInt(el.dataset.target);let current=0;const increment=target/60;const timer=setInterval(()=>{current+=increment;if(current>=target){current=target;clearInterval(timer)}el.textContent=Math.floor(current)+'+'},30);counterObs.unobserve(el)}})},{threshold:0.5});
-document.querySelectorAll('.stat-num[data-target]').forEach(el=>counterObs.observe(el));
 
 // ===== PORTFOLIO FILTERS =====
 let currentFilter='all';
