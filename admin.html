@@ -1,0 +1,749 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cheditz — Admin Panel</title>
+<meta name="theme-color" content="#9333ea" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{font-size:16px}
+  @media(min-width:768px){html{font-size:17px}}
+  @media(min-width:1024px){html{font-size:18px}}
+
+  :root{
+    --bg:#0a0a0a;--surface:#111;--raised:#1a1a1a;--edge:#2a2a2a;
+    --txt:#f5f5f5;--dim:#999;--muted:#666;
+    --acc:#9333ea;--acc2:#1d4ed8;--warm:#f3e8ff;
+  }
+
+  body{background:var(--bg);color:var(--txt);font-family:'Space Grotesk',system-ui,sans-serif;
+    overflow-x:hidden;-webkit-font-smoothing:antialiased;line-height:1.6;min-height:100vh}
+
+  /* Blobs */
+  .blob{position:fixed;pointer-events:none;z-index:0;border-radius:50%;filter:blur(100px);opacity:0.25;will-change:transform}
+  .blob-1{width:min(600px,80vw);height:min(400px,60vw);background:radial-gradient(circle,#9333ea,transparent);top:-15%;right:-10%;animation:blobDrift1 10s ease-in-out infinite alternate}
+  .blob-2{width:min(400px,60vw);height:min(400px,60vw);background:radial-gradient(circle,#c026d3,transparent);bottom:10%;left:-5%;opacity:0.15;animation:blobDrift2 12s ease-in-out infinite alternate}
+  .blob-3{width:min(450px,65vw);height:min(300px,45vw);background:radial-gradient(circle,#f97316,transparent);bottom:10%;right:20%;opacity:0.15;animation:blobDrift3 9s ease-in-out infinite alternate}
+  .blob-4{width:min(380px,55vw);height:min(380px,55vw);background:radial-gradient(circle,#1d4ed8,transparent);top:35%;left:35%;opacity:0.12;animation:blobDrift4 14s ease-in-out infinite alternate}
+  @keyframes blobDrift4{from{transform:translate(0,0) scale(1)}to{transform:translate(50px,-40px) scale(1.2)}}
+  @keyframes blobDrift1{from{transform:translate(0,0) scale(1)}to{transform:translate(-60px,40px) scale(1.15)}}
+  @keyframes blobDrift2{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,-30px) scale(0.9)}}
+  @keyframes blobDrift3{from{transform:translate(0,0) scale(1)}to{transform:translate(-30px,30px) scale(1.1)}}
+
+  /* Aurora glow */
+  .aurora{position:fixed;inset:-25%;z-index:0;pointer-events:none;opacity:.55;filter:blur(70px);
+    background:conic-gradient(from 0deg,
+      rgba(147,51,234,.22),rgba(192,38,211,.18),rgba(249,115,22,.16),
+      rgba(29,78,216,.18),rgba(147,51,234,.22));
+    animation:auroraSpin 26s linear infinite}
+  @keyframes auroraSpin{to{transform:rotate(360deg)}}
+
+  /* Drifting grid */
+  .grid-overlay{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.06;
+    background-image:linear-gradient(var(--edge) 1px,transparent 1px),linear-gradient(90deg,var(--edge) 1px,transparent 1px);
+    background-size:46px 46px;animation:gridDrift 20s linear infinite}
+  @keyframes gridDrift{to{background-position:46px 46px,46px 46px}}
+
+  /* Floating particles */
+  .particles-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  .particles-bg i{position:absolute;bottom:-12px;border-radius:50%;box-shadow:0 0 9px rgba(255,255,255,.5);
+    animation:floatUp linear infinite}
+  @keyframes floatUp{
+    0%{transform:translateY(110vh) scale(.4);opacity:0}
+    10%{opacity:.9}
+    90%{opacity:.9}
+    100%{transform:translateY(-12vh) scale(1);opacity:0}
+  }
+
+  /* Top bar */
+  .adm-top{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:1rem;
+    padding:0.9rem 2rem;border-bottom:1px solid var(--edge);background:rgba(10,10,10,0.85);
+    backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);
+    border-bottom:1px solid rgba(147,51,234,0.25)}
+  .adm-top-left{display:flex;align-items:center;gap:0.8rem}
+  .adm-top img{height:32px}
+  .adm-top-name{font-family:'Crimson Pro',serif;font-weight:700;font-size:1.1rem}
+  .adm-top-name span{color:var(--acc)}
+  .adm-top-tag{font-family:'Fira Code',monospace;font-size:0.55rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted)}
+  .adm-top-actions{display:flex;align-items:center;gap:0.75rem}
+  .adm-top-actions a{font-size:0.75rem;color:var(--dim);text-decoration:none;transition:color .2s}
+  .adm-top-actions a:hover{color:var(--acc)}
+  .btn{display:inline-flex;align-items:center;gap:0.5rem;font-family:inherit;font-weight:600;font-size:0.8rem;
+    border:1px solid var(--edge);background:var(--raised);color:var(--txt);padding:0.7rem 1.4rem;cursor:pointer;
+    transition:all .2s;text-decoration:none}
+  .btn:hover{border-color:var(--acc);color:var(--acc);transform:translateY(-1px)}
+  .btn-acc{background:var(--acc);color:var(--bg);border-color:var(--acc)}
+  .btn-acc:hover{background:var(--acc2);color:var(--bg)}
+  .btn-sm{padding:0.5rem 1rem;font-size:0.7rem}
+  .btn-danger{background:rgba(239,68,68,0.1);color:#fca5a5;border:1px solid rgba(239,68,68,0.2)}
+  .btn-danger:hover{background:rgba(239,68,68,0.2);color:#fca5a5;border-color:rgba(239,68,68,0.4)}
+
+  /* Login overlay */
+  #loginOverlay{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.85);
+    display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;
+    backdrop-filter:blur(12px)}
+  #loginOverlay.on{opacity:1;pointer-events:all}
+  .login-box{width:min(360px,92vw);background:var(--surface);border:1px solid var(--edge);padding:2.5rem 2rem;
+    text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.6)}
+  .login-box h3{font-family:'Crimson Pro',serif;font-size:1.4rem;margin-bottom:0.4rem}
+  .login-box p{font-size:0.75rem;color:var(--dim);margin-bottom:1.5rem}
+  .ff{display:flex;flex-direction:column;gap:0.35rem;margin-bottom:1rem;text-align:left}
+  .ff label{font-family:'Fira Code',monospace;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted)}
+  .ff input,.ff textarea,.ff select{background:var(--raised);border:1px solid var(--edge);color:var(--txt);padding:0.7rem 0.9rem;
+    font-family:inherit;font-size:0.85rem;transition:border-color .2s;-webkit-appearance:none;width:100%}
+  .ff input:focus,.ff textarea:focus,.ff select:focus{outline:none;border-color:var(--acc)}
+  .err{display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);padding:8px;
+    font-size:0.75rem;color:#fca5a5;margin-bottom:0.8rem;text-align:center}
+
+  /* Admin panel shell */
+  .adm-wrap{position:relative;z-index:10;max-width:900px;margin:2rem auto;padding:0 1.25rem}
+  .adm-panel-shell{background:rgba(20,20,20,0.92);backdrop-filter:blur(40px) saturate(180%);
+    -webkit-backdrop-filter:blur(40px) saturate(180%);
+    border:2px solid rgba(147,51,234,0.5);border-radius:24px;overflow:hidden;
+    box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 20px rgba(147,51,234,0.3),0 0 40px rgba(249,115,22,0.15),inset 0 1px 0 rgba(255,255,255,0.06);
+    animation:neonGlow 3s ease-in-out infinite}
+  @keyframes neonGlow{
+    0%,100%{border-color:rgba(147,51,234,0.5);box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 20px rgba(147,51,234,0.3),0 0 40px rgba(192,38,211,0.15),inset 0 1px 0 rgba(255,255,255,0.06)}
+    33%{border-color:rgba(192,38,211,0.6);box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 25px rgba(192,38,211,0.35),0 0 50px rgba(249,115,22,0.15),inset 0 1px 0 rgba(255,255,255,0.06)}
+    66%{border-color:rgba(249,115,22,0.5);box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 25px rgba(249,115,22,0.3),0 0 50px rgba(147,51,234,0.15),inset 0 1px 0 rgba(255,255,255,0.06)}
+  }
+  .adm-head{display:flex;align-items:center;justify-content:space-between;gap:0.75rem;padding:0.9rem 1.25rem;
+    border-bottom:1px solid rgba(255,255,255,0.06)}
+  .adm-head-l{display:flex;align-items:center;gap:10px}
+  .adm-dot{width:10px;height:10px;background:#22c55e;border-radius:50%;animation:aiPulse 2s infinite}
+  @keyframes aiPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,197,94,0.4)}50%{opacity:.7;box-shadow:0 0 0 6px rgba(34,197,94,0)}}
+  .adm-head-label{font-family:'Fira Code',monospace;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--dim)}
+  .adm-head-name{font-family:'Crimson Pro',serif;font-size:0.95rem;font-weight:700}
+
+  /* Admin tabs */
+  .adm-tabs{display:flex;border-bottom:1px solid var(--edge);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+  .adm-tabs::-webkit-scrollbar{display:none}
+  .adm-tab{flex:1;padding:14px 8px;background:none;border:none;border-bottom:2px solid transparent;
+    font-family:inherit;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);
+    cursor:pointer;transition:all .2s;white-space:nowrap}
+  .adm-tab:hover{color:var(--txt)}
+  .adm-tab.on{color:var(--acc);border-bottom-color:var(--acc)}
+
+  .adm-panel{display:none;padding:1.75rem}
+  .adm-panel.on{display:block}
+
+  /* Admin form elements */
+  .aff{display:flex;flex-direction:column;gap:0.3rem;margin-bottom:1rem}
+  .aff label{font-family:'Fira Code',monospace;font-size:0.55rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted)}
+  .aff input,.aff textarea,.aff select{background:var(--raised);border:1px solid var(--edge);color:var(--txt);padding:0.7rem 0.9rem;
+    font-family:inherit;font-size:0.85rem;transition:border-color .2s;-webkit-appearance:none;width:100%}
+  .aff input:focus,.aff textarea:focus,.aff select:focus{outline:none;border-color:var(--acc)}
+  .aff textarea{resize:vertical;min-height:80px}
+  .aff select option{background:var(--surface)}
+  .aff-row{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem}
+  .aff-check{display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;color:var(--dim);cursor:pointer}
+  .aff-check input{accent-color:var(--acc);width:auto}
+
+  .sec-label{font-family:'Fira Code',monospace;font-size:0.55rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--acc);margin-bottom:1rem}
+
+  /* Work list items */
+  .wl-item{display:flex;align-items:center;gap:10px;border:1px solid var(--edge);padding:10px 12px;margin-bottom:8px;
+    transition:border-color .2s;position:relative}
+  .wl-item:hover{border-color:rgba(217,119,6,0.3)}
+  .wl-thumb{width:44px;height:60px;overflow:hidden;flex-shrink:0;background:var(--raised);border:1px solid var(--edge)}
+  .wl-thumb img,.wl-thumb video{width:100%;height:100%;object-fit:cover;display:block}
+  .wl-info{flex:1;min-width:0}
+  .wl-title{font-weight:600;font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .wl-sub{font-size:0.65rem;color:var(--muted);margin-top:2px}
+  .wl-vis{font-family:'Fira Code',monospace;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;
+    padding:2px 6px;border-radius:2px;margin-top:4px;display:inline-block}
+  .wl-vis.shown{background:rgba(34,197,94,0.15);color:#86efac}
+  .wl-vis.hidden{background:rgba(239,68,68,0.1);color:#fca5a5}
+  .wl-btns{display:flex;gap:4px;flex-shrink:0}
+  .wl-btn{width:30px;height:30px;border:1px solid var(--edge);background:transparent;color:var(--dim);
+    cursor:pointer;display:grid;place-items:center;font-size:0.7rem;transition:all .2s}
+  .wl-btn:hover{border-color:var(--acc);color:var(--acc)}
+  .wl-btn.del:hover{border-color:#ef4444;color:#fca5a5}
+
+  /* Color picker */
+  .color-row{display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:1rem}
+  .color-swatch{width:36px;height:36px;border:2px solid var(--edge);cursor:pointer;transition:border-color .2s;position:relative}
+  .color-swatch:hover,.color-swatch.on{border-color:var(--acc)}
+  .color-swatch.on::after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;font-size:0.8rem;color:var(--bg);font-weight:700}
+
+  /* Export/Import */
+  .ex-btn{width:100%;padding:10px;background:var(--raised);border:1px solid var(--edge);color:var(--dim);
+    cursor:pointer;font-family:inherit;font-size:0.8rem;transition:all .2s;margin-bottom:8px;text-align:center}
+  .ex-btn:hover{border-color:var(--acc);color:var(--acc)}
+
+  hr{border:none;border-top:1px solid var(--edge);margin:1.5rem 0}
+</style>
+</head>
+<body>
+
+<div class="blob blob-1" aria-hidden="true"></div>
+<div class="blob blob-2" aria-hidden="true"></div>
+<div class="blob blob-3" aria-hidden="true"></div>
+<div class="blob blob-4" aria-hidden="true"></div>
+
+<div class="aurora" aria-hidden="true"></div>
+<div class="grid-overlay" aria-hidden="true"></div>
+<div class="particles-bg" id="particlesBg" aria-hidden="true"></div>
+
+<!-- TOP BAR -->
+<div class="adm-top">
+  <div class="adm-top-left">
+    <img src="b_Enhance_the_image_to-removebg-preview.png" alt="Cheditz" />
+    <div>
+      <div class="adm-top-name">chedi<span>t</span>z</div>
+      <div class="adm-top-tag">Admin Panel</div>
+    </div>
+  </div>
+  <div class="adm-top-actions">
+    <a href="index%20(2).html">View site &#8599;</a>
+    <button class="btn btn-sm" onclick="doLogout()" id="logoutBtn" style="display:none">Logout</button>
+  </div>
+</div>
+
+<!-- LOGIN OVERLAY -->
+<div id="loginOverlay">
+  <div class="login-box">
+    <div style="font-size:2rem;margin-bottom:1rem">&#128274;</div>
+    <h3>Admin Access</h3>
+    <p>Enter password to manage your site</p>
+    <div class="ff">
+      <label>Password</label>
+      <input id="loginPass" type="password" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()" />
+    </div>
+    <div class="err" id="loginErr">Incorrect password. Try again.</div>
+    <button class="btn btn-acc" style="width:100%;justify-content:center;margin-top:0.5rem" onclick="doLogin()">Login</button>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="adm-wrap" id="adminPanel" style="display:none">
+  <div class="adm-panel-shell">
+    <div class="adm-head">
+      <div class="adm-head-l">
+        <div class="adm-dot"></div>
+        <div>
+          <div class="adm-head-label">Admin</div>
+          <div class="adm-head-name">Site Manager</div>
+        </div>
+      </div>
+      <a href="index%20(2).html" class="btn btn-sm">View site &#8599;</a>
+    </div>
+    <div class="adm-tabs">
+      <button class="adm-tab on" onclick="admTab('works',this)">Works</button>
+      <button class="adm-tab" onclick="admTab('content',this)">Content</button>
+      <button class="adm-tab" onclick="admTab('services',this)">Services</button>
+      <button class="adm-tab" onclick="admTab('contact',this)">Contact</button>
+      <button class="adm-tab" onclick="admTab('settings',this)">Settings</button>
+    </div>
+
+    <!-- WORKS TAB -->
+    <div class="adm-panel on" id="tabWorks">
+      <div class="sec-label">Add New Work</div>
+      <div style="border:1px solid var(--edge);padding:1.25rem;margin-bottom:1.5rem">
+        <div class="aff"><label>Title *</label><input id="w-title" type="text" placeholder="e.g. Brand Poster" /></div>
+        <div class="aff"><label>Subtitle</label><input id="w-sub" type="text" placeholder="Client · Project type" /></div>
+        <div class="aff-row">
+          <div class="aff"><label>Category</label><select id="w-cat"><option>Poster</option><option>Video</option><option>Document</option></select></div>
+          <div class="aff"><label>Meta / Tag</label><input id="w-meta" type="text" placeholder="A2 print" /></div>
+        </div>
+        <div class="aff-row" style="margin-bottom:0.8rem">
+          <label class="aff-check"><input type="radio" name="w-type" value="image" id="w-type-img" checked /> Image</label>
+          <label class="aff-check"><input type="radio" name="w-type" value="video" id="w-type-vid" /> Video</label>
+        </div>
+        <div style="display:flex;border:1px solid var(--edge);overflow:hidden;margin-bottom:0.8rem">
+          <button type="button" id="tabUrl" onclick="setTab('url')" style="flex:1;padding:8px;border:none;cursor:pointer;font-size:0.7rem;font-family:inherit;font-weight:600;background:var(--acc);color:var(--bg)">Paste URL</button>
+          <button type="button" id="tabFile" onclick="setTab('file')" style="flex:1;padding:8px;border:none;cursor:pointer;font-size:0.7rem;font-family:inherit;font-weight:600;background:transparent;color:var(--muted);border-left:1px solid var(--edge)">Upload</button>
+        </div>
+        <div id="panelUrl">
+          <div class="aff"><label id="wUrlLabel">Image URL *</label><input id="w-url" type="text" placeholder="https://..." /></div>
+          <div style="font-size:0.6rem;color:var(--muted);margin-top:2px" id="wUrlHint">Paste a hosted link (CDN, Drive, Cloudinary...)</div>
+        </div>
+        <div id="panelFile" style="display:none">
+          <div id="dropZone" onclick="document.getElementById('wFileInput').click()"
+            style="border:1px dashed var(--acc);padding:1.5rem;text-align:center;cursor:pointer;color:var(--muted);font-size:0.8rem;transition:background .2s"
+            ondragover="event.preventDefault();this.style.background='rgba(217,119,6,0.05)'"
+            ondragleave="this.style.background='transparent'"
+            ondrop="onDrop(event)">Click or drag file here</div>
+          <input id="wFileInput" type="file" accept="image/*" style="display:none" onchange="onSelect(event)" />
+          <div id="filePrev" style="display:none;margin-top:8px;position:relative;background:var(--raised)">
+            <img id="prevImg" style="width:100%;max-height:140px;object-fit:cover;display:block" />
+            <video id="prevVid" muted autoplay loop playsinline style="width:100%;max-height:140px;object-fit:cover;display:none"></video>
+            <button type="button" onclick="clrPrev()" style="position:absolute;top:6px;right:6px;width:24px;height:24px;background:rgba(0,0,0,0.7);border:1px solid var(--edge);color:var(--txt);cursor:pointer;font-size:11px">&#10005;</button>
+            <div id="prevName" style="font-size:0.6rem;color:var(--muted);padding:6px 8px"></div>
+          </div>
+        </div>
+        <div id="wErr" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);padding:8px;font-size:0.75rem;color:#fca5a5;margin-top:8px"></div>
+        <button id="wAddBtn" onclick="addWork()" style="width:100%;background:var(--acc);color:var(--bg);font-weight:700;padding:10px;border:none;cursor:pointer;font-size:0.85rem;font-family:inherit;letter-spacing:0.05em;margin-top:8px;transition:background .2s">Add to Works &nearr;</button>
+      </div>
+      <div style="font-family:'Fira Code',monospace;font-size:0.55rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem">Current Works (drag to reorder)</div>
+      <div id="worksList"></div>
+    </div>
+
+    <!-- CONTENT TAB -->
+    <div class="adm-panel" id="tabContent">
+      <div class="sec-label">Hero Section</div>
+      <div class="aff"><label>Badge Text</label><input id="c-heroBadge" type="text" placeholder="Open for commissions · 2026" /></div>
+      <div class="aff"><label>Headline (use *text* for italic)</label><input id="c-heroHead" type="text" placeholder="Edits that *linger* long after the scroll." /></div>
+      <div class="aff"><label>Subtitle</label><textarea id="c-heroSub" rows="3" placeholder="Cheditz is a one-desk editing house..."></textarea></div>
+      <button class="btn btn-acc btn-sm" style="width:100%;justify-content:center" onclick="saveContent()">Save Content</button>
+      <hr/>
+      <div class="sec-label">Section Headers</div>
+      <div class="aff"><label>Works Section Title</label><input id="c-worksTitle" type="text" placeholder="Recent commissions." /></div>
+      <div class="aff"><label>Services Section Title</label><input id="c-svcTitle" type="text" placeholder="Three crafts. One steady hand." /></div>
+      <div class="aff"><label>Order Section Title</label><input id="c-orderTitle" type="text" placeholder="Tell us what you need." /></div>
+      <div class="aff"><label>Order Section Description</label><textarea id="c-orderDesc" rows="3" placeholder="Fill the brief below..."></textarea></div>
+      <div class="aff"><label>Contact Headline</label><input id="c-contactHead" type="text" placeholder="Let's make something unforgettable." /></div>
+      <div class="aff"><label>Contact Description</label><textarea id="c-contactDesc" rows="2" placeholder="Quick questions, partnership ideas..."></textarea></div>
+      <button class="btn btn-acc btn-sm" style="width:100%;justify-content:center" onclick="saveContent()">Save Content</button>
+    </div>
+
+    <!-- SERVICES TAB -->
+    <div class="adm-panel" id="tabServices">
+      <div class="sec-label">Service 1 — Poster</div>
+      <div class="aff"><label>Name</label><input id="s1-name" type="text" /></div>
+      <div class="aff"><label>Description</label><textarea id="s1-desc" rows="3"></textarea></div>
+      <div class="aff"><label>Features (one per line)</label><textarea id="s1-feats" rows="4"></textarea></div>
+      <div class="aff"><label>Price</label><input id="s1-price" type="text" /></div>
+      <button class="btn btn-acc btn-sm" style="width:100%;justify-content:center;margin-bottom:1.5rem" onclick="saveServices()">Save Poster</button>
+      <hr style="margin:0 0 1.5rem"/>
+      <div class="sec-label">Service 2 — Video</div>
+      <div class="aff"><label>Name</label><input id="s2-name" type="text" /></div>
+      <div class="aff"><label>Description</label><textarea id="s2-desc" rows="3"></textarea></div>
+      <div class="aff"><label>Features (one per line)</label><textarea id="s2-feats" rows="4"></textarea></div>
+      <div class="aff"><label>Price</label><input id="s2-price" type="text" /></div>
+      <button class="btn btn-acc btn-sm" style="width:100%;justify-content:center;margin-bottom:1.5rem" onclick="saveServices()">Save Video</button>
+      <hr style="margin:0 0 1.5rem"/>
+      <div class="sec-label">Service 3 — Document</div>
+      <div class="aff"><label>Name</label><input id="s3-name" type="text" /></div>
+      <div class="aff"><label>Description</label><textarea id="s3-desc" rows="3"></textarea></div>
+      <div class="aff"><label>Features (one per line)</label><textarea id="s3-feats" rows="4"></textarea></div>
+      <div class="aff"><label>Price</label><input id="s3-price" type="text" /></div>
+      <button class="btn btn-acc btn-sm" style="width:100%;justify-content:center" onclick="saveServices()">Save Document</button>
+    </div>
+
+    <!-- CONTACT TAB -->
+    <div class="adm-panel" id="tabContact">
+      <div class="sec-label">Contact Information</div>
+      <div class="aff"><label>Email Address</label><input id="ct-email" type="email" /></div>
+      <div class="aff"><label>Instagram Handle</label><input id="ct-insta" type="text" placeholder="@cheditz1" /></div>
+      <div class="aff"><label>Instagram URL</label><input id="ct-instaUrl" type="text" /></div>
+      <div class="aff"><label>Working Hours</label><input id="ct-hours" type="text" placeholder="Mon — Sat · 9:00 – 19:00 IST" /></div>
+      <div class="aff"><label>Reply Note</label><input id="ct-reply" type="text" placeholder="Replies usually within 4 hours." /></div>
+      <button class="btn btn-acc btn-sm" style="width:100%;justify-content:center" onclick="saveContact()">Save Contact</button>
+    </div>
+
+    <!-- SETTINGS TAB -->
+    <div class="adm-panel" id="tabSettings">
+      <div class="sec-label">Change Admin Password</div>
+      <div class="aff"><label>Current Password</label><input id="set-curPass" type="password" /></div>
+      <div class="aff"><label>New Password</label><input id="set-newPass" type="password" /></div>
+      <div class="aff"><label>Confirm New Password</label><input id="set-confirmPass" type="password" /></div>
+      <button class="btn btn-acc btn-sm" style="width:100%;justify-content:center;margin-bottom:1.5rem" onclick="changePassword()">Update Password</button>
+      <hr style="margin:0 0 1.5rem"/>
+      <div class="sec-label">Accent Color</div>
+      <div class="color-row" id="colorPickers"></div>
+      <button class="btn btn-acc btn-sm" style="width:100%;justify-content:center;margin-bottom:1.5rem" onclick="saveColor()">Save Color</button>
+      <hr style="margin:0 0 1.5rem"/>
+      <div class="sec-label">Export / Import</div>
+      <button class="ex-btn" onclick="exportData()">📦 Export All Settings (JSON)</button>
+      <button class="ex-btn" onclick="document.getElementById('importFile').click()">📂 Import Settings (JSON)</button>
+      <input id="importFile" type="file" accept=".json" style="display:none" onchange="importData(event)" />
+      <button class="ex-btn" style="color:#fca5a5;border-color:rgba(239,68,68,0.2)" onclick="resetAll()">🗑 Reset Everything</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== FIREBASE CONFIG =====
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyA3v4LwBRytUdPtFOgbndLEDmqj_1UgY-w",
+  authDomain: "cheditz.firebaseapp.com",
+  databaseURL: "https://cheditz-default-rtdb.firebaseio.com",
+  projectId: "cheditz",
+  storageBucket: "cheditz.firebasestorage.app",
+  messagingSenderId: "736473040071",
+  appId: "1:736473040071:web:ff63497d7cde19524beae2",
+  measurementId: "G-FVCLSDEPL9"
+};
+const FIREBASE_ENABLED = FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY";
+let firebaseApp = null, firebaseDb = null;
+if (FIREBASE_ENABLED) {
+  try {
+    firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
+    firebaseDb = firebase.database();
+  } catch(e) { console.warn('Firebase init failed:', e); }
+}
+
+// ===== CONFIG & STATE =====
+const DEFAULT_PASS_HASH = 'vaandana';
+let isAdmin = false;
+
+function getConfig() {
+  try { return JSON.parse(localStorage.getItem('cheditz_config')) || getDefaultConfig(); }
+  catch { return getDefaultConfig(); }
+}
+function saveConfig(c) {
+  localStorage.setItem('cheditz_config', JSON.stringify(c));
+  if (FIREBASE_ENABLED && firebaseDb) {
+    firebaseDb.ref('cheditz/config').set(c).catch(e => console.warn('Firebase save failed:', e));
+  }
+}
+function getDefaultConfig() {
+  return {
+    password: DEFAULT_PASS_HASH,
+    accent: '#9333ea',
+    works: [
+      { id:'d1', title:"Vande Bharat", sub:"Nagercoil → Chennai", cat:"Poster", meta:"Rail launch · A2", type:"image", url:"https://miaoda-conversation-file.s3cdn.medo.dev/user-c4hvi7diyakg/app-c4hvyv74mdxd/20260605/Vande Bharat Nagercoil to Chennai Poster.png", visible:true },
+      { id:'d2', title:"Video Reel", sub:"Brand edit", cat:"Video", meta:"Short-form", type:"video", url:"https://drive.google.com/uc?export=download&id=15yMqmznY3JufjA20k1vnS0Cz9c8T8UqN", visible:true }
+    ],
+    content: {
+      heroBadge: 'Open for commissions · 2026',
+      heroHead: 'Edits that <em>linger</em> long after the scroll.',
+      heroSub: 'Cheditz is a one-desk editing house for photo, video, and document work. Sharpen frames, colour the mood, polish words — quietly, quickly, on deadline.',
+      worksTitle:'Recent commissions.',
+      svcTitle:'Three crafts.<br/>One steady hand.',
+      orderTitle:'Tell us what<br/>you need.',
+      orderDesc:'Fill the brief below and we\'ll reply with a quote and timeline within hours. For files over 25 MB, drop a WeTransfer or Drive link in the notes.',
+      contactHead:'Let\'s make<br/>something<br/><em style="font-style:italic;color:var(--acc)">unforgettable.</em>',
+      contactDesc:'Quick questions, partnership ideas, or just to say hi — the inbox is always open.'
+    },
+    services: [
+      { name:'Poster Editing', desc:'Event flyers, movie-style posters, product launches, social posts, and brand campaign artwork — designed and finished print-ready.', feats:'Event & function posters\nMovie / cinematic style\nProduct & sale flyers\nSocial posts & stories', price:'₹20 / poster' },
+      { name:'Video Editing', desc:'Reels, shorts, long-form cuts, sound design, motion titles, and end-to-end colour grading for narrative and brand pieces.', feats:'Instagram Reels & YouTube Shorts\nLong-form narrative cuts\nMotion titles & lower thirds\nFull colour grading', price:'₹20 / minute' },
+      { name:'Document Editing', desc:'Proofreading, copy editing, layout in InDesign/Word, formatting for theses, ebooks, pitch decks, and reports.', feats:'Proofreading & line editing\nThesis & manuscript formatting\nPitch decks & one-pagers\nEbook layout (EPUB / PDF)', price:'₹20 / word' }
+    ],
+    contact: { email:'cheditz94@gmail.com', insta:'@cheditz1', instaUrl:'https://www.instagram.com/cheditz1?igsh=bXcyYXgzZ2l2Nm8w', hours:'Mon — Sat · 9:00 – 19:00 IST', reply:'Replies usually within 4 hours.' },
+    testimonials: []
+  };
+}
+
+// ===== ADMIN AUTH =====
+function showPanel(){
+  document.getElementById('loginOverlay').classList.remove('on');
+  document.getElementById('adminPanel').style.display='block';
+  document.getElementById('logoutBtn').style.display='inline-flex';
+  loadAllEditors();
+  applyColor();
+}
+function hidePanel(){
+  document.getElementById('loginOverlay').classList.add('on');
+  document.getElementById('adminPanel').style.display='none';
+  document.getElementById('logoutBtn').style.display='none';
+}
+function doLogin(){
+  const pass=document.getElementById('loginPass').value;
+  const cfg=getConfig();
+  if(pass===cfg.password||pass===DEFAULT_PASS_HASH){
+    isAdmin=true;
+    sessionStorage.setItem('cheditz_admin','1');
+    document.getElementById('loginErr').style.display='none';
+    document.getElementById('loginPass').value='';
+    showPanel();
+  } else {
+    document.getElementById('loginErr').style.display='block';
+  }
+}
+function doLogout(){
+  isAdmin=false;
+  sessionStorage.removeItem('cheditz_admin');
+  hidePanel();
+}
+// Auto-login if session active
+if (sessionStorage.getItem('cheditz_admin')==='1') {
+  showPanel();
+} else {
+  document.getElementById('loginOverlay').classList.add('on');
+}
+
+// ===== ADMIN TABS =====
+function admTab(name,btn){
+  document.querySelectorAll('.adm-tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.adm-panel').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('tab'+name.charAt(0).toUpperCase()+name.slice(1)).classList.add('on');
+}
+
+// ===== LOAD EDITORS =====
+function loadAllEditors(){
+  const cfg=getConfig();
+  const c=cfg.content;
+  document.getElementById('c-heroBadge').value=c.heroBadge;
+  document.getElementById('c-heroHead').value=c.heroHead.replace(/<[^>]+>/g,'');
+  document.getElementById('c-heroSub').value=c.heroSub;
+  document.getElementById('c-worksTitle').value=c.worksTitle;
+  document.getElementById('c-svcTitle').value=c.svcTitle.replace(/<[^>]+>/g,'');
+  document.getElementById('c-orderTitle').value=c.orderTitle.replace(/<[^>]+>/g,'');
+  document.getElementById('c-orderDesc').value=c.orderDesc;
+  document.getElementById('c-contactHead').value=c.contactHead.replace(/<[^>]+>/g,'');
+  document.getElementById('c-contactDesc').value=c.contactDesc;
+  cfg.services.forEach((s,i)=>{
+    const n=i+1;
+    document.getElementById(`s${n}-name`).value=s.name;
+    document.getElementById(`s${n}-desc`).value=s.desc;
+    document.getElementById(`s${n}-feats`).value=s.feats;
+    document.getElementById(`s${n}-price`).value=s.price;
+  });
+  const ct=cfg.contact;
+  document.getElementById('ct-email').value=ct.email;
+  document.getElementById('ct-insta').value=ct.insta;
+  document.getElementById('ct-instaUrl').value=ct.instaUrl;
+  document.getElementById('ct-hours').value=ct.hours;
+  document.getElementById('ct-reply').value=ct.reply;
+  buildColorPickers(cfg.accent);
+  renderWorksList();
+}
+
+// ===== SAVE CONTENT =====
+function saveContent(){
+  const cfg=getConfig();
+  cfg.content.heroBadge=document.getElementById('c-heroBadge').value;
+  cfg.content.heroHead='<em>'+document.getElementById('c-heroHead').value+'</em>';
+  cfg.content.heroSub=document.getElementById('c-heroSub').value;
+  cfg.content.worksTitle=document.getElementById('c-worksTitle').value;
+  cfg.content.svcTitle=document.getElementById('c-svcTitle').value;
+  cfg.content.orderTitle=document.getElementById('c-orderTitle').value;
+  cfg.content.orderDesc=document.getElementById('c-orderDesc').value;
+  cfg.content.contactHead=document.getElementById('c-contactHead').value;
+  cfg.content.contactDesc=document.getElementById('c-contactDesc').value;
+  saveConfig(cfg);
+  showSaved();
+}
+
+// ===== SAVE SERVICES =====
+function saveServices(){
+  const cfg=getConfig();
+  [1,2,3].forEach(n=>{
+    cfg.services[n-1].name=document.getElementById(`s${n}-name`).value;
+    cfg.services[n-1].desc=document.getElementById(`s${n}-desc`).value;
+    cfg.services[n-1].feats=document.getElementById(`s${n}-feats`).value;
+    cfg.services[n-1].price=document.getElementById(`s${n}-price`).value;
+  });
+  saveConfig(cfg);
+  showSaved();
+}
+
+// ===== SAVE CONTACT =====
+function saveContact(){
+  const cfg=getConfig();
+  cfg.contact.email=document.getElementById('ct-email').value;
+  cfg.contact.insta=document.getElementById('ct-insta').value;
+  cfg.contact.instaUrl=document.getElementById('ct-instaUrl').value;
+  cfg.contact.hours=document.getElementById('ct-hours').value;
+  cfg.contact.reply=document.getElementById('ct-reply').value;
+  saveConfig(cfg);
+  showSaved();
+}
+
+function esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):''}
+
+// ===== WORKS MANAGEMENT =====
+let curTab='url',pendingFile=null;
+function setTab(t){
+  curTab=t;
+  document.getElementById('panelUrl').style.display=t==='url'?'block':'none';
+  document.getElementById('panelFile').style.display=t==='file'?'block':'none';
+  document.getElementById('tabUrl').style.background=t==='url'?'var(--acc)':'transparent';
+  document.getElementById('tabUrl').style.color=t==='url'?'var(--bg)':'var(--muted)';
+  document.getElementById('tabFile').style.background=t==='file'?'var(--acc)':'transparent';
+  document.getElementById('tabFile').style.color=t==='file'?'var(--bg)':'var(--muted)';
+  syncAcc();
+}
+document.querySelectorAll('input[name="w-type"]').forEach(r=>{r.addEventListener('change',()=>{
+  const v=document.getElementById('w-type-vid').checked;
+  document.getElementById('wUrlLabel').textContent=v?'Video URL *':'Image URL *';
+  document.getElementById('wUrlHint').textContent=v?'Paste a hosted video link':'Paste a hosted image link';
+  document.getElementById('w-url').placeholder=v?'https://... or reel.mp4':'https://... or image.jpg';
+  clrPrev();syncAcc();
+})});
+function syncAcc(){document.getElementById('wFileInput').accept=document.getElementById('w-type-vid').checked?'video/*':'image/*'}
+function onDrop(e){e.preventDefault();const f=e.dataTransfer.files[0];if(f)procFile(f)}
+function onSelect(e){const f=e.target.files[0];if(f)procFile(f)}
+function procFile(f){
+  const isV=f.type.startsWith('video/');
+  document.getElementById(isV?'w-type-vid':'w-type-img').checked=true;
+  document.querySelectorAll('input[name="w-type"]').forEach(r=>r.dispatchEvent(new Event('change')));
+  const pe=document.getElementById('filePrev'),ie=document.getElementById('prevImg'),ve=document.getElementById('prevVid'),ne=document.getElementById('prevName');
+  if(!isV){const r=new FileReader();r.onload=e=>{pendingFile={d:e.target.result,v:false};ie.src=e.target.result;ie.style.display='block';ve.style.display='none';pe.style.display='block';ne.textContent=f.name+' · '+(f.size/1024).toFixed(0)+' KB'};r.readAsDataURL(f)}
+  else{const b=URL.createObjectURL(f);pendingFile={d:b,v:true,b};ve.src=b;ve.style.display='block';ie.style.display='none';pe.style.display='block';ne.textContent=f.name+' · session only'}
+}
+function clrPrev(){if(pendingFile&&pendingFile.b)URL.revokeObjectURL(pendingFile.b);pendingFile=null;document.getElementById('filePrev').style.display='none';document.getElementById('prevImg').src='';document.getElementById('prevVid').src='';document.getElementById('prevName').textContent='';document.getElementById('wFileInput').value=''}
+document.querySelectorAll('#tabWorks .aff input[type="text"],#tabWorks .aff select').forEach(el=>{el.addEventListener('focus',()=>el.style.borderColor='var(--acc)');el.addEventListener('blur',()=>el.style.borderColor='var(--edge)')});
+
+function addWork(){
+  const title=document.getElementById('w-title').value.trim(),sub=document.getElementById('w-sub').value.trim(),cat=document.getElementById('w-cat').value,meta=document.getElementById('w-meta').value.trim(),type=document.querySelector('input[name="w-type"]:checked').value;
+  const err=document.getElementById('wErr');err.style.display='none';
+  if(!title){showErr('Title is required.');return}
+  let url='';
+  if(curTab==='url'){url=document.getElementById('w-url').value.trim();if(!url){showErr('Enter a URL.');return}}
+  else{if(!pendingFile){showErr('Select a file.');return}url=pendingFile.d}
+  const cfg=getConfig();
+  cfg.works.push({id:'w-'+Date.now(),title,sub,cat,meta,type,url,visible:true});
+  saveConfig(cfg);
+  ['w-title','w-sub','w-meta','w-url'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('w-type-img').checked=true;clrPrev();setTab('url');
+  renderWorksList();
+  const b=document.getElementById('wAddBtn'),o=b.textContent;b.textContent='✓ Added!';b.style.background='#22c55e';
+  setTimeout(()=>{b.textContent=o;b.style.background='var(--acc)'},1500);
+}
+function showErr(m){const e=document.getElementById('wErr');e.textContent=m;e.style.display='block'}
+
+function renderWorksList(){
+  const cfg=getConfig(),el=document.getElementById('worksList');
+  if(!cfg.works.length){el.innerHTML='<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.75rem">No works yet</div>';return}
+  el.innerHTML=cfg.works.map((w,i)=>{
+    const vis=w.visible!==false;
+    return`<div class="wl-item" draggable="true" data-idx="${i}">
+      <div class="wl-thumb">${w.type==='video'?`<div style="width:100%;height:100%;background:var(--raised);display:grid;place-items:center;color:var(--muted);font-size:1.2rem">🎬</div>`:`<img src="${esc(w.url)}" loading="lazy"/>`}</div>
+      <div class="wl-info">
+        <div class="wl-title">${esc(w.title)}</div>
+        <div class="wl-sub">${esc(w.cat)}${w.meta?' · '+esc(w.meta):''}</div>
+        <span class="wl-vis ${vis?'shown':'hidden'}">${vis?'Visible':'Hidden'}</span>
+      </div>
+      <div class="wl-btns">
+        <button class="wl-btn" onclick="toggleVis(${i})" title="${vis?'Hide':'Show'}">${vis?'👁':'👁‍🗨'}</button>
+        <button class="wl-btn" onclick="moveWork(${i},-1)" title="Move up">↑</button>
+        <button class="wl-btn" onclick="moveWork(${i},1)" title="Move down">↓</button>
+        <button class="wl-btn del" onclick="delWork(${i})" title="Delete">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+  initDrag();
+}
+
+function toggleVis(i){const cfg=getConfig();cfg.works[i].visible=cfg.works[i].visible===false?true:false;saveConfig(cfg);renderWorksList()}
+function moveWork(i,dir){const cfg=getConfig();const j=i+dir;if(j<0||j>=cfg.works.length)return;[cfg.works[i],cfg.works[j]]=[cfg.works[j],cfg.works[i]];saveConfig(cfg);renderWorksList()}
+function delWork(i){if(!confirm('Delete this work?'))return;const cfg=getConfig();cfg.works.splice(i,1);saveConfig(cfg);renderWorksList()}
+
+// Drag reorder
+let dragIdx=null;
+function initDrag(){
+  document.querySelectorAll('.wl-item[draggable]').forEach(el=>{
+    el.addEventListener('dragstart',e=>{dragIdx=parseInt(el.dataset.idx);el.style.opacity='0.4'});
+    el.addEventListener('dragend',e=>{el.style.opacity='1'});
+    el.addEventListener('dragover',e=>{e.preventDefault();el.style.borderColor='var(--acc)'});
+    el.addEventListener('dragleave',e=>{el.style.borderColor='var(--edge)'});
+    el.addEventListener('drop',e=>{
+      e.preventDefault();el.style.borderColor='var(--edge)';
+      const toIdx=parseInt(el.dataset.idx);
+      if(dragIdx===null||dragIdx===toIdx)return;
+      const cfg=getConfig();
+      const item=cfg.works.splice(dragIdx,1)[0];
+      cfg.works.splice(toIdx,0,item);
+      saveConfig(cfg);renderWorksList();
+      dragIdx=null;
+    });
+  });
+}
+
+// ===== COLOR PICKER =====
+const COLORS=['#dc2626','#9333ea','#1d4ed8','#c026d3','#ef4444','#3b82f6','#f97316','#0d9488','#16a34a','#0891b2','#000000','#111111'];
+function buildColorPickers(active){
+  const el=document.getElementById('colorPickers');
+  el.innerHTML=COLORS.map(c=>`<div class="color-swatch ${c===active?'on':''}" style="background:${c}" onclick="pickColor('${c}',this)"></div>`).join('');
+}
+function pickColor(c,el){
+  document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
+}
+function saveColor(){
+  const on=document.querySelector('.color-swatch.on');
+  if(!on)return;
+  const cfg=getConfig();
+  cfg.accent=on.style.background;
+  saveConfig(cfg);
+  applyColor();
+  showSaved();
+}
+function applyColor(){
+  const cfg=getConfig();
+  if(!cfg.accent||cfg.accent==='#000000')return;
+  document.documentElement.style.setProperty('--acc',cfg.accent);
+  const r=parseInt(cfg.accent.slice(1,3),16),g=parseInt(cfg.accent.slice(3,5),16),b=parseInt(cfg.accent.slice(5,7),16);
+  const dr=Math.max(0,r-30),dg=Math.max(0,g-30),db=Math.max(0,b-30);
+  document.documentElement.style.setProperty('--acc2',`rgb(${dr},${dg},${db})`);
+}
+
+// ===== PASSWORD =====
+function changePassword(){
+  const cur=document.getElementById('set-curPass').value;
+  const nw=document.getElementById('set-newPass').value;
+  const cf=document.getElementById('set-confirmPass').value;
+  const cfg=getConfig();
+  if(cur!==cfg.password){alert('Current password incorrect.');return}
+  if(!nw||nw.length<4){alert('New password must be at least 4 characters.');return}
+  if(nw!==cf){alert('Passwords do not match.');return}
+  cfg.password=nw;saveConfig(cfg);
+  document.getElementById('set-curPass').value='';
+  document.getElementById('set-newPass').value='';
+  document.getElementById('set-confirmPass').value='';
+  alert('Password updated!');
+}
+
+// ===== EXPORT / IMPORT =====
+function exportData(){
+  const cfg=getConfig();
+  const blob=new Blob([JSON.stringify(cfg,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='cheditz-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();URL.revokeObjectURL(url);
+}
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!data.works||!data.content){alert('Invalid backup file.');return}
+      saveConfig(data);
+      if (FIREBASE_ENABLED && firebaseDb) {
+        firebaseDb.ref('cheditz/config').set(data).catch(e => console.warn('Firebase import sync failed:', e));
+      }
+      location.reload();
+    }catch{alert('Failed to parse JSON.');}
+  };
+  reader.readAsText(file);
+}
+function resetAll(){
+  if(!confirm('This will delete ALL your data and reset to defaults. Continue?'))return;
+  if(!confirm('Are you REALLY sure? This cannot be undone.'))return;
+  localStorage.removeItem('cheditz_config');
+  if (FIREBASE_ENABLED && firebaseDb) {
+    firebaseDb.ref('cheditz/config').remove().catch(e => console.warn('Firebase reset failed:', e));
+  }
+  location.reload();
+}
+
+// ===== SAVED TOAST =====
+function showSaved(){
+  const t=document.createElement('div');
+  t.textContent='✓ Saved';
+  t.style.cssText='position:fixed;top:1.5rem;right:1.5rem;z-index:99999;background:#22c55e;color:#000;padding:10px 20px;font-size:0.8rem;font-weight:600;animation:fadeInOut 2s forwards';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2100);
+}
+const st=document.createElement('style');st.textContent='@keyframes fadeInOut{0%{opacity:0;transform:translateY(-10px)}20%{opacity:1;transform:translateY(0)}80%{opacity:1}100%{opacity:0}}';document.head.appendChild(st);
+
+// ===== BACKGROUND PARTICLES =====
+(function(){
+  const bg=document.getElementById('particlesBg');if(!bg)return;
+  const colors=['147,51,234','192,38,211','249,115,22','29,78,216'];
+  for(let i=0;i<36;i++){
+    const p=document.createElement('i');
+    const s=(Math.random()*3+2).toFixed(1);
+    p.style.width=s+'px';p.style.height=s+'px';
+    p.style.left=(Math.random()*100).toFixed(2)+'%';
+    p.style.background='rgba('+colors[i%colors.length]+',0.85)';
+    p.style.animationDuration=(Math.random()*14+10).toFixed(1)+'s';
+    p.style.animationDelay='-'+(Math.random()*16).toFixed(1)+'s';
+    bg.appendChild(p);
+  }
+})();
+</script>
+</body>
+</html>
