@@ -22,7 +22,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   html{font-size:16px;scroll-behavior:smooth}
@@ -1024,21 +1024,19 @@
 <script>
 // ===== FIREBASE CONFIG =====
 const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyA3v4LwBRytUdPtFOgbndLEDmqj_1UgY-w",
-  authDomain: "cheditz.firebaseapp.com",
-  databaseURL: "https://cheditz-default-rtdb.firebaseio.com",
-  projectId: "cheditz",
-  storageBucket: "cheditz.firebasestorage.app",
-  messagingSenderId: "736473040071",
-  appId: "1:736473040071:web:ff63497d7cde19524beae2",
-  measurementId: "G-FVCLSDEPL9"
+  apiKey: "AIzaSyC2CVkVLsXEOtyuxOeJXhijbQ2x08odwkw",
+  authDomain: "cheditz-dee25.firebaseapp.com",
+  projectId: "cheditz-dee25",
+  storageBucket: "cheditz-dee25.firebasestorage.app",
+  messagingSenderId: "79278126031",
+  appId: "1:79278126031:web:87a596a8894ccf4a20d8ba"
 };
 const FIREBASE_ENABLED = FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY";
 let firebaseApp = null, firebaseDb = null;
 if (FIREBASE_ENABLED) {
   try {
     firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
-    firebaseDb = firebase.database();
+    firebaseDb = firebase.firestore();
   } catch(e) { console.warn('Firebase init failed:', e); }
 }
 
@@ -1050,7 +1048,7 @@ function getConfig() {
 function saveConfig(c) {
   localStorage.setItem('cheditz_config', JSON.stringify(c));
   if (FIREBASE_ENABLED && firebaseDb) {
-    firebaseDb.ref('cheditz/config').set(c).catch(e => console.warn('Firebase save failed:', e));
+    firebaseDb.collection('cheditz').doc('config').set(c).catch(e => console.warn('Firebase save failed:', e));
   }
 }
 function getDefaultConfig() {
@@ -1332,32 +1330,10 @@ document.getElementById('orderForm').addEventListener('submit',e=>{
 })();
 
 // ===== FIREBASE REAL-TIME LISTENER =====
-// On page load, try to fetch latest config from Firebase and merge with localStorage
 if (FIREBASE_ENABLED && firebaseDb) {
-  firebaseDb.ref('cheditz/config').once('value').then(snap => {
-    const fbCfg = snap.val();
-    if (fbCfg) {
-      const localCfg = getConfig();
-      // Merge: Firebase values override localStorage for shared fields
-      const merged = Object.assign({}, localCfg, {
-        accent: fbCfg.accent || localCfg.accent,
-        content: Object.assign({}, localCfg.content, fbCfg.content || {}),
-        services: fbCfg.services || localCfg.services,
-        contact: Object.assign({}, localCfg.contact, fbCfg.contact || {}),
-        works: fbCfg.works || localCfg.works
-      });
-      localStorage.setItem('cheditz_config', JSON.stringify(merged));
-      applyColor();
-      applyContent();
-      applyServices();
-      applyContact();
-      renderWorks();
-    }
-  }).catch(e => console.warn('Firebase initial fetch failed:', e));
-
   // Listen for real-time changes from any admin
-  firebaseDb.ref('cheditz/config').on('value', snap => {
-    const fbCfg = snap.val();
+  firebaseDb.collection('cheditz').doc('config').onSnapshot(doc => {
+    const fbCfg = doc.data();
     if (!fbCfg) return;
     const localCfg = getConfig();
     const merged = Object.assign({}, localCfg, {
@@ -1365,16 +1341,17 @@ if (FIREBASE_ENABLED && firebaseDb) {
       content: Object.assign({}, localCfg.content, fbCfg.content || {}),
       services: fbCfg.services || localCfg.services,
       contact: Object.assign({}, localCfg.contact, fbCfg.contact || {}),
-      works: fbCfg.works || localCfg.works
+      works: fbCfg.works || localCfg.works,
+      testimonials: fbCfg.testimonials || localCfg.testimonials
     });
     localStorage.setItem('cheditz_config', JSON.stringify(merged));
-    // Apply changes live
     applyColor();
     applyContent();
     applyServices();
     applyContact();
     renderWorks();
-  });
+    renderTestimonials();
+  }, e => console.warn('Firebase listener error:', e));
 }
 
 // ===== AI CHATBOT =====

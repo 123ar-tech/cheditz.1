@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   html{font-size:16px}
@@ -366,7 +366,6 @@
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyA3v4LwBRytUdPtFOgbndLEDmqj_1UgY-w",
   authDomain: "cheditz.firebaseapp.com",
-  databaseURL: "https://cheditz-default-rtdb.firebaseio.com",
   projectId: "cheditz",
   storageBucket: "cheditz.firebasestorage.app",
   messagingSenderId: "736473040071",
@@ -378,7 +377,7 @@ let firebaseApp = null, firebaseDb = null;
 if (FIREBASE_ENABLED) {
   try {
     firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
-    firebaseDb = firebase.database();
+    firebaseDb = firebase.firestore();
   } catch(e) { console.warn('Firebase init failed:', e); }
 }
 
@@ -393,7 +392,7 @@ function getConfig() {
 function saveConfig(c) {
   localStorage.setItem('cheditz_config', JSON.stringify(c));
   if (FIREBASE_ENABLED && firebaseDb) {
-    firebaseDb.ref('cheditz/config').set(c).catch(e => console.warn('Firebase save failed:', e));
+    firebaseDb.collection('cheditz').doc('config').set(c).catch(e => console.warn('Firebase save failed:', e));
   }
 }
 function getDefaultConfig() {
@@ -704,9 +703,6 @@ function importData(e){
       const data=JSON.parse(ev.target.result);
       if(!data.works||!data.content){alert('Invalid backup file.');return}
       saveConfig(data);
-      if (FIREBASE_ENABLED && firebaseDb) {
-        firebaseDb.ref('cheditz/config').set(data).catch(e => console.warn('Firebase import sync failed:', e));
-      }
       location.reload();
     }catch{alert('Failed to parse JSON.');}
   };
@@ -717,7 +713,7 @@ function resetAll(){
   if(!confirm('Are you REALLY sure? This cannot be undone.'))return;
   localStorage.removeItem('cheditz_config');
   if (FIREBASE_ENABLED && firebaseDb) {
-    firebaseDb.ref('cheditz/config').remove().catch(e => console.warn('Firebase reset failed:', e));
+    firebaseDb.collection('cheditz').doc('config').delete().catch(e => console.warn('Firebase reset failed:', e));
   }
   location.reload();
 }
