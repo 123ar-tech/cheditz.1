@@ -26,7 +26,7 @@
 <link rel="manifest" href="manifest.json" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <style>
@@ -42,6 +42,7 @@ img{max-width:100%;display:block}
 
 /* Node Graph Canvas */
 #node-bg{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none}
+@media(max-width:768px){#node-bg{display:none !important}}
 
 /* Subtle Grid Behind Nodes */
 .bg-node-grid{position:fixed;inset:0;pointer-events:none;z-index:0;
@@ -50,6 +51,7 @@ img{max-width:100%;display:block}
 
 /* Floating Data Shapes */
 .bg-shapes{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+@media(max-width:768px){.bg-shapes{display:none !important}}
 .bg-shape{position:absolute;border:1px solid;opacity:0;animation:shapeFloat linear infinite}
 .bg-shape:nth-child(1){width:20px;height:20px;border-color:rgba(56,189,248,0.15);top:10%;left:15%;animation-duration:25s;animation-delay:0s}
 .bg-shape:nth-child(2){width:14px;height:14px;border-color:rgba(168,85,247,0.15);top:25%;right:20%;animation-duration:30s;animation-delay:2s;transform:rotate(45deg)}
@@ -74,6 +76,7 @@ img{max-width:100%;display:block}
 /* Floating Orbs */
 .bg-orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
 .bg-orb{position:absolute;border-radius:50%;will-change:transform;filter:blur(1px)}
+@media(max-width:768px){.bg-orb{filter:none}}
 .bg-orb::after{content:'';position:absolute;inset:0;border-radius:50%;background:inherit;filter:blur(30px);opacity:0.5}
 .bg-orb-1{width:12px;height:12px;background:radial-gradient(circle,rgba(56,189,248,0.7),transparent);top:20%;left:20%;animation:orbFloat1 20s ease-in-out infinite}
 .bg-orb-2{width:10px;height:10px;background:radial-gradient(circle,rgba(168,85,247,0.7),transparent);top:40%;right:25%;animation:orbFloat2 24s ease-in-out infinite}
@@ -114,6 +117,12 @@ img{max-width:100%;display:block}
   background:radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,0.5) 100%)}
 
 @media(prefers-reduced-motion:reduce){#node-bg,.bg-shape,.bg-aurora::before,.bg-aurora::after,.bg-orb,.bg-pulse,.bg-scanlines{display:none}}
+
+/* Mobile: disable heavy backgrounds for performance */
+@media(max-width:768px){
+  #node-bg,.bg-node-grid,.bg-shapes,.bg-aurora,.bg-orbs,.bg-pulse,.bg-scanlines,.bg-grain,.bg-vignette,.bg-corner-tl,.bg-corner-br,.bg-corner-tr,.bg-corner-bl{display:none !important}
+  body{background:#0a0a0a}
+}
 
 /* Loader */
 #loader{position:fixed;inset:0;z-index:99999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;transition:opacity .8s,visibility .8s}
@@ -217,9 +226,10 @@ img{max-width:100%;display:block}
 /* Works */
 .works-scroll{overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 clamp(1.5rem,4vw,5rem);display:flex;gap:1.5rem;padding:0 clamp(1.5rem,4vw,5rem) 2rem;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .works-scroll::-webkit-scrollbar{display:none}
-.work-card{flex:0 0 350px;scroll-snap-align:start;position:relative;overflow:hidden;border:1px solid var(--edge);background:var(--surface);transition:all .4s}
+.work-card{flex:0 0 350px;scroll-snap-align:start;position:relative;overflow:hidden;border:1px solid var(--edge);background:var(--surface);transition:all .4s;will-change:transform}
 @media(min-width:640px){.work-card{flex:0 0 420px}}
 @media(min-width:1024px){.work-card{flex:0 0 500px}}
+@media(max-width:768px){.work-card{flex:0 0 calc(100vw - 3rem);transition-duration:.3s}}
 .work-card:hover{border-color:var(--acc);transform:translateY(-4px)}
 .work-card img,.work-card video,.work-card iframe,.work-card .work-card-video{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;border:none}
 .work-card .work-card-video{cursor:pointer}
@@ -463,7 +473,9 @@ footer a:hover{color:var(--txt)}
 /* ===== WEBTACTICS ANIMATIONS ===== */
 
 /* Scroll Reveal - Enhanced */
-.rv{opacity:0;transform:translateY(40px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+.rv{opacity:0;transform:translateY(30px);transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1);will-change:opacity,transform}
+.rv.vis{opacity:1;transform:translateY(0)}
+@media(max-width:768px){.rv{transform:translateY(20px);transition-duration:.4s}}
 .rv.vis{opacity:1;transform:translateY(0)}
 .rv.delay-1{transition-delay:.1s}
 .rv.delay-2{transition-delay:.2s}
@@ -719,6 +731,112 @@ body:hover .cursor-glow{opacity:1}
   0%{transform:translateY(0) rotate(0deg);opacity:1}
   100%{transform:translateY(100vh) rotate(720deg);opacity:0}
 }
+
+/* ===== RESPONSIVE: FULL MOBILE + TABLET + DESKTOP ===== */
+@media(max-width:480px){
+  .nav{width:calc(100% - 1rem);padding:0.5rem 1rem;border-radius:40px;font-size:0.75rem}
+  .nav-links{gap:0.8rem}
+  .nav-links a{font-size:0.65rem;letter-spacing:0.08em}
+  .hero{padding:6rem 0 4rem;min-height:auto}
+  .hero h1{font-size:clamp(1.8rem,8vw,2.8rem);line-height:1}
+  .hero p{font-size:0.85rem;line-height:1.7}
+  .sec{padding:clamp(2.5rem,6vw,4rem) 0}
+  .sec-title{font-size:clamp(1.6rem,5vw,2.5rem)}
+  .wrap{padding:0 1rem}
+  .work-card{flex:0 0 280px}
+  .svc-item{padding:1.5rem}
+  .process-steps{grid-template-columns:1fr !important}
+  .process-step{padding:1.5rem}
+  .stats-row{grid-template-columns:repeat(2,1fr) !important}
+  .pricing-grid{grid-template-columns:1fr !important}
+  .price-card{padding:2rem 1.5rem}
+  .testi-grid{grid-template-columns:1fr !important}
+  .testi-card{padding:1.5rem}
+  .order-grid{grid-template-columns:1fr !important}
+  .tools-grid{grid-template-columns:1fr !important}
+  .trends-grid{grid-template-columns:1fr !important}
+  .contact-grid{grid-template-columns:1fr !important;gap:2rem !important}
+  .contact-link{padding:1rem 0}
+  .cl-label{width:70px;font-size:0.5rem}
+  .cl-value{font-size:0.9rem}
+  .chat-window{width:calc(100vw - 1rem);right:0.5rem;bottom:5rem;height:min(450px,70vh)}
+  .chat-fab{width:46px;height:46px;bottom:1rem;right:1rem;font-size:1.2rem}
+  #waBtn{width:46px;height:46px;bottom:1rem;left:1rem;font-size:1.3rem}
+  .share-panel{display:none}
+  footer .wrap{flex-direction:column;text-align:center;gap:1rem}
+  footer .wrap div{justify-content:center}
+  .hscroll-wrap{padding:2rem 0}
+  .brief-assist textarea{min-height:100px}
+  .svc-content{grid-template-columns:1fr !important}
+}
+
+@media(min-width:481px) and (max-width:768px){
+  .nav{width:calc(100% - 1.5rem);max-width:600px;padding:0.5rem 1.5rem}
+  .nav-links{gap:1rem}
+  .nav-links a{font-size:0.7rem}
+  .hero h1{font-size:clamp(2rem,6vw,3.2rem)}
+  .wrap{padding:0 1.25rem}
+  .work-card{flex:0 0 320px}
+  .process-steps{grid-template-columns:1fr 1fr !important}
+  .stats-row{grid-template-columns:repeat(2,1fr) !important}
+  .pricing-grid{grid-template-columns:1fr 1fr !important}
+  .testi-grid{grid-template-columns:1fr 1fr !important}
+  .tools-grid{grid-template-columns:1fr 1fr !important}
+  .trends-grid{grid-template-columns:1fr 1fr !important}
+  .contact-grid{grid-template-columns:1fr !important;gap:2.5rem !important}
+  .chat-window{width:min(360px,90vw)}
+  .share-panel{left:0.5rem}
+  .share-btn{width:34px;height:34px}
+}
+
+@media(min-width:769px) and (max-width:1024px){
+  .nav{max-width:750px}
+  .nav-links a{font-size:0.72rem}
+  .wrap{padding:0 clamp(1.5rem,3vw,3rem)}
+  .work-card{flex:0 0 380px}
+  .process-steps{grid-template-columns:repeat(4,1fr)}
+  .stats-row{grid-template-columns:repeat(4,1fr)}
+  .pricing-grid{grid-template-columns:repeat(3,1fr)}
+  .testi-grid{grid-template-columns:repeat(2,1fr)}
+  .tools-grid{grid-template-columns:repeat(2,1fr)}
+  .trends-grid{grid-template-columns:repeat(2,1fr)}
+  .contact-grid{grid-template-columns:1fr 1fr;gap:2.5rem}
+  .order-grid{grid-template-columns:1fr 1.2fr}
+}
+
+@media(min-width:1025px) and (max-width:1440px){
+  .nav{max-width:1000px}
+  .wrap{padding:0 clamp(2rem,4vw,5rem)}
+  .work-card{flex:0 0 450px}
+}
+
+@media(min-width:1441px){
+  .wrap{max-width:1400px}
+  .work-card{flex:0 0 500px}
+}
+
+/* Touch device optimizations */
+@media(hover:none)and (pointer:coarse){
+  .work-card:hover{transform:none;border-color:var(--edge)}
+  .contact-link:hover{padding-left:0;color:var(--txt)}
+  .contact-link:hover .cl-arrow{transform:none}
+  .price-card:hover{transform:none;border-color:var(--edge)}
+  .testi-card:hover{transform:none}
+  .svc-item:hover{border-color:var(--edge)}
+  .chat-fab:hover{transform:none}
+  #waBtn:hover{transform:none}
+  .btn:hover{transform:none}
+  .blob-btn:hover{transform:none}
+}
+
+/* Safe area for notched phones */
+@supports(padding:max(0px)){
+  .nav{top:max(1rem,env(safe-area-inset-top))}
+  footer{padding-bottom:max(1rem,env(safe-area-inset-bottom))}
+  #waBtn{bottom:max(1.5rem,env(safe-area-inset-bottom))}
+  .chat-fab{bottom:max(1.5rem,env(safe-area-inset-bottom))}
+  .chat-window{bottom:max(5.5rem,calc(env(safe-area-inset-bottom) + 4rem))}
+}
 </style>
 <script type="application/ld+json">
 {
@@ -772,7 +890,7 @@ body:hover .cursor-glow{opacity:1}
 
 <!-- PAGE LOADER -->
 <div id="loader">
-  <img src="b_Enhance_the_image_to-removebg-preview.png" alt="Cheditz" style="height:60px" class="ld-logo" />
+  <img src="b_Enhance_the_image_to-removebg-preview.png" alt="Cheditz" style="height:60px" class="ld-logo" decoding="async" />
   <div class="ld-bar"><div class="ld-fill"></div></div>
 </div>
 
@@ -799,7 +917,7 @@ body:hover .cursor-glow{opacity:1}
 <nav class="nav" id="mainNav">
   <div class="wrap">
     <a href="#top" class="nav-logo">
-  <img src="b_Enhance_the_image_to-removebg-preview.png" alt="Cheditz" style="height:32px" />
+  <img src="b_Enhance_the_image_to-removebg-preview.png" alt="Cheditz" style="height:32px" decoding="async" />
 </a>
     <ul class="nav-links">
       <li><a href="#works" class="smooth-underline">Work</a></li>
@@ -818,7 +936,7 @@ body:hover .cursor-glow{opacity:1}
 
 <!-- MOBILE MENU -->
 <div class="mob-menu" id="mobMenu">
-  <img src="b_Enhance_the_image_to-removebg-preview.png" alt="Cheditz" style="height:40px" />
+  <img src="b_Enhance_the_image_to-removebg-preview.png" alt="Cheditz" style="height:40px" decoding="async" />
   <a href="#works" onclick="closeMob()">Work</a>
   <a href="#services" onclick="closeMob()">Services</a>
   <a href="#pricing" onclick="closeMob()">Pricing</a>
@@ -850,7 +968,7 @@ body:hover .cursor-glow{opacity:1}
 <section id="top" class="hero">
   <div class="wrap">
     <div class="rv" style="margin-bottom:2rem">
-      <img src="b_Enhance_the_image_to-removebg-preview.png" alt="Cheditz" style="height:48px" />
+      <img src="b_Enhance_the_image_to-removebg-preview.png" alt="Cheditz" style="height:48px" decoding="async" />
     </div>
     <div class="hero-tag rv" id="heroBadge">A Global Editing Studio · 2026</div>
     <h1 class="rv" id="heroHead">Edits that <em>linger</em> long after the scroll.</h1>
@@ -1366,7 +1484,7 @@ body:hover .cursor-glow{opacity:1}
 <footer>
   <div class="wrap">
     <span style="font-size:0.75rem;color:var(--muted);display:flex;align-items:center;gap:0.5rem">
-      <img src="b_Enhance_the_image_to-removebg-preview.png" alt="Cheditz" style="height:24px" />
+      <img src="b_Enhance_the_image_to-removebg-preview.png" alt="Cheditz" style="height:24px" decoding="async" />
       &copy; 2026 Cheditz.
     </span>
     <div style="display:flex;gap:2rem"><a href="#services">Services</a><a href="#works">Work</a><a href="#tools">Tools</a><a href="#trends">Trends</a><a href="#contact">Contact</a></div>
@@ -1408,7 +1526,7 @@ function initReveal(){document.querySelectorAll('.rv').forEach(el=>{el.classList
 initReveal();
 
 // ===== NAV SCROLL =====
-window.addEventListener('scroll',()=>{document.getElementById('mainNav').classList.toggle('scrolled',window.scrollY>50);document.getElementById('scrollTop').classList.toggle('show',window.scrollY>500);document.getElementById('sharePanel').classList.toggle('show',window.scrollY>300)});
+window.addEventListener('scroll',()=>{document.getElementById('mainNav').classList.toggle('scrolled',window.scrollY>50);document.getElementById('scrollTop').classList.toggle('show',window.scrollY>500);document.getElementById('sharePanel').classList.toggle('show',window.scrollY>300)},{passive:true});
 
 // ===== APPLY =====
 function applyContent(){const c=getConfig().content;document.getElementById('heroBadge').innerHTML=c.heroBadge;document.getElementById('heroHead').innerHTML=c.heroHead;document.getElementById('heroSub').textContent=c.heroSub;document.getElementById('secWorksTitle').textContent=c.worksTitle;document.getElementById('secSvcTitle').innerHTML=c.svcTitle;document.getElementById('secOrderTitle').innerHTML=c.orderTitle;document.getElementById('secOrderDesc').textContent=c.orderDesc;document.getElementById('secContactHead').innerHTML=c.contactHead;document.getElementById('secContactDesc').textContent=c.contactDesc;}
@@ -1490,7 +1608,7 @@ window.addEventListener('scroll',()=>{
   const scrollHeight=document.documentElement.scrollHeight-document.documentElement.clientHeight;
   const progress=(scrollTop/scrollHeight)*100;
   document.getElementById('scrollProgress').style.width=progress+'%';
-});
+},{passive:true});
 
 // ===== SMOOTH ENTRANCE OBSERVER =====
 const smoothObserver=new IntersectionObserver(entries=>{
@@ -1558,7 +1676,7 @@ function typeWriter(element,text,speed=50){
 }
 
 // Chat Pop Bubble
-setTimeout(()=>{const pop=document.getElementById('chatPop');if(pop&&!chatOpen)pop.classList.add('show');setTimeout(()=>{if(pop)pop.classList.remove('show')},5000)},3000);
+setTimeout(()=>{const pop=document.getElementById('chatPop');if(pop&&!chatOpen)pop.classList.add('show');setTimeout(()=>{if(pop)pop.classList.remove('show')},window.innerWidth<769?3000:5000)},window.innerWidth<769?1500:3000);
 document.getElementById('chatPop').addEventListener('click',()=>{toggleChat()});
 function toggleChat(){chatOpen=!chatOpen;document.getElementById('chatWindow').classList.toggle('open',chatOpen);document.getElementById('chatFab').classList.toggle('open',chatOpen);if(chatOpen&&!chatInit){chatInit=true;initChat()}}
 function initChat(){addBotMsg("Hey! 👋 I'm <strong>Cheditz AI</strong>. I can help with pricing, services, ordering, and project guidance. What would you like to know?");showSugs(sugs)}
@@ -1870,7 +1988,7 @@ window.addEventListener('scroll',()=>{
     }
   });
   lastScrollY=currentScrollY;
-});
+},{passive:true});
 
 // Smooth Reveal for Process Steps
 const processObserver=new IntersectionObserver(entries=>{
@@ -1927,7 +2045,7 @@ document.querySelectorAll('.svc-head').forEach(head=>{
 // ===== NODE GRAPH BACKGROUND =====
 (function(){
   const canvas=document.getElementById('node-bg');
-  if(!canvas)return;
+  if(!canvas||window.innerWidth<769)return;
   const ctx=canvas.getContext('2d');
   let width,height;
   let nodes=[];
@@ -1950,14 +2068,15 @@ document.querySelectorAll('.svc-head').forEach(head=>{
 
   function initNodes(){
     nodes=[];
-    const count=Math.max(12,Math.floor((width*height)/90000));
+    const isMobile=width<769;
+    const count=isMobile?0:Math.max(8,Math.floor((width*height)/120000));
     for(let i=0;i<count;i++){
       const type=NODE_TYPES[Math.floor(Math.random()*NODE_TYPES.length)];
       nodes.push({
         x:Math.random()*width,
         y:Math.random()*height,
-        vx:(Math.random()-0.5)*0.4,
-        vy:(Math.random()-0.5)*0.4,
+        vx:(Math.random()-0.5)*0.3,
+        vy:(Math.random()-0.5)*0.3,
         radius:4,
         label:type.label,
         color:type.color,
@@ -2030,6 +2149,7 @@ document.querySelectorAll('.svc-head').forEach(head=>{
 
 // ===== CURSOR GLOW =====
 (function(){
+  if(window.innerWidth<769||matchMedia('(hover:none)').matches)return;
   const glow=document.createElement('div');
   glow.className='cursor-glow';
   document.body.appendChild(glow);
