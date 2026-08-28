@@ -380,15 +380,15 @@ img{max-width:100%;display:block}
 #contact::before{content:'';position:absolute;inset:0;background:var(--bg);z-index:-1}
 .contact-grid{display:grid;grid-template-columns:1fr;gap:4rem}
 @media(min-width:1024px){.contact-grid{grid-template-columns:1fr 1fr;gap:3rem}}
-.contact-link{display:flex;align-items:center;gap:1rem;padding:1.5rem 0;border-bottom:1px solid var(--edge);text-decoration:none;color:var(--txt);transition:padding-left .3s,color .3s;min-width:0}
+.contact-link{display:flex;align-items:center;gap:1rem;padding:1.5rem 0;border-bottom:1px solid var(--edge);text-decoration:none;color:var(--txt);transition:padding-left .3s,color .3s;overflow:hidden;min-width:0}
 .contact-link:first-of-type{border-top:1px solid var(--edge)}
 .contact-link:hover{padding-left:0.8rem;color:var(--acc)}
 .contact-link[style*="#25D366"]:hover{color:#25D366}
 .cl-label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);width:90px;flex-shrink:0}
-.cl-value{font-family:'Playfair Display',serif;font-size:clamp(1rem,2vw,1.4rem);font-weight:600;min-width:0;word-break:break-word}
+.cl-value{font-family:'Playfair Display',serif;font-size:clamp(1rem,2vw,1.4rem);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .cl-arrow{flex-shrink:0;transition:transform .2s;margin-left:auto;color:var(--acc)}
 .contact-link:hover .cl-arrow{transform:translateX(3px)}
-.hours-box{border:1px solid var(--edge);padding:1.5rem;display:flex;gap:1rem;align-items:flex-start;margin-top:1.5rem;min-width:0}
+.hours-box{border:1px solid var(--edge);padding:1.5rem;display:flex;gap:1rem;align-items:flex-start;margin-top:1.5rem;min-width:0;overflow:hidden}
 .hours-box .icon{width:36px;height:36px;border:1px solid var(--edge);display:grid;place-items:center;flex-shrink:0;color:var(--acc);font-size:0.9rem}
 
 /* Chatbot */
