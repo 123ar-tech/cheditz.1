@@ -118,10 +118,21 @@ img{max-width:100%;display:block}
 
 @media(prefers-reduced-motion:reduce){#node-bg,.bg-shape,.bg-aurora::before,.bg-aurora::after,.bg-orb,.bg-pulse,.bg-scanlines{display:none}}
 
-/* Mobile: disable heavy backgrounds for performance */
+/* Mobile: disable heavy backgrounds, add light bg effect */
 @media(max-width:768px){
   #node-bg,.bg-node-grid,.bg-shapes,.bg-aurora,.bg-orbs,.bg-pulse,.bg-scanlines,.bg-grain,.bg-vignette,.bg-corner-tl,.bg-corner-br,.bg-corner-tr,.bg-corner-bl{display:none !important}
   body{background:#0a0a0a}
+  body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(ellipse 600px 400px at 20% 20%,rgba(200,255,0,0.04),transparent),
+      radial-gradient(ellipse 500px 500px at 80% 70%,rgba(168,85,247,0.03),transparent),
+      radial-gradient(ellipse 400px 300px at 50% 50%,rgba(56,189,248,0.02),transparent);
+    animation:mobGlow 12s ease-in-out infinite alternate}
+  @keyframes mobGlow{
+    0%{opacity:0.6;filter:hue-rotate(0deg)}
+    50%{opacity:1;filter:hue-rotate(15deg)}
+    100%{opacity:0.6;filter:hue-rotate(-15deg)}
+  }
 }
 
 /* Loader */
