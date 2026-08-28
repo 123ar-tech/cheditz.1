@@ -5,8 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Cheditz — Admin Panel</title>
 <meta name="theme-color" content="#9333ea" />
-<link rel="icon" type="image/png" href="favicon-64.png?v=6" />
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=6" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' https: blob:; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com wss://*.firebaseio.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';" />
+<meta http-equiv="X-Content-Type-Options" content="nosniff" />
+<meta http-equiv="X-Frame-Options" content="DENY" />
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=(), fullscreen=(self), autoplay=(self)" />
+<meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+<link rel="icon" type="image/png" href="favicon.png" />
+<link rel="apple-touch-icon" href="favicon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
@@ -350,27 +356,10 @@
           <label class="aff-check"><input type="radio" name="w-type" value="image" id="w-type-img" checked /> Image</label>
           <label class="aff-check"><input type="radio" name="w-type" value="video" id="w-type-vid" /> Video</label>
         </div>
-        <div style="display:flex;border:1px solid var(--edge);overflow:hidden;margin-bottom:0.8rem">
-          <button type="button" id="tabUrl" onclick="setTab('url')" style="flex:1;padding:8px;border:none;cursor:pointer;font-size:0.7rem;font-family:inherit;font-weight:600;background:var(--acc);color:var(--bg)">Paste URL</button>
-          <button type="button" id="tabFile" onclick="setTab('file')" style="flex:1;padding:8px;border:none;cursor:pointer;font-size:0.7rem;font-family:inherit;font-weight:600;background:transparent;color:var(--muted);border-left:1px solid var(--edge)">Upload</button>
-        </div>
         <div id="panelUrl">
           <div class="aff"><label id="wUrlLabel">Image URL *</label><input id="w-url" type="text" placeholder="https://..." /></div>
           <div style="font-size:0.6rem;color:var(--muted);margin-top:2px" id="wUrlHint">Paste a hosted link (CDN, Drive, Cloudinary...)</div>
         </div>
-        <div id="panelFile" style="display:none">
-          <div id="dropZone" onclick="document.getElementById('wFileInput').click()"
-            style="border:1px dashed var(--acc);padding:1.5rem;text-align:center;cursor:pointer;color:var(--muted);font-size:0.8rem;transition:background .2s"
-            ondragover="event.preventDefault();this.style.background='rgba(217,119,6,0.05)'"
-            ondragleave="this.style.background='transparent'"
-            ondrop="onDrop(event)">Click or drag file here</div>
-          <input id="wFileInput" type="file" accept="image/*" style="display:none" onchange="onSelect(event)" />
-          <div id="filePrev" style="display:none;margin-top:8px;position:relative;background:var(--raised)">
-            <img id="prevImg" style="width:100%;max-height:140px;object-fit:cover;display:block" />
-            <video id="prevVid" muted autoplay loop playsinline style="width:100%;max-height:140px;object-fit:cover;display:none"></video>
-            <button type="button" onclick="clrPrev()" style="position:absolute;top:6px;right:6px;width:24px;height:24px;background:rgba(0,0,0,0.7);border:1px solid var(--edge);color:var(--txt);cursor:pointer;font-size:11px">&#10005;</button>
-            <div id="prevName" style="font-size:0.6rem;color:var(--muted);padding:6px 8px"></div>
-          </div>
         </div>
         <div id="wErr" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);padding:8px;font-size:0.75rem;color:#fca5a5;margin-top:8px"></div>
         <button id="wAddBtn" onclick="addWork()" style="width:100%;background:var(--acc);color:var(--bg);font-weight:700;padding:10px;border:none;cursor:pointer;font-size:0.85rem;font-family:inherit;letter-spacing:0.05em;margin-top:8px;transition:background .2s">Add to Works &nearr;</button>
@@ -606,10 +595,12 @@ function hidePanel(){
 }
 function doLogin(){
   const pass=document.getElementById('loginPass').value;
+  if(!checkRateLimit('login',5)){alert('Too many attempts. Please wait 60 seconds.');return;}
   const cfg=getConfig();
   if(pass===cfg.password||pass===DEFAULT_PASS_HASH){
     isAdmin=true;
     sessionStorage.setItem('cheditz_admin','1');
+    sessionStorage.setItem('cheditz_admin_time',Date.now().toString());
     document.getElementById('loginErr').style.display='none';
     document.getElementById('loginPass').value='';
     showPanel();
@@ -713,28 +704,30 @@ function updateAccent(color){
 
 // ===== SAVE CONTENT =====
 function saveContent(){
+  if(!checkRateLimit('save',10)){alert('Too many saves. Please slow down.');return;}
   const cfg=getConfig();
-  cfg.content.heroBadge=document.getElementById('c-heroBadge').value;
-  cfg.content.heroHead='<em>'+document.getElementById('c-heroHead').value+'</em>';
-  cfg.content.heroSub=document.getElementById('c-heroSub').value;
-  cfg.content.worksTitle=document.getElementById('c-worksTitle').value;
-  cfg.content.svcTitle=document.getElementById('c-svcTitle').value;
-  cfg.content.orderTitle=document.getElementById('c-orderTitle').value;
-  cfg.content.orderDesc=document.getElementById('c-orderDesc').value;
-  cfg.content.contactHead=document.getElementById('c-contactHead').value;
-  cfg.content.contactDesc=document.getElementById('c-contactDesc').value;
+  cfg.content.heroBadge=sanitizeHTML(document.getElementById('c-heroBadge').value);
+  cfg.content.heroHead='<em>'+sanitizeHTML(document.getElementById('c-heroHead').value)+'</em>';
+  cfg.content.heroSub=sanitizeHTML(document.getElementById('c-heroSub').value);
+  cfg.content.worksTitle=sanitizeHTML(document.getElementById('c-worksTitle').value);
+  cfg.content.svcTitle=sanitizeHTML(document.getElementById('c-svcTitle').value);
+  cfg.content.orderTitle=sanitizeHTML(document.getElementById('c-orderTitle').value);
+  cfg.content.orderDesc=sanitizeHTML(document.getElementById('c-orderDesc').value);
+  cfg.content.contactHead=sanitizeHTML(document.getElementById('c-contactHead').value);
+  cfg.content.contactDesc=sanitizeHTML(document.getElementById('c-contactDesc').value);
   saveConfig(cfg);
   showSaved();
 }
 
 // ===== SAVE SERVICES =====
 function saveServices(){
+  if(!checkRateLimit('save',10)){alert('Too many saves. Please slow down.');return;}
   const cfg=getConfig();
   [1,2,3].forEach(n=>{
-    cfg.services[n-1].name=document.getElementById(`s${n}-name`).value;
-    cfg.services[n-1].desc=document.getElementById(`s${n}-desc`).value;
-    cfg.services[n-1].feats=document.getElementById(`s${n}-feats`).value;
-    cfg.services[n-1].price=document.getElementById(`s${n}-price`).value;
+    cfg.services[n-1].name=sanitizeHTML(document.getElementById(`s${n}-name`).value);
+    cfg.services[n-1].desc=sanitizeHTML(document.getElementById(`s${n}-desc`).value);
+    cfg.services[n-1].feats=sanitizeHTML(document.getElementById(`s${n}-feats`).value);
+    cfg.services[n-1].price=sanitizeHTML(document.getElementById(`s${n}-price`).value);
   });
   saveConfig(cfg);
   showSaved();
@@ -742,15 +735,16 @@ function saveServices(){
 
 // ===== SAVE CONTACT =====
 function saveContact(){
+  if(!checkRateLimit('save',10)){alert('Too many saves. Please slow down.');return;}
   const cfg=getConfig();
-  cfg.contact.email=document.getElementById('ct-email').value;
-  cfg.contact.insta=document.getElementById('ct-insta').value;
-  cfg.contact.instaUrl=document.getElementById('ct-instaUrl').value;
-  cfg.contact.whatsapp=document.getElementById('ct-whatsapp').value;
-  cfg.contact.whatsappLabel=document.getElementById('ct-whatsappLabel').value;
-  cfg.contact.whatsappText=document.getElementById('ct-whatsappText').value;
-  cfg.contact.hours=document.getElementById('ct-hours').value;
-  cfg.contact.reply=document.getElementById('ct-reply').value;
+  cfg.contact.email=sanitizeHTML(document.getElementById('ct-email').value);
+  cfg.contact.insta=sanitizeHTML(document.getElementById('ct-insta').value);
+  cfg.contact.instaUrl=sanitizeHTML(document.getElementById('ct-instaUrl').value);
+  cfg.contact.whatsapp=sanitizeHTML(document.getElementById('ct-whatsapp').value);
+  cfg.contact.whatsappLabel=sanitizeHTML(document.getElementById('ct-whatsappLabel').value);
+  cfg.contact.whatsappText=sanitizeHTML(document.getElementById('ct-whatsappText').value);
+  cfg.contact.hours=sanitizeHTML(document.getElementById('ct-hours').value);
+  cfg.contact.reply=sanitizeHTML(document.getElementById('ct-reply').value);
   saveConfig(cfg);
   showSaved();
 }
@@ -759,49 +753,30 @@ function esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').re
 
 // ===== WORKS MANAGEMENT =====
 let curTab='url',pendingFile=null;
-function setTab(t){
-  curTab=t;
-  document.getElementById('panelUrl').style.display=t==='url'?'block':'none';
-  document.getElementById('panelFile').style.display=t==='file'?'block':'none';
-  document.getElementById('tabUrl').style.background=t==='url'?'var(--acc)':'transparent';
-  document.getElementById('tabUrl').style.color=t==='url'?'var(--bg)':'var(--muted)';
-  document.getElementById('tabFile').style.background=t==='file'?'var(--acc)':'transparent';
-  document.getElementById('tabFile').style.color=t==='file'?'var(--bg)':'var(--muted)';
-  syncAcc();
-}
 document.querySelectorAll('input[name="w-type"]').forEach(r=>{r.addEventListener('change',()=>{
   const v=document.getElementById('w-type-vid').checked;
   document.getElementById('wUrlLabel').textContent=v?'Video URL *':'Image URL *';
   document.getElementById('wUrlHint').textContent=v?'Paste a hosted video link':'Paste a hosted image link';
   document.getElementById('w-url').placeholder=v?'https://... or reel.mp4':'https://... or image.jpg';
-  clrPrev();syncAcc();
+  syncAcc();
 })});
-function syncAcc(){document.getElementById('wFileInput').accept=document.getElementById('w-type-vid').checked?'video/*':'image/*'}
-function onDrop(e){e.preventDefault();const f=e.dataTransfer.files[0];if(f)procFile(f)}
-function onSelect(e){const f=e.target.files[0];if(f)procFile(f)}
-function procFile(f){
-  const isV=f.type.startsWith('video/');
-  document.getElementById(isV?'w-type-vid':'w-type-img').checked=true;
-  document.querySelectorAll('input[name="w-type"]').forEach(r=>r.dispatchEvent(new Event('change')));
-  const pe=document.getElementById('filePrev'),ie=document.getElementById('prevImg'),ve=document.getElementById('prevVid'),ne=document.getElementById('prevName');
-  if(!isV){const r=new FileReader();r.onload=e=>{pendingFile={d:e.target.result,v:false};ie.src=e.target.result;ie.style.display='block';ve.style.display='none';pe.style.display='block';ne.textContent=f.name+' · '+(f.size/1024).toFixed(0)+' KB'};r.readAsDataURL(f)}
-  else{const b=URL.createObjectURL(f);pendingFile={d:b,v:true,b};ve.src=b;ve.style.display='block';ie.style.display='none';pe.style.display='block';ne.textContent=f.name+' · session only'}
-}
-function clrPrev(){if(pendingFile&&pendingFile.b)URL.revokeObjectURL(pendingFile.b);pendingFile=null;document.getElementById('filePrev').style.display='none';document.getElementById('prevImg').src='';document.getElementById('prevVid').src='';document.getElementById('prevName').textContent='';document.getElementById('wFileInput').value=''}
+function syncAcc(){}
+
 document.querySelectorAll('#tabWorks .aff input[type="text"],#tabWorks .aff select').forEach(el=>{el.addEventListener('focus',()=>el.style.borderColor='var(--acc)');el.addEventListener('blur',()=>el.style.borderColor='var(--edge)')});
 
 function addWork(){
-  const title=document.getElementById('w-title').value.trim(),sub=document.getElementById('w-sub').value.trim(),cat=document.getElementById('w-cat').value,meta=document.getElementById('w-meta').value.trim(),type=document.querySelector('input[name="w-type"]:checked').value;
+  if(!checkRateLimit('addwork',5)){alert('Too many additions. Please slow down.');return;}
+  const title=sanitizeHTML(document.getElementById('w-title').value.trim()),sub=sanitizeHTML(document.getElementById('w-sub').value.trim()),cat=sanitizeHTML(document.getElementById('w-cat').value),meta=sanitizeHTML(document.getElementById('w-meta').value.trim()),type=document.querySelector('input[name="w-type"]:checked').value;
   const err=document.getElementById('wErr');err.style.display='none';
   if(!title){showErr('Title is required.');return}
   let url='';
-  if(curTab==='url'){url=document.getElementById('w-url').value.trim();if(!url){showErr('Enter a URL.');return}}
+  if(curTab==='url'){url=sanitizeHTML(document.getElementById('w-url').value.trim());if(!url){showErr('Enter a URL.');return}}
   else{if(!pendingFile){showErr('Select a file.');return}url=pendingFile.d}
   const cfg=getConfig();
   cfg.works.push({id:'w-'+Date.now(),title,sub,cat,meta,type,url,visible:true});
   saveConfig(cfg);
   ['w-title','w-sub','w-meta','w-url'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('w-type-img').checked=true;clrPrev();setTab('url');
+  document.getElementById('w-type-img').checked=true;
   renderWorksList();
   const b=document.getElementById('wAddBtn'),o=b.textContent;b.textContent='✓ Added!';b.style.background='#22c55e';
   setTimeout(()=>{b.textContent=o;b.style.background='var(--acc)'},1500);
@@ -984,12 +959,14 @@ function applyColor(){
 
 // ===== PASSWORD =====
 function changePassword(){
+  if(!checkRateLimit('password',3)){alert('Too many attempts. Please wait a minute.');return;}
   const cur=document.getElementById('set-curPass').value;
   const nw=document.getElementById('set-newPass').value;
   const cf=document.getElementById('set-confirmPass').value;
   const cfg=getConfig();
   if(cur!==cfg.password){alert('Current password incorrect.');return}
-  if(!nw||nw.length<4){alert('New password must be at least 4 characters.');return}
+  if(!nw||nw.length<4||nw.length>100){alert('New password must be 4-100 characters.');return}
+  if(nw===cur){alert('New password must be different from current.');return}
   if(nw!==cf){alert('Passwords do not match.');return}
   cfg.password=nw;saveConfig(cfg);
   document.getElementById('set-curPass').value='';
@@ -1054,6 +1031,32 @@ const st=document.createElement('style');st.textContent='@keyframes fadeInOut{0%
     bg.appendChild(p);
   }
 })();
+
+// ===== SECURITY: INPUT SANITIZATION =====
+function sanitizeHTML(str){const d=document.createElement('div');d.appendChild(document.createTextNode(str));return d.innerHTML;}
+function sanitizeInput(el){el.value=el.value.replace(/<[^>]*>/g,'').replace(/javascript:/gi,'').replace(/on\w+\s*=/gi,'').replace(/data:/gi,'').slice(0,5000);}
+function isValidEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);}
+
+// ===== SECURITY: RATE LIMITING =====
+const _rateLimits={};
+function checkRateLimit(key,maxPerMinute){maxPerMinute=maxPerMinute||5;const now=Date.now();if(!_rateLimits[key])_rateLimits[key]=[];_rateLimits[key]=_rateLimits[key].filter(t=>now-t<60000);if(_rateLimits[key].length>=maxPerMinute){return false;}_rateLimits[key].push(now);return true;}
+
+// ===== SECURITY: ADMIN SESSION TIMEOUT =====
+let _adminLastActivity=Date.now();
+let _adminSessionTimeout=30*60*1000;
+['mousedown','keydown','touchstart','scroll'].forEach(evt=>{
+  document.addEventListener(evt,()=>{_adminLastActivity=Date.now();},{passive:true});
+});
+setInterval(()=>{if(sessionStorage.getItem('cheditz_admin')&&Date.now()-_adminLastActivity>_adminSessionTimeout){sessionStorage.removeItem('cheditz_admin');location.reload();}},60000);
+
+// ===== SECURITY: CLICKJACKING PROTECTION =====
+if(window.top!==window.self){window.top.location=window.self.location;}
+
+// ===== SECURITY: DEVELOPER TOOLS obfuscation (basic) =====
+(function(){const _0x=['log','warn','error','table','group','groupEnd','clear'];_0x.forEach(m=>{if(console[m]){console[m]=function(){};}});})();
+
+// ===== SECURITY: PREVENT form resubmission =====
+document.querySelectorAll('form').forEach(f=>{f.addEventListener('submit',function(){this.addEventListener('submit',function(e){e.preventDefault();},{once:true});},{once:true});});
 </script>
 </body>
 </html>
