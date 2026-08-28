@@ -87,21 +87,60 @@
   .btn-danger:hover{background:rgba(239,68,68,0.2);color:#fca5a5;border-color:rgba(239,68,68,0.4)}
 
   /* Login overlay */
-  #loginOverlay{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.85);
-    display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;
-    backdrop-filter:blur(12px)}
+  #loginOverlay{position:fixed;inset:0;z-index:10000;background:#0a0a0a;
+    display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s;
+    overflow:hidden}
   #loginOverlay.on{opacity:1;pointer-events:all}
-  .login-box{width:min(360px,92vw);background:var(--surface);border:1px solid var(--edge);padding:2.5rem 2rem;
-    text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.6)}
-  .login-box h3{font-family:'Crimson Pro',serif;font-size:1.4rem;margin-bottom:0.4rem}
-  .login-box p{font-size:0.75rem;color:var(--dim);margin-bottom:1.5rem}
-  .ff{display:flex;flex-direction:column;gap:0.35rem;margin-bottom:1rem;text-align:left}
-  .ff label{font-family:'Fira Code',monospace;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted)}
-  .ff input,.ff textarea,.ff select{background:var(--raised);border:1px solid var(--edge);color:var(--txt);padding:0.7rem 0.9rem;
-    font-family:inherit;font-size:0.85rem;transition:border-color .2s;-webkit-appearance:none;width:100%}
-  .ff input:focus,.ff textarea:focus,.ff select:focus{outline:none;border-color:var(--acc)}
-  .err{display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);padding:8px;
-    font-size:0.75rem;color:#fca5a5;margin-bottom:0.8rem;text-align:center}
+  .login-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);background-size:50px 50px;animation:gridMove 20s linear infinite}
+  @keyframes gridMove{to{background-position:50px 50px,50px 50px}}
+  .login-orb{position:absolute;border-radius:50%;filter:blur(80px);animation:orbFloat 8s ease-in-out infinite}
+  .login-orb-1{width:400px;height:400px;background:var(--acc);opacity:0.08;top:-100px;left:10%;animation-delay:0s}
+  .login-orb-2{width:300px;height:300px;background:#c026d3;opacity:0.06;bottom:-50px;right:15%;animation-delay:2s}
+  .login-orb-3{width:250px;height:250px;background:#06b6d4;opacity:0.05;top:40%;left:60%;animation-delay:4s}
+  @keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.1)}66%{transform:translate(-20px,30px) scale(0.9)}}
+  .login-box{position:relative;z-index:1;width:min(380px,92vw);padding:3rem 2.5rem;text-align:center;
+    background:rgba(20,20,20,0.6);backdrop-filter:blur(20px);border-radius:24px;
+    animation:slideUp .6s ease-out}
+  .login-box::before{content:'';position:absolute;inset:-2px;border-radius:26px;background:conic-gradient(from var(--angle,0deg),#ff0000,#ff8800,#ffff00,#00ff00,#00ffff,#0000ff,#ff00ff,#ff0000);z-index:-1;animation:rgbRotate 3s linear infinite}
+  .login-box::after{content:'';position:absolute;inset:0;border-radius:24px;background:rgba(20,20,20,0.95);z-index:-1}
+  @property --angle{syntax:'<angle>';initial-value:0deg;inherits:false}
+  @keyframes rgbRotate{to{--angle:360deg}}
+  .login-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(200,255,0,0.1);border:1px solid rgba(200,255,0,0.2);border-radius:100px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--acc);margin-bottom:2rem;font-family:'Fira Code',monospace;animation:fadeIn .6s ease-out}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+  .login-avatar{width:100px;height:100px;margin:0 auto 1.5rem;border-radius:24px;overflow:hidden;
+    border:2px solid var(--edge);position:relative;animation:avatarPulse 3s ease-in-out infinite;
+    box-shadow:0 20px 40px rgba(0,0,0,0.4)}
+  .login-avatar img{width:100%;height:100%;object-fit:cover}
+  .login-avatar::after{content:'';position:absolute;inset:-2px;border-radius:24px;border:2px solid var(--acc);opacity:0;animation:avatarRing 3s ease-in-out infinite}
+  @keyframes avatarPulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  @keyframes avatarRing{0%,100%{opacity:0;transform:scale(1)}50%{opacity:0.5;transform:scale(1.05)}}
+  .login-title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--txt);
+    margin-bottom:0.3rem;animation:slideUp .6s ease-out}
+  .login-subtitle{font-size:0.8rem;color:var(--muted);margin-bottom:2.5rem;animation:slideUp .6s ease-out .1s both}
+  @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .login-input-wrap{position:relative;margin-bottom:1.5rem;animation:slideUp .6s ease-out .2s both}
+  .login-input-wrap input{width:100%;background:transparent;border:none;border-bottom:2px solid var(--edge);
+    color:var(--txt);padding:1rem 0;font-family:'Playfair Display',serif;font-size:1.2rem;
+    transition:all .3s;text-align:center;letter-spacing:0.3em}
+  .login-input-wrap input:focus{outline:none;border-bottom-color:var(--acc)}
+  .login-input-wrap input::placeholder{color:var(--muted);letter-spacing:0.1em;font-size:0.9rem;font-family:'Inter',sans-serif}
+  .login-input-line{position:absolute;bottom:0;left:50%;width:0;height:2px;background:var(--acc);
+    transition:all .3s;transform:translateX(-50%)}
+  .login-input-wrap input:focus~.login-input-line{width:100%}
+  .login-err{display:none;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);
+    padding:12px;font-size:0.75rem;color:#fca5a5;margin-bottom:1.5rem;text-align:center;
+    border-radius:12px;animation:slideUp .3s ease-out}
+  .login-submit{width:100%;padding:1.1rem;background:transparent;border:2px solid var(--acc);
+    color:var(--acc);font-family:'Inter',sans-serif;font-weight:600;font-size:0.8rem;
+    letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all .4s;
+    border-radius:12px;position:relative;overflow:hidden;animation:slideUp .6s ease-out .3s both}
+  .login-submit::before{content:'';position:absolute;inset:0;background:var(--acc);transform:translateY(100%);transition:transform .4s;z-index:-1}
+  .login-submit:hover{color:#0a0a0a;border-color:var(--acc)}
+  .login-submit:hover::before{transform:translateY(0)}
+  .login-divider{display:flex;align-items:center;gap:1rem;margin:2rem 0;animation:slideUp .6s ease-out .4s both}
+  .login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--edge)}
+  .login-divider span{font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em}
+  .login-footer{font-size:0.65rem;color:var(--muted);opacity:0.5;animation:slideUp .6s ease-out .5s both}
 
   /* Admin panel shell */
   .adm-wrap{position:relative;z-index:10;max-width:900px;margin:2rem auto;padding:0 1.25rem}
@@ -210,16 +249,22 @@
 
 <!-- LOGIN OVERLAY -->
 <div id="loginOverlay">
+  <div class="login-grid"></div>
+  <div class="login-orb login-orb-1"></div>
+  <div class="login-orb login-orb-2"></div>
+  <div class="login-orb login-orb-3"></div>
   <div class="login-box">
-    <div style="font-size:2rem;margin-bottom:1rem">&#128274;</div>
-    <h3>Admin Access</h3>
-    <p>Enter password to manage your site</p>
-    <div class="ff">
-      <label>Password</label>
-      <input id="loginPass" type="password" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()" />
+    <div class="login-badge">🔐 Secure Access</div>
+    <div class="login-title">Cheditz</div>
+    <div class="login-subtitle">Admin Dashboard</div>
+    <div class="login-input-wrap">
+      <input id="loginPass" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()" autocomplete="off" />
+      <div class="login-input-line"></div>
     </div>
-    <div class="err" id="loginErr">Incorrect password. Try again.</div>
-    <button class="btn btn-acc" style="width:100%;justify-content:center;margin-top:0.5rem" onclick="doLogin()">Login</button>
+    <div class="login-err" id="loginErr">Invalid password. Try again.</div>
+    <button class="login-submit" onclick="doLogin()">Enter Dashboard</button>
+    <div class="login-divider"><span>v2.0</span></div>
+    <div class="login-footer">© 2026 Cheditz. All rights reserved.</div>
   </div>
 </div>
 
@@ -237,15 +282,62 @@
       <a href="index.html" class="btn btn-sm">View site &#8599;</a>
     </div>
     <div class="adm-tabs">
-      <button class="adm-tab on" onclick="admTab('works',this)">Works</button>
+      <button class="adm-tab on" onclick="admTab('dashboard',this)">Dashboard</button>
+      <button class="adm-tab" onclick="admTab('works',this)">Works</button>
+      <button class="adm-tab" onclick="admTab('orders',this)">Orders</button>
+      <button class="adm-tab" onclick="admTab('testimonials',this)">Reviews</button>
       <button class="adm-tab" onclick="admTab('content',this)">Content</button>
       <button class="adm-tab" onclick="admTab('services',this)">Services</button>
       <button class="adm-tab" onclick="admTab('contact',this)">Contact</button>
       <button class="adm-tab" onclick="admTab('settings',this)">Settings</button>
     </div>
 
+    <!-- DASHBOARD TAB -->
+    <div class="adm-panel on" id="tabDashboard">
+      <div class="sec-label">Overview</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem">
+        <div style="background:var(--raised);border:1px solid var(--edge);padding:1rem;text-align:center;border-left:3px solid var(--acc)">
+          <div style="font-size:2rem;font-weight:700;color:var(--acc)" id="dashWorks">0</div>
+          <div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em">Works</div>
+        </div>
+        <div style="background:var(--raised);border:1px solid var(--edge);padding:1rem;text-align:center;border-left:3px solid #22c55e">
+          <div style="font-size:2rem;font-weight:700;color:#22c55e" id="dashOrders">0</div>
+          <div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em">Orders</div>
+        </div>
+        <div style="background:var(--raised);border:1px solid var(--edge);padding:1rem;text-align:center;border-left:3px solid #f97316">
+          <div style="font-size:2rem;font-weight:700;color:#f97316" id="dashPending">0</div>
+          <div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em">Pending</div>
+        </div>
+        <div style="background:var(--raised);border:1px solid var(--edge);padding:1rem;text-align:center;border-left:3px solid #06b6d4">
+          <div style="font-size:2rem;font-weight:700;color:#06b6d4" id="dashServices">3</div>
+          <div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em">Services</div>
+        </div>
+      </div>
+      <div class="sec-label">Quick Actions</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1.5rem">
+        <button class="btn btn-acc" onclick="admTab('works',document.querySelectorAll('.adm-tab')[1])" style="justify-content:center">➕ Add New Work</button>
+        <button class="btn btn-acc" onclick="admTab('orders',document.querySelectorAll('.adm-tab')[2])" style="justify-content:center">📋 View Orders</button>
+        <button class="btn btn-acc" onclick="admTab('content',document.querySelectorAll('.adm-tab')[3])" style="justify-content:center">✏️ Edit Content</button>
+        <button class="btn btn-acc" onclick="admTab('settings',document.querySelectorAll('.adm-tab')[6])" style="justify-content:center">⚙️ Settings</button>
+      </div>
+      <div class="sec-label">Recent Activity</div>
+      <div id="activityFeed" style="max-height:300px;overflow-y:auto"></div>
+      <div class="sec-label" style="margin-top:1.5rem">Site Status</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div style="background:var(--raised);border:1px solid var(--edge);padding:1rem">
+          <div style="font-size:0.7rem;color:var(--muted);margin-bottom:0.5rem">Accent Color</div>
+          <div id="dashAccent" style="width:40px;height:40px;border:2px solid var(--edge);cursor:pointer" onclick="document.getElementById('accentPicker').click()"></div>
+          <input type="color" id="accentPicker" style="display:none" onchange="updateAccent(this.value)">
+        </div>
+        <div style="background:var(--raised);border:1px solid var(--edge);padding:1rem">
+          <div style="font-size:0.7rem;color:var(--muted);margin-bottom:0.5rem">Last Updated</div>
+          <div id="dashLastUpdate" style="font-size:0.85rem">Never</div>
+        </div>
+      </div>
+    </div>
+
     <!-- WORKS TAB -->
-    <div class="adm-panel on" id="tabWorks">
+    <div class="adm-panel" id="tabWorks">
       <div class="sec-label">Add New Work</div>
       <div style="border:1px solid var(--edge);padding:1.25rem;margin-bottom:1.5rem">
         <div class="aff"><label>Title *</label><input id="w-title" type="text" placeholder="e.g. Brand Poster" /></div>
@@ -285,6 +377,44 @@
       </div>
       <div style="font-family:'Fira Code',monospace;font-size:0.55rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem">Current Works (drag to reorder)</div>
       <div id="worksList"></div>
+    </div>
+
+    <!-- ORDERS TAB -->
+    <div class="adm-panel" id="tabOrders">
+      <div class="sec-label">Order Statistics</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem">
+        <div style="background:var(--raised);border:1px solid var(--edge);padding:1rem;text-align:center">
+          <div style="font-size:2rem;font-weight:700;color:var(--acc)" id="orderCountTotal">0</div>
+          <div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em">Total Orders</div>
+        </div>
+        <div style="background:var(--raised);border:1px solid var(--edge);padding:1rem;text-align:center">
+          <div style="font-size:2rem;font-weight:700;color:#22c55e" id="orderCountCompleted">0</div>
+          <div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em">Completed</div>
+        </div>
+        <div style="background:var(--raised);border:1px solid var(--edge);padding:1rem;text-align:center">
+          <div style="font-size:2rem;font-weight:700;color:#f97316" id="orderCountPending">0</div>
+          <div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em">Pending</div>
+        </div>
+      </div>
+      <div class="sec-label">All Orders</div>
+      <div id="ordersList"></div>
+    </div>
+
+    <!-- TESTIMONIALS TAB -->
+    <div class="adm-panel" id="tabTestimonials">
+      <div class="sec-label">Review Statistics</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1.5rem">
+        <div style="background:var(--raised);border:1px solid var(--edge);padding:1rem;text-align:center">
+          <div style="font-size:2rem;font-weight:700;color:var(--acc)" id="testiCountTotal">0</div>
+          <div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em">Total Reviews</div>
+        </div>
+        <div style="background:var(--raised);border:1px solid var(--edge);padding:1rem;text-align:center">
+          <div style="font-size:2rem;font-weight:700;color:#f59e0b" id="testiAvgRating">0</div>
+          <div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em">Average Rating</div>
+        </div>
+      </div>
+      <div class="sec-label">All Reviews</div>
+      <div id="testimonialsList"></div>
     </div>
 
     <!-- CONTENT TAB -->
@@ -335,6 +465,9 @@
       <div class="aff"><label>Email Address</label><input id="ct-email" type="email" /></div>
       <div class="aff"><label>Instagram Handle</label><input id="ct-insta" type="text" placeholder="@cheditz1" /></div>
       <div class="aff"><label>Instagram URL</label><input id="ct-instaUrl" type="text" /></div>
+      <div class="aff"><label>WhatsApp Number (with country code, e.g. 918129021975)</label><input id="ct-whatsapp" type="text" placeholder="918129021975" /></div>
+      <div class="aff"><label>WhatsApp Button Text</label><input id="ct-whatsappLabel" type="text" placeholder="Chat with us" /></div>
+      <div class="aff"><label>WhatsApp Default Message</label><input id="ct-whatsappText" type="text" placeholder="Hi Cheditz! I'm interested in your editing services." /></div>
       <div class="aff"><label>Working Hours</label><input id="ct-hours" type="text" placeholder="Mon — Sat · 9:00 – 19:00 IST" /></div>
       <div class="aff"><label>Reply Note</label><input id="ct-reply" type="text" placeholder="Replies usually within 4 hours." /></div>
       <button class="btn btn-acc btn-sm" style="width:100%;justify-content:center" onclick="saveContact()">Save Contact</button>
@@ -364,13 +497,12 @@
 <script>
 // ===== FIREBASE CONFIG =====
 const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyA3v4LwBRytUdPtFOgbndLEDmqj_1UgY-w",
-  authDomain: "cheditz.firebaseapp.com",
-  projectId: "cheditz",
-  storageBucket: "cheditz.firebasestorage.app",
-  messagingSenderId: "736473040071",
-  appId: "1:736473040071:web:ff63497d7cde19524beae2",
-  measurementId: "G-FVCLSDEPL9"
+  apiKey: "AIzaSyC2CVkVLsXEOtyuxOeJXhijbQ2x08odwkw",
+  authDomain: "cheditz-dee25.firebaseapp.com",
+  projectId: "cheditz-dee25",
+  storageBucket: "cheditz-dee25.firebasestorage.app",
+  messagingSenderId: "79278126031",
+  appId: "1:79278126031:web:87a596a8894ccf4a20d8ba"
 };
 const FIREBASE_ENABLED = FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY";
 let firebaseApp = null, firebaseDb = null;
@@ -379,6 +511,34 @@ if (FIREBASE_ENABLED) {
     firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
     firebaseDb = firebase.firestore();
   } catch(e) { console.warn('Firebase init failed:', e); }
+}
+
+// Real-time Firestore Sync for Admin Panel
+if (FIREBASE_ENABLED && firebaseDb) {
+  // 1. Sync Website Config & Content
+  firebaseDb.collection('cheditz').doc('config').onSnapshot(doc => {
+    const data = doc.data();
+    if (data) {
+      localStorage.setItem('cheditz_config', JSON.stringify(data));
+      applyColor();
+    }
+  }, e => console.warn('Config snapshot error:', e));
+
+  // 2. Real-time Incoming Orders Listener
+  firebaseDb.collection('cheditz_orders').orderBy('date', 'desc').onSnapshot(snapshot => {
+    const orders = [];
+    snapshot.forEach(doc => orders.push({ id: doc.id, ...doc.data() }));
+    localStorage.setItem('cheditz_orders', JSON.stringify(orders));
+    if (isAdmin) renderOrdersList();
+  }, e => console.warn('Orders snapshot error:', e));
+
+  // 3. Real-time Reviews Listener
+  firebaseDb.collection('cheditz_testimonials').orderBy('date', 'desc').onSnapshot(snapshot => {
+    const reviews = [];
+    snapshot.forEach(doc => reviews.push({ id: doc.id, ...doc.data() }));
+    localStorage.setItem('cheditz_testimonials', JSON.stringify(reviews));
+    if (isAdmin) renderTestimonialsList();
+  }, e => console.warn('Reviews snapshot error:', e));
 }
 
 // ===== CONFIG & STATE =====
@@ -392,7 +552,14 @@ function getConfig() {
 function saveConfig(c) {
   localStorage.setItem('cheditz_config', JSON.stringify(c));
   if (FIREBASE_ENABLED && firebaseDb) {
-    firebaseDb.collection('cheditz').doc('config').set(c).catch(e => console.warn('Firebase save failed:', e));
+    firebaseDb.collection('cheditz').doc('config').set(c)
+      .then(() => console.log('✓ Saved to Firestore'))
+      .catch(e => {
+        console.warn('Firebase save failed:', e);
+        alert('Firebase SAVE failed: ' + e.code + '\n\n' + e.message + '\n\nCheck Firestore rules allow write.');
+      });
+  } else {
+    alert('Firebase NOT initialized. Check FIREBASE_CONFIG.');
   }
 }
 function getDefaultConfig() {
@@ -494,11 +661,54 @@ function loadAllEditors(){
   document.getElementById('ct-email').value=ct.email;
   document.getElementById('ct-insta').value=ct.insta;
   document.getElementById('ct-instaUrl').value=ct.instaUrl;
+  document.getElementById('ct-whatsapp').value=ct.whatsapp||'';
+  document.getElementById('ct-whatsappLabel').value=ct.whatsappLabel||'Chat with us';
+  document.getElementById('ct-whatsappText').value=ct.whatsappText||'Hi Cheditz! I\'m interested in your editing services.';
   document.getElementById('ct-hours').value=ct.hours;
   document.getElementById('ct-reply').value=ct.reply;
   selectedColor=cfg.accent;
   buildColorPickers(cfg.accent);
   renderWorksList();
+  renderOrdersList();
+  renderTestimonialsList();
+  renderDashboard();
+}
+
+// ===== DASHBOARD =====
+function renderDashboard(){
+  const cfg=getConfig();
+  const orders=getOrders();
+  document.getElementById('dashWorks').textContent=cfg.works.length;
+  document.getElementById('dashOrders').textContent=orders.length;
+  document.getElementById('dashPending').textContent=orders.filter(o=>o.status!=='completed').length;
+  document.getElementById('dashServices').textContent=cfg.services?cfg.services.length:3;
+  document.getElementById('dashAccent').style.background=cfg.accent;
+  document.getElementById('dashLastUpdate').textContent=new Date().toLocaleString();
+  renderActivityFeed(orders);
+}
+
+function renderActivityFeed(orders){
+  const feed=document.getElementById('activityFeed');
+  const activities=[];
+  orders.slice(-5).reverse().forEach(o=>{
+    activities.push({icon:'📦',text:`New order from ${o.name||'Unknown'} — ${o.service||'Service'}`,time:o.date||'Just now'});
+  });
+  if(!activities.length){
+    feed.innerHTML='<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.75rem">No recent activity</div>';
+    return;
+  }
+  feed.innerHTML=activities.map(a=>`<div style="display:flex;align-items:center;gap:10px;padding:8px;border-bottom:1px solid var(--edge)">
+    <div style="font-size:1.2rem">${a.icon}</div>
+    <div style="flex:1"><div style="font-size:0.8rem">${a.text}</div><div style="font-size:0.65rem;color:var(--muted)">${a.time}</div></div>
+  </div>`).join('');
+}
+
+function updateAccent(color){
+  const cfg=getConfig();
+  cfg.accent=color;
+  saveConfig(cfg);
+  document.getElementById('dashAccent').style.background=color;
+  showSaved();
 }
 
 // ===== SAVE CONTENT =====
@@ -536,6 +746,9 @@ function saveContact(){
   cfg.contact.email=document.getElementById('ct-email').value;
   cfg.contact.insta=document.getElementById('ct-insta').value;
   cfg.contact.instaUrl=document.getElementById('ct-instaUrl').value;
+  cfg.contact.whatsapp=document.getElementById('ct-whatsapp').value;
+  cfg.contact.whatsappLabel=document.getElementById('ct-whatsappLabel').value;
+  cfg.contact.whatsappText=document.getElementById('ct-whatsappText').value;
   cfg.contact.hours=document.getElementById('ct-hours').value;
   cfg.contact.reply=document.getElementById('ct-reply').value;
   saveConfig(cfg);
@@ -621,6 +834,104 @@ function renderWorksList(){
 function toggleVis(i){const cfg=getConfig();cfg.works[i].visible=cfg.works[i].visible===false?true:false;saveConfig(cfg);renderWorksList()}
 function moveWork(i,dir){const cfg=getConfig();const j=i+dir;if(j<0||j>=cfg.works.length)return;[cfg.works[i],cfg.works[j]]=[cfg.works[j],cfg.works[i]];saveConfig(cfg);renderWorksList()}
 function delWork(i){if(!confirm('Delete this work?'))return;const cfg=getConfig();cfg.works.splice(i,1);saveConfig(cfg);renderWorksList()}
+
+// ===== ORDERS =====
+function getOrders(){try{return JSON.parse(localStorage.getItem('cheditz_orders'))||[]}catch{return[]}}
+function saveOrders(orders){localStorage.setItem('cheditz_orders',JSON.stringify(orders))}
+
+function renderOrdersList(){
+  const orders=getOrders(),el=document.getElementById('ordersList');
+  const total=orders.length;
+  const completed=orders.filter(o=>o.status==='completed').length;
+  const pending=total-completed;
+  document.getElementById('orderCountTotal').textContent=total;
+  document.getElementById('orderCountCompleted').textContent=completed;
+  document.getElementById('orderCountPending').textContent=pending;
+  if(!orders.length){el.innerHTML='<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.75rem">No orders yet</div>';return}
+  el.innerHTML=orders.map((o,i)=>{
+    const isComplete=o.status==='completed';
+    return`<div class="wl-item">
+      <div class="wl-info">
+        <div class="wl-title">${esc(o.name||'Unknown')} — ${esc(o.service||'Service')}</div>
+        <div class="wl-sub">${esc(o.email||'')} · ${esc(o.date||'')}</div>
+        <div class="wl-sub" style="margin-top:4px">${esc(o.budget||'')} · ${esc(o.deadline||'No deadline')}</div>
+        <span class="wl-vis ${isComplete?'shown':'hidden'}">${isComplete?'Completed':'Pending'}</span>
+      </div>
+      <div class="wl-btns">
+        <button class="wl-btn" onclick="toggleOrderStatus(${i})" title="${isComplete?'Mark Pending':'Mark Complete'}">${isComplete?'🔄':'✓'}</button>
+        <button class="wl-btn del" onclick="delOrder(${i})" title="Delete">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function toggleOrderStatus(i) {
+  const orders = getOrders();
+  const target = orders[i];
+  const newStatus = target.status === 'completed' ? 'pending' : 'completed';
+  
+  if (FIREBASE_ENABLED && firebaseDb && target.id) {
+    await firebaseDb.collection('cheditz_orders').doc(target.id).update({ status: newStatus });
+  } else {
+    orders[i].status = newStatus;
+    saveOrders(orders);
+    renderOrdersList();
+  }
+}
+
+async function delOrder(i) {
+  if (!confirm('Delete this order?')) return;
+  const orders = getOrders();
+  const target = orders[i];
+
+  if (FIREBASE_ENABLED && firebaseDb && target.id) {
+    await firebaseDb.collection('cheditz_orders').doc(target.id).delete();
+  } else {
+    orders.splice(i, 1);
+    saveOrders(orders);
+    renderOrdersList();
+  }
+}
+
+// ===== TESTIMONIALS =====
+function getTestimonials(){try{return JSON.parse(localStorage.getItem('cheditz_testimonials'))||[]}catch{return[]}}
+function saveTestimonials(testis){localStorage.setItem('cheditz_testimonials',JSON.stringify(testis))}
+
+function renderTestimonialsList(){
+  const testis=getTestimonials(),el=document.getElementById('testimonialsList');
+  const total=testis.length;
+  const avgRating=total?testis.reduce((a,t)=>a+(t.rating||5),0)/total:0;
+  document.getElementById('testiCountTotal').textContent=total;
+  document.getElementById('testiAvgRating').textContent=avgRating.toFixed(1);
+  if(!testis.length){el.innerHTML='<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.75rem">No reviews yet</div>';return}
+  el.innerHTML=testis.map((t,i)=>{
+    const stars='★'.repeat(t.rating||5)+'☆'.repeat(5-(t.rating||5));
+    return`<div class="wl-item">
+      <div class="wl-info">
+        <div class="wl-title">${esc(t.name||'Anonymous')} — ${stars}</div>
+        <div class="wl-sub">"${esc(t.text||'')}"</div>
+        <div class="wl-sub" style="margin-top:4px">${esc(t.role||'Client')} · ${esc(t.date||'')}</div>
+      </div>
+      <div class="wl-btns">
+        <button class="wl-btn del" onclick="delTestimonial(${i})" title="Delete">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function delTestimonial(i) {
+  if (!confirm('Delete this review?')) return;
+  const testis = getTestimonials();
+  const target = testis[i];
+
+  if (FIREBASE_ENABLED && firebaseDb && target.id) {
+    await firebaseDb.collection('cheditz_testimonials').doc(target.id).delete();
+  } else {
+    testis.splice(i, 1);
+    saveTestimonials(testis);
+    renderTestimonialsList();
+  }
+}
 
 // Drag reorder
 let dragIdx=null;
