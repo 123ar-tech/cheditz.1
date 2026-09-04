@@ -225,6 +225,31 @@
   .ex-btn:hover{border-color:var(--acc);color:var(--acc)}
 
   hr{border:none;border-top:1px solid var(--edge);margin:1.5rem 0}
+
+  /* Admin Responsive */
+  @media(max-width:480px){
+    .login-box{width:90%;padding:2rem 1.5rem}
+    .adm-tabs{flex-wrap:wrap;gap:6px}
+    .adm-tab{font-size:0.6rem;padding:6px 10px;min-width:0}
+    .adm-panel{padding:1rem}
+    .stat-card{padding:0.8rem}
+    .stat-val{font-size:1.5rem}
+    .wl-item{flex-direction:column;text-align:center}
+    .wl-thumb{width:100%;height:120px}
+    .wl-info{padding:0.5rem 0}
+    .aff label{font-size:0.65rem}
+    .aff input,.aff textarea,.aff select{font-size:14px}
+    .adm-head{font-size:1rem;letter-spacing:0.1em}
+  }
+  @media(min-width:481px) and (max-width:768px){
+    .login-box{width:70%;max-width:380px}
+    .adm-tabs{gap:4px}
+    .adm-tab{font-size:0.65rem;padding:7px 12px}
+    .adm-panel{padding:1.25rem}
+  }
+  @media(min-width:769px){
+    .adm-panels{display:grid;grid-template-columns:1fr}
+  }
 </style>
 </head>
 <body>
@@ -484,23 +509,13 @@
 </div>
 
 <script>
-// ===== FIREBASE CONFIG =====
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyC2CVkVLsXEOtyuxOeJXhijbQ2x08odwkw",
-  authDomain: "cheditz-dee25.firebaseapp.com",
-  projectId: "cheditz-dee25",
-  storageBucket: "cheditz-dee25.firebasestorage.app",
-  messagingSenderId: "79278126031",
-  appId: "1:79278126031:web:87a596a8894ccf4a20d8ba"
-};
-const FIREBASE_ENABLED = FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY";
-let firebaseApp = null, firebaseDb = null;
-if (FIREBASE_ENABLED) {
-  try {
-    firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
-    firebaseDb = firebase.firestore();
-  } catch(e) { console.warn('Firebase init failed:', e); }
-}
+// ===== FIREBASE CONFIG (obfuscated) =====
+const _fC=['YWl6YVNZQzJDVmtWTHNYRU90eXV4T2VKWGhpamJRMngwOG9kd2t3','Y2hlZGl0ei1kZWUyNS5maXJlYmFzZWFwcC5jb20=','Y2hlZGl0ei1kZWUyNQ==','Y2hlZGl0ei1kZWUyNS5maXJlYmFzZXN0b3JhZ2UuYXBw','NzkyNzgxMjYwMzE=','OjE3OTI3ODEyNjAzMTp3ZWI6ODdhNTk2YTg4OTRjY2ZhMjBkOGJh'];
+function _fD(s){return decodeURIComponent(atob(s).split('').map(function(c){return '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)}).join(''))}
+const FIREBASE_CONFIG={apiKey:_fD(_fC[0]),authDomain:_fD(_fC[1]),projectId:_fD(_fC[2]),storageBucket:_fD(_fC[3]),messagingSenderId:_fD(_fC[4]),appId:_fD(_fC[5])};
+const FIREBASE_ENABLED=FIREBASE_CONFIG.apiKey!=="YOUR_API_KEY";
+let firebaseApp=null,firebaseDb=null;
+if(FIREBASE_ENABLED){try{firebaseApp=firebase.initializeApp(FIREBASE_CONFIG);firebaseDb=firebase.firestore();}catch(e){console.warn('Firebase init failed:',e);}}
 
 // Real-time Firestore Sync for Admin Panel
 if (FIREBASE_ENABLED && firebaseDb) {
@@ -508,7 +523,12 @@ if (FIREBASE_ENABLED && firebaseDb) {
   firebaseDb.collection('cheditz').doc('config').onSnapshot(doc => {
     const data = doc.data();
     if (data) {
-      localStorage.setItem('cheditz_config', JSON.stringify(data));
+      const localCfg = JSON.parse(localStorage.getItem('cheditz_config') || '{}');
+      const syncData = Object.assign({}, data);
+      delete syncData.password;
+      const merged = Object.assign({}, localCfg, syncData);
+      merged.password = localCfg.password || _fD('Y2hlZGl0ekAyMDI2');
+      localStorage.setItem('cheditz_config', JSON.stringify(merged));
       applyColor();
     }
   }, e => console.warn('Config snapshot error:', e));
@@ -531,7 +551,7 @@ if (FIREBASE_ENABLED && firebaseDb) {
 }
 
 // ===== CONFIG & STATE =====
-const DEFAULT_PASS_HASH = 'vaandana';
+const DEFAULT_PASS_HASH = _fD('Y2hlZGl0ekAyMDI2');
 let isAdmin = false;
 
 function getConfig() {
@@ -541,8 +561,10 @@ function getConfig() {
 function saveConfig(c) {
   localStorage.setItem('cheditz_config', JSON.stringify(c));
   if (FIREBASE_ENABLED && firebaseDb) {
-    firebaseDb.collection('cheditz').doc('config').set(c)
-      .then(() => console.log('✓ Saved to Firestore'))
+    const syncData = Object.assign({}, c);
+    delete syncData.password;
+    firebaseDb.collection('cheditz').doc('config').set(syncData)
+      .then(() => console.log('✓ Saved to Firestore (password excluded)'))
       .catch(e => {
         console.warn('Firebase save failed:', e);
         alert('Firebase SAVE failed: ' + e.code + '\n\n' + e.message + '\n\nCheck Firestore rules allow write.');
@@ -553,7 +575,7 @@ function saveConfig(c) {
 }
 function getDefaultConfig() {
   return {
-    password: DEFAULT_PASS_HASH,
+    password: _fD('Y2hlZGl0ekAyMDI2'),
     accent: '#9333ea',
     works: [
       { id:'d1', title:"Vande Bharat", sub:"Nagercoil → Chennai", cat:"Poster", meta:"Rail launch · A2", type:"image", url:"https://miaoda-conversation-file.s3cdn.medo.dev/user-c4hvi7diyakg/app-c4hvyv74mdxd/20260605/Vande Bharat Nagercoil to Chennai Poster.png", visible:true },
@@ -597,7 +619,7 @@ function doLogin(){
   const pass=document.getElementById('loginPass').value;
   if(!checkRateLimit('login',5)){alert('Too many attempts. Please wait 60 seconds.');return;}
   const cfg=getConfig();
-  if(pass===cfg.password||pass===DEFAULT_PASS_HASH){
+  if(pass===cfg.password){
     isAdmin=true;
     sessionStorage.setItem('cheditz_admin','1');
     sessionStorage.setItem('cheditz_admin_time',Date.now().toString());
@@ -969,10 +991,13 @@ function changePassword(){
   if(nw===cur){alert('New password must be different from current.');return}
   if(nw!==cf){alert('Passwords do not match.');return}
   cfg.password=nw;saveConfig(cfg);
+  sessionStorage.removeItem('cheditz_admin');
+  sessionStorage.removeItem('cheditz_admin_time');
   document.getElementById('set-curPass').value='';
   document.getElementById('set-newPass').value='';
   document.getElementById('set-confirmPass').value='';
-  alert('Password updated!');
+  alert('Password updated! You will be logged out. Please login with the new password.');
+  location.reload();
 }
 
 // ===== EXPORT / IMPORT =====
