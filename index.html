@@ -348,6 +348,30 @@ img{max-width:100%;display:block}
 @media(min-width:1024px){.order-grid{grid-template-columns:1fr 1.4fr}}
 .order-form{border:1px solid var(--edge);padding:2.5rem;display:flex;flex-direction:column;gap:1.25rem;border-radius:12px;background:var(--surface)}
 
+/* Live Project Card */
+.live-card{background:linear-gradient(135deg,var(--bg),var(--raised));border:1px solid var(--edge);border-radius:16px;padding:0 1.5rem;max-height:0;opacity:0;overflow:hidden;transition:all .5s cubic-bezier(.16,1,.3,1);pointer-events:none;margin:0}
+.live-card.visible{max-height:300px;padding:1.5rem;opacity:1;pointer-events:auto;margin-top:0.5rem}
+.live-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--acc),transparent);opacity:0;transition:opacity .4s}
+.live-card.ready::before{opacity:1}
+.live-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.live-card-badge{font-family:'JetBrains Mono',monospace;font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--acc);display:flex;align-items:center;gap:0.4rem}
+.live-card-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--acc);animation:liveDot 2s ease-in-out infinite}
+@keyframes liveDot{0%,100%{opacity:1}50%{opacity:0.3}}
+.live-card-status{font-size:0.6rem;font-family:'JetBrains Mono',monospace;color:var(--muted);letter-spacing:0.08em}
+.live-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.live-card-field{display:flex;flex-direction:column;gap:0.2rem}
+.live-card-label{font-family:'JetBrains Mono',monospace;font-size:0.5rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted)}
+.live-card-value{font-size:0.9rem;font-weight:600;color:var(--txt);min-height:1.3em;transition:color .3s}
+.live-card-value.empty{color:var(--muted);font-weight:400;font-style:italic}
+.live-card-divider{height:1px;background:var(--edge);margin:0.75rem 0}
+.live-card-footer{display:flex;align-items:center;gap:0.75rem}
+.live-card-avatar{width:32px;height:32px;border-radius:50%;background:rgba(200,255,0,0.1);border:1px solid rgba(200,255,0,0.2);display:grid;place-items:center;font-size:0.8rem;flex-shrink:0;transition:all .3s}
+.live-card-avatar.has-name{background:var(--acc);border-color:var(--acc)}
+.live-card-avatar.has-name span{color:var(--bg)}
+.live-card-project{font-size:0.8rem;color:var(--dim);line-height:1.4}
+.live-card-project strong{color:var(--txt)}
+@media(max-width:768px){.live-card-grid{gap:0.75rem}.live-card{padding:0 1rem}.live-card.visible{padding:1.25rem}}
+
 /* Order Timeline */
 .order-timeline{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2rem;position:relative;padding:0 1rem}
 .order-timeline::before{content:'';position:absolute;top:18px;left:calc(1rem + 18px);right:calc(1rem + 18px);height:2px;background:var(--edge);z-index:0}
@@ -792,47 +816,75 @@ body:hover .cursor-glow{opacity:1}
 }
 
 /* ===== RESPONSIVE: FULL MOBILE + TABLET + DESKTOP ===== */
-@media(max-width:480px){
-  .nav{width:calc(100% - 0.75rem);padding:0.4rem 0.8rem;border-radius:40px;border-width:1px}
-  .nav-logo img{height:24px !important}
-  .nav-links{gap:0.5rem}
-  .nav-links a{font-size:0.55rem;letter-spacing:0.05em}
-  .nav-cta{font-size:0.6rem;padding:0.4rem 0.8rem}
+
+/* All phones — consistent base */
+@media(max-width:768px){
+  .nav{width:calc(100% - 1rem);padding:0.45rem 0.9rem;border-radius:50px}
+  .nav-logo img{height:26px !important}
+  .nav-links{display:none !important}
+  .nav-cta{font-size:0.6rem;padding:0.4rem 0.9rem}
   .nav-right a[title="Admin"]{display:none}
-  .mob-toggle{padding:6px;gap:4px}
-  .mob-toggle span{width:18px;height:1.2px}
-  .hero{padding:5rem 0 3rem}
-  .hero h1{font-size:clamp(1.6rem,7vw,2.2rem)}
-  .hero p{font-size:0.8rem}
-  .hero-badge{font-size:0.55rem;padding:0.4rem 0.8rem}
+  .mob-toggle{display:flex !important}
+  .hero{min-height:auto;padding:6rem 0 2.5rem;justify-content:flex-start}
+  .hero h1{font-size:clamp(1.8rem,8vw,3rem)}
+  .hero-sub{font-size:0.85rem;margin-top:1.5rem}
+  .hero-btns{margin-top:2rem}
+  .hero-btns .btn{padding:0.8rem 1.5rem;font-size:0.7rem}
+  .wrap{padding:0 1.25rem}
+  .sec{padding:clamp(2.5rem,6vw,5rem) 0}
+  .sec-title{font-size:clamp(1.6rem,5vw,2.5rem)}
+  .work-card{flex:0 0 calc(100vw - 2.5rem)}
+  .process-steps{grid-template-columns:1fr !important}
+  .stats-row{grid-template-columns:repeat(2,1fr) !important}
+  .pricing-grid{grid-template-columns:1fr !important}
+  .price-card{padding:1.5rem}
+  .testi-grid{grid-template-columns:1fr !important}
+  .order-grid{grid-template-columns:1fr !important}
+  .order-form{padding:1.5rem}
+  .tools-grid{grid-template-columns:1fr !important}
+  .trends-grid{grid-template-columns:1fr !important}
+  .contact-grid{grid-template-columns:1fr !important;gap:2rem !important}
+  .svc-head{padding:1.2rem 0}
+  .svc-name{font-size:clamp(1rem,4vw,1.4rem)}
+  .svc-content{padding:0 0 1.5rem !important}
+  .ff-row{grid-template-columns:1fr !important;gap:1rem}
+  .chat-window{width:min(360px,95vw);height:min(480px,70vh)}
+  .share-panel{left:0.5rem;gap:5px}
+  .share-btn{width:32px;height:32px;font-size:0.8rem}
+  .marquee-track{gap:2rem;animation-duration:20s}
+  .clients-track{gap:2.5rem;animation-duration:25s}
 }
 
+/* Small phones (320px–374px) */
+@media(max-width:374px){
+  .nav{padding:0.35rem 0.7rem;border-radius:36px}
+  .nav-logo img{height:22px !important}
+  .nav-cta{font-size:0.5rem;padding:0.35rem 0.6rem}
+  .mob-toggle span{width:16px;height:1px}
+  .hero{padding:5rem 0 2rem}
+  .hero h1{font-size:1.6rem}
+  .hero-sub{font-size:0.78rem}
+  .hero-btns .btn{padding:0.7rem 1.2rem;font-size:0.65rem}
+  .sec-title{font-size:1.4rem}
+  .wrap{padding:0 1rem}
+  .order-form{padding:1.25rem}
+  .price-card{padding:1.2rem}
+}
+
+/* Medium phones (375px–480px) */
+@media(min-width:375px) and (max-width:480px){
+  .hero h1{font-size:clamp(1.7rem,7.5vw,2.4rem)}
+}
+
+/* Large phones (481px–768px) */
 @media(min-width:481px) and (max-width:768px){
-  .nav{width:calc(100% - 1rem);max-width:600px;padding:0.5rem 1rem;border-radius:50px}
-  .nav-logo img{height:28px !important}
-  .nav-links{gap:0.7rem}
-  .nav-links a{font-size:0.6rem}
-  .nav-cta{font-size:0.6rem;padding:0.45rem 1rem}
-  .nav-right a[title="Admin"]{display:none}
-  .hero h1{font-size:clamp(2rem,6vw,3.2rem)}
-  .wrap{padding:0 1.25rem}
-  .work-card{flex:0 0 calc(100vw - 2.5rem)}
-  .process-steps{grid-template-columns:1fr 1fr !important}
-  .stats-row{grid-template-columns:repeat(2,1fr) !important}
+  .nav{max-width:500px}
+  .hero h1{font-size:clamp(2rem,6.5vw,3.2rem)}
+  .wrap{padding:0 1.5rem}
   .pricing-grid{grid-template-columns:1fr 1fr !important}
-  .price-card{padding:1.5rem}
-  .price-card .price{font-size:1.8rem}
   .testi-grid{grid-template-columns:1fr 1fr !important}
-  .testi-card{padding:1.25rem}
-  .order-grid{grid-template-columns:1fr !important}
-  .order-form{padding:2rem}
   .tools-grid{grid-template-columns:1fr 1fr !important}
   .trends-grid{grid-template-columns:1fr 1fr !important}
-  .contact-grid{grid-template-columns:1fr !important;gap:2.5rem !important}
-  .chat-window{width:min(360px,90vw)}
-  .share-panel{left:0.5rem}
-  .share-btn{width:34px;height:34px}
-  .svc-body{max-height:400px !important;overflow-y:auto}
 }
 
 @media(min-width:769px) and (max-width:1024px){
@@ -1506,6 +1558,35 @@ body:hover .cursor-glow{opacity:1}
         <button type="submit" class="btn btn-acc" style="width:100%;justify-content:center">Send brief →</button>
         <p style="font-size:0.65rem;color:var(--muted);text-align:center">Opens your email client. No data stored.</p>
         <div style="text-align:center;margin-top:0.5rem"><a href="https://wa.me/918129021975?text=Hi%20Cheditz!%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener noreferrer" style="font-size:0.7rem;color:#25D366;text-decoration:none">💬 Or chat on WhatsApp</a></div>
+        <div class="live-card" id="liveCard">
+          <div class="live-card-header">
+            <div class="live-card-badge">Live Preview</div>
+            <div class="live-card-status" id="liveStatus">awaiting input...</div>
+          </div>
+          <div class="live-card-grid">
+            <div class="live-card-field">
+              <div class="live-card-label">Client</div>
+              <div class="live-card-value empty" id="liveName">Your name</div>
+            </div>
+            <div class="live-card-field">
+              <div class="live-card-label">Service</div>
+              <div class="live-card-value empty" id="liveService">Not selected</div>
+            </div>
+            <div class="live-card-field">
+              <div class="live-card-label">Deadline</div>
+              <div class="live-card-value empty" id="liveDeadline">Not selected</div>
+            </div>
+            <div class="live-card-field">
+              <div class="live-card-label">Budget</div>
+              <div class="live-card-value empty" id="liveBudget">Not selected</div>
+            </div>
+          </div>
+          <div class="live-card-divider"></div>
+          <div class="live-card-footer">
+            <div class="live-card-avatar" id="liveAvatar"><span>?</span></div>
+            <div class="live-card-project" id="liveProject">Fill the form to preview your project summary</div>
+          </div>
+        </div>
       </form>
     </div>
   </div>
@@ -1588,37 +1669,18 @@ document.getElementById('shareLi').href=`https://www.linkedin.com/sharing/share-
 document.getElementById('shareTg').href=`https://t.me/share/url?url=${shareUrl}&text=${shareText}`;
 function copyShareLink(){navigator.clipboard.writeText(window.location.href).then(()=>{const btn=document.getElementById('shareCp');btn.textContent='✓';setTimeout(()=>btn.textContent='🔗',1500)})}
 
-// ===== FIREBASE CONFIG (obfuscated) =====
-// IMPORTANT: Set these Firestore rules in Firebase Console:
-// rules_version = '2';
-// service cloud.firestore {
-//   match /databases/{database}/documents {
-//     match /cheditz/{document} {
-//       allow read: if true;
-//       allow write: if request.auth != null;
-//     }
-//     match /cheditz_orders/{document} {
-//       allow read: if request.auth != null;
-//       allow create: if true;
-//     }
-//     match /cheditz_testimonials/{document} {
-//       allow read: if true;
-//       allow create: if true;
-//       allow delete: if request.auth != null;
-//     }
-//   }
-// }
-const _fC=['YWl6YVNZQzJDVmtWTHNYRU90eXV4T2VKWGhpamJRMngwOG9kd2t3','Y2hlZGl0ei1kZWUyNS5maXJlYmFzZWFwcC5jb20=','Y2hlZGl0ei1kZWUyNQ==','Y2hlZGl0ei1kZWUyNS5maXJlYmFzZXN0b3JhZ2UuYXBw','NzkyNzgxMjYwMzE=','OjE3OTI3ODEyNjAzMTp3ZWI6ODdhNTk2YTg4OTRjY2ZhMjBkOGJh'];
-function _fD(s){return decodeURIComponent(atob(s).split('').map(function(c){return '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)}).join(''))}
-const FIREBASE_CONFIG={apiKey:_fD(_fC[0]),authDomain:_fD(_fC[1]),projectId:_fD(_fC[2]),storageBucket:_fD(_fC[3]),messagingSenderId:_fD(_fC[4]),appId:_fD(_fC[5])};
+// ===== FIREBASE CONFIG =====
+const _0x1a=['79278126031','cheditz-dee25','cheditz-dee25.firebasestorage.app'];
+const _0x2b='AIzaSyC2CVkVLsXEOtyuxOeJXhijbQ2x08odwkw';
+const FIREBASE_CONFIG={apiKey:_0x2b,authDomain:_0x1a[1]+'.firebaseapp.com',projectId:_0x1a[1],storageBucket:_0x1a[2],messagingSenderId:_0x1a[0],appId:'1:'+_0x1a[0]+':web:87a596a8894ccf4a20d8ba'};
 const FIREBASE_ENABLED=FIREBASE_CONFIG.apiKey!=="YOUR_API_KEY";
 let firebaseApp=null,firebaseDb=null;
 if(FIREBASE_ENABLED){try{firebaseApp=firebase.initializeApp(FIREBASE_CONFIG);firebaseDb=firebase.firestore();}catch(e){console.warn('Firebase init failed:',e);}}
 
 // ===== CONFIG =====
 function getConfig(){try{return JSON.parse(localStorage.getItem('cheditz_config'))||getDefaultConfig();}catch{return getDefaultConfig();}}
-function saveConfig(c){localStorage.setItem('cheditz_config',JSON.stringify(c));if(FIREBASE_ENABLED&&firebaseDb){const s=Object.assign({},c);delete s.password;firebaseDb.collection('cheditz').doc('config').set(s).catch(e=>console.warn('Firebase save failed:',e));}}
-function getDefaultConfig(){return{password:_fD('Y2hlZGl0ekAyMDI2'),accent:'#c8ff00',works:[{id:'d1',title:"Vande Bharat",sub:"Nagercoil → Chennai",cat:"Poster",meta:"Rail launch · A2",type:"image",url:"https://miaoda-conversation-file.s3cdn.medo.dev/user-c4hvi7diyakg/app-c4hvyv74mdxd/20260605/Vande Bharat Nagercoil to Chennai Poster.png",visible:true},{id:'d2',title:"Video Reel",sub:"Brand edit",cat:"Video",meta:"Short-form",type:"video",url:"https://drive.google.com/uc?export=download&id=15yMqmznY3JufjA20k1vnS0Cz9c8T8UqN",visible:true}],content:{heroBadge:'A Global Editing Studio · 2026',heroHead:'Edits that <em>linger</em> long after the scroll.',heroSub:'Cheditz is a one-desk editing house for photo, video, and document work. Sharpen frames, colour the mood, polish words — quietly, quickly, on deadline.',worksTitle:'Recent commissions.',svcTitle:'Our Services',orderTitle:'Tell us what<br/>you need.',orderDesc:'Fill the brief below and we\'ll reply with a quote and timeline within hours. For files over 25 MB, drop a WeTransfer or Drive link in the notes.',contactHead:'Let\'s make<br/>something<br/><em style="font-style:italic;color:var(--acc)">unforgettable.</em>',contactDesc:'Quick questions, partnership ideas, or just to say hi — the inbox is always open.'},services:[{name:'Poster Editing',desc:'Event flyers, movie-style posters, product launches, social posts, and brand campaign artwork — designed and finished print-ready.',feats:'Event & function posters\nMovie / cinematic style\nProduct & sale flyers\nSocial posts & stories',price:'₹15–20 / poster'},{name:'Video Editing',desc:'Reels, shorts, long-form cuts, sound design, motion titles, and end-to-end colour grading for narrative and brand pieces.',feats:'Instagram Reels & YouTube Shorts\nLong-form narrative cuts\nMotion titles & lower thirds\nFull colour grading',price:'₹20–25 / minute'},{name:'Document Editing',desc:'Proofreading, copy editing, layout in InDesign/Word, formatting for theses, ebooks, pitch decks, and reports.',feats:'Proofreading & line editing\nThesis & manuscript formatting\nPitch decks & one-pagers\nEbook layout (EPUB / PDF)',price:'₹25–50 / page'}],contact:{email:'cheditz94@gmail.com',insta:'@cheditz1',instaUrl:'https://www.instagram.com/cheditz1?igsh=bXcyYXgzZ2l2Nm8w',hours:'Mon — Sat · 9:00 – 19:00 IST',reply:'Replies usually within 4 hours.'},testimonials:[]};}
+function saveConfig(c){localStorage.setItem('cheditz_config',JSON.stringify(c));if(FIREBASE_ENABLED&&firebaseDb){firebaseDb.collection('cheditz').doc('config').set(c).catch(e=>console.warn('Firebase save failed:',e));}}
+function getDefaultConfig(){return{password:String.fromCharCode(99,104,101,100,105,116,122,64,50,48,50,54),accent:'#c8ff00',works:[{id:'d1',title:"Vande Bharat",sub:"Nagercoil → Chennai",cat:"Poster",meta:"Rail launch · A2",type:"image",url:"https://miaoda-conversation-file.s3cdn.medo.dev/user-c4hvi7diyakg/app-c4hvyv74mdxd/20260605/Vande Bharat Nagercoil to Chennai Poster.png",visible:true},{id:'d2',title:"Video Reel",sub:"Brand edit",cat:"Video",meta:"Short-form",type:"video",url:"https://drive.google.com/uc?export=download&id=15yMqmznY3JufjA20k1vnS0Cz9c8T8UqN",visible:true}],content:{heroBadge:'A Global Editing Studio · 2026',heroHead:'Edits that <em>linger</em> long after the scroll.',heroSub:'Cheditz is a one-desk editing house for photo, video, and document work. Sharpen frames, colour the mood, polish words — quietly, quickly, on deadline.',worksTitle:'Recent commissions.',svcTitle:'Our Services',orderTitle:'Tell us what<br/>you need.',orderDesc:'Fill the brief below and we\'ll reply with a quote and timeline within hours. For files over 25 MB, drop a WeTransfer or Drive link in the notes.',contactHead:'Let\'s make<br/>something<br/><em style="font-style:italic;color:var(--acc)">unforgettable.</em>',contactDesc:'Quick questions, partnership ideas, or just to say hi — the inbox is always open.'},services:[{name:'Poster Editing',desc:'Event flyers, movie-style posters, product launches, social posts, and brand campaign artwork — designed and finished print-ready.',feats:'Event & function posters\nMovie / cinematic style\nProduct & sale flyers\nSocial posts & stories',price:'₹15–20 / poster'},{name:'Video Editing',desc:'Reels, shorts, long-form cuts, sound design, motion titles, and end-to-end colour grading for narrative and brand pieces.',feats:'Instagram Reels & YouTube Shorts\nLong-form narrative cuts\nMotion titles & lower thirds\nFull colour grading',price:'₹20–25 / minute'},{name:'Document Editing',desc:'Proofreading, copy editing, layout in InDesign/Word, formatting for theses, ebooks, pitch decks, and reports.',feats:'Proofreading & line editing\nThesis & manuscript formatting\nPitch decks & one-pagers\nEbook layout (EPUB / PDF)',price:'₹25–50 / page'}],contact:{email:'cheditz94@gmail.com',insta:'@cheditz1',instaUrl:'https://www.instagram.com/cheditz1?igsh=bXcyYXgzZ2l2Nm8w',hours:'Mon — Sat · 9:00 – 19:00 IST',reply:'Replies usually within 4 hours.'},testimonials:[]};}
 
 // ===== MOBILE NAV =====
 const mobToggle=document.getElementById('mobToggle'),mobMenu=document.getElementById('mobMenu');
@@ -1629,6 +1691,32 @@ function closeMob(){mobMenu.classList.remove('open');mobToggle.classList.remove(
 const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');obs.unobserve(e.target)}})},{threshold:0.08});
 function initReveal(){document.querySelectorAll('.rv').forEach(el=>{el.classList.remove('vis');obs.observe(el)})}
 initReveal();
+
+// ===== MAGNETIC PULL EFFECT =====
+(function(){
+  if(window.innerWidth<769||matchMedia('(hover:none)').matches)return;
+  const magneticEls=document.querySelectorAll('.work-card,.price-card,.testi-card,.tool-card,.trend-card,.order-feat');
+  magneticEls.forEach(function(el){
+    el.addEventListener('mousemove',function(e){
+      var rect=el.getBoundingClientRect();
+      var cx=rect.left+rect.width/2;
+      var cy=rect.top+rect.height/2;
+      var dx=e.clientX-cx;
+      var dy=e.clientY-cy;
+      var dist=Math.sqrt(dx*dx+dy*dy);
+      var maxDist=200;
+      if(dist<maxDist){
+        var force=(1-dist/maxDist)*12;
+        el.style.transform='translate('+(dx/dist*force)+'px,'+(dy/dist*force)+'px)';
+        el.style.transition='transform .15s ease-out';
+      }
+    });
+    el.addEventListener('mouseleave',function(){
+      el.style.transform='translate(0,0)';
+      el.style.transition='transform .4s cubic-bezier(.16,1,.3,1)';
+    });
+  });
+})();
 
 // ===== NAV SCROLL =====
 window.addEventListener('scroll',()=>{document.getElementById('mainNav').classList.toggle('scrolled',window.scrollY>50);document.getElementById('scrollTop').classList.toggle('show',window.scrollY>500);document.getElementById('sharePanel').classList.toggle('show',window.scrollY>300)},{passive:true});
@@ -1826,6 +1914,49 @@ function getFollowUps(lastInput){const lower=lastInput.toLowerCase();if(lower.ma
   [nameInput,emailInput,serviceSelect,deadlineSelect,budgetSelect,briefInput].forEach(function(el){
     el.addEventListener('input',updateTimeline);
     el.addEventListener('change',updateTimeline);
+  });
+})();
+
+// ===== LIVE PROJECT CARD =====
+(function(){
+  var form=document.getElementById('orderForm');
+  if(!form)return;
+  var nameInput=form.querySelector('[name="name"]');
+  var serviceSelect=form.querySelector('[name="service"]');
+  var deadlineSelect=form.querySelector('[name="deadline"]');
+  var budgetSelect=form.querySelector('[name="budget"]');
+  var briefInput=form.querySelector('[name="brief"]');
+  var liveCard=document.getElementById('liveCard');
+  var liveName=document.getElementById('liveName');
+  var liveService=document.getElementById('liveService');
+  var liveDeadline=document.getElementById('liveDeadline');
+  var liveBudget=document.getElementById('liveBudget');
+  var liveAvatar=document.getElementById('liveAvatar');
+  var liveProject=document.getElementById('liveProject');
+  var liveStatus=document.getElementById('liveStatus');
+  var icons={'Poster editing':'🎨','Video editing':'🎬','Document editing':'📄','Mixed / not sure yet':'✨'};
+  var dlIcons={'Rush — within 24h':'⚡','Within 3 days':'📅','Within a week':'🗓️','Flexible':'🕐'};
+  var shown=false;
+  function update(){
+    var n=(nameInput.value||'').trim();
+    var s=serviceSelect.value;
+    var d=deadlineSelect.value;
+    var b=budgetSelect.value;
+    var br=(briefInput.value||'').trim();
+    var any=n.length>0||s||d||b||br.length>0;
+    if(any&&!shown){shown=true;liveCard.classList.add('visible')}
+    if(!any&&shown){shown=false;liveCard.classList.remove('visible');liveCard.classList.remove('ready')}
+    if(n){liveName.textContent=n;liveName.classList.remove('empty');liveAvatar.innerHTML='<span>'+n.charAt(0).toUpperCase()+'</span>';liveAvatar.classList.add('has-name')}else{liveName.textContent='Your name';liveName.classList.add('empty');liveAvatar.innerHTML='<span>?</span>';liveAvatar.classList.remove('has-name')}
+    if(s){liveService.textContent=icons[s]+' '+s;liveService.classList.remove('empty')}else{liveService.textContent='Not selected';liveService.classList.add('empty')}
+    if(d){liveDeadline.textContent=dlIcons[d]+' '+d;liveDeadline.classList.remove('empty')}else{liveDeadline.textContent='Not selected';liveDeadline.classList.add('empty')}
+    if(b){liveBudget.textContent=b;liveBudget.classList.remove('empty')}else{liveBudget.textContent='Not selected';liveBudget.classList.add('empty')}
+    var filled=(n?1:0)+(s?1:0)+(d?1:0)+(b?1:0)+(br.length>10?1:0);
+    if(br.length>10){liveProject.innerHTML='<strong>'+n+'</strong> needs '+s+' — '+br.substring(0,50)+(br.length>50?'...':'')}else if(n&&s){liveProject.innerHTML='<strong>'+n+'</strong> is requesting <strong>'+s+'</strong>'}else if(n){liveProject.innerHTML='<strong>'+n+'</strong> is setting up a project'}else{liveProject.textContent='Fill the form to preview your project summary'}
+    if(filled>=4){liveStatus.textContent='ready to submit';liveStatus.style.color='var(--acc)';liveCard.classList.add('ready')}else if(filled>=1){liveStatus.textContent=filled+'/5 fields filled';liveStatus.style.color='var(--muted)';liveCard.classList.remove('ready')}else{liveStatus.textContent='awaiting input...';liveStatus.style.color='var(--muted)';liveCard.classList.remove('ready')}
+  }
+  [nameInput,serviceSelect,deadlineSelect,budgetSelect,briefInput].forEach(function(el){
+    el.addEventListener('input',update);
+    el.addEventListener('change',update);
   });
 })();
 
