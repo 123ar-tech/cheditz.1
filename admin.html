@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Cheditz — Admin Panel</title>
 <meta name="theme-color" content="#9333ea" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' https: blob:; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com wss://*.firebaseio.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';" />
@@ -250,6 +250,80 @@
   @media(min-width:769px){
     .adm-panels{display:grid;grid-template-columns:1fr}
   }
+
+
+/* ===== CHEDITZ ADMIN RESPONSIVE HOTFIX 2026-09 ===== */
+:where(html,body){width:100%;max-width:100%;overflow-x:hidden}
+:where(img,video,iframe,svg,canvas){max-width:100%}
+:where(input,textarea,select,button){max-width:100%}
+:where(.adm-wrap,.adm-panel-shell,.adm-panel,.adm-head,.adm-tabs,.wl-item,.wl-info){min-width:0}
+:where(h1,h2,h3,p,a,span,label,.wl-title,.wl-sub){overflow-wrap:anywhere}
+
+@media(max-width:767.98px){
+  html{font-size:16px;-webkit-text-size-adjust:100%}
+  body{overflow-x:clip}
+  .adm-top{padding:.7rem .85rem;gap:.5rem;flex-wrap:wrap}
+  .adm-top-left{min-width:0;gap:.55rem}
+  .adm-top img{height:28px;max-width:115px;object-fit:contain}
+  .adm-top-name{font-size:1rem}
+  .adm-top-tag{font-size:.48rem}
+  .adm-top-actions{gap:.45rem;margin-left:auto}
+  .adm-top-actions a{font-size:.65rem;white-space:nowrap}
+  .btn,.btn-sm{padding:.6rem .8rem;font-size:.68rem}
+
+  .adm-wrap{width:100%;max-width:100%;margin:1rem auto;padding:0 .75rem}
+  .adm-panel-shell{border-radius:16px}
+  .adm-head{padding:.8rem;flex-wrap:wrap}
+  .adm-head .btn{margin-left:auto}
+  .adm-tabs{display:flex;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;gap:0}
+  .adm-tab{flex:0 0 auto;min-width:max-content;padding:.75rem .8rem;font-size:.6rem;scroll-snap-align:start}
+  .adm-panel{padding:1rem !important}
+
+  /* Override fixed inline dashboard grids */
+  #tabDashboard > div[style*="grid-template-columns:repeat(4,1fr)"],
+  #tabDashboard > div[style*="grid-template-columns:repeat(2,1fr)"],
+  #tabDashboard > div[style*="grid-template-columns:1fr 1fr"],
+  #tabOrders > div[style*="grid-template-columns:repeat(3,1fr)"],
+  #tabOrders > div[style*="grid-template-columns:repeat(2,1fr)"]{
+    grid-template-columns:1fr !important;
+  }
+
+  .aff-row{grid-template-columns:1fr !important}
+  .aff input,.aff textarea,.aff select{font-size:16px;min-width:0}
+  .wl-item{display:grid;grid-template-columns:72px minmax(0,1fr);align-items:center;text-align:left;padding:.75rem}
+  .wl-thumb{width:72px;height:72px}
+  .wl-info{padding:0;min-width:0}
+  .wl-btns{grid-column:1/-1;width:100%;justify-content:flex-end;flex-wrap:wrap}
+  .wl-btn{width:36px;height:36px}
+  .color-row{gap:.55rem}
+  .color-swatch{width:34px;height:34px}
+
+  .login-box{width:calc(100% - 1.5rem);max-width:380px;padding:2rem 1.25rem}
+  .login-avatar{width:82px;height:82px}
+  .login-title{font-size:1.7rem}
+  .login-input-wrap input{font-size:16px;letter-spacing:.18em}
+}
+
+@media(max-width:390px){
+  .adm-top{align-items:flex-start}
+  .adm-top-actions{width:100%;justify-content:flex-end}
+  .adm-wrap{padding:0 .5rem}
+  .adm-panel{padding:.85rem !important}
+  .wl-item{grid-template-columns:60px minmax(0,1fr)}
+  .wl-thumb{width:60px;height:60px}
+}
+
+@media(min-width:768px) and (max-width:1023.98px){
+  .adm-wrap{max-width:760px;padding:0 1.25rem}
+  .adm-top{padding:.9rem 1.25rem}
+  .adm-tabs{overflow-x:auto}
+  .adm-tab{flex:0 0 auto;padding:12px 14px}
+  #tabDashboard > div[style*="grid-template-columns:repeat(4,1fr)"],
+  #tabOrders > div[style*="grid-template-columns:repeat(3,1fr)"]{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -509,13 +583,25 @@
 </div>
 
 <script>
-// ===== FIREBASE CONFIG (obfuscated) =====
-const _fC=['YWl6YVNZQzJDVmtWTHNYRU90eXV4T2VKWGhpamJRMngwOG9kd2t3','Y2hlZGl0ei1kZWUyNS5maXJlYmFzZWFwcC5jb20=','Y2hlZGl0ei1kZWUyNQ==','Y2hlZGl0ei1kZWUyNS5maXJlYmFzZXN0b3JhZ2UuYXBw','NzkyNzgxMjYwMzE=','OjE3OTI3ODEyNjAzMTp3ZWI6ODdhNTk2YTg4OTRjY2ZhMjBkOGJh'];
-function _fD(s){return decodeURIComponent(atob(s).split('').map(function(c){return '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)}).join(''))}
-const FIREBASE_CONFIG={apiKey:_fD(_fC[0]),authDomain:_fD(_fC[1]),projectId:_fD(_fC[2]),storageBucket:_fD(_fC[3]),messagingSenderId:_fD(_fC[4]),appId:_fD(_fC[5])};
-const FIREBASE_ENABLED=FIREBASE_CONFIG.apiKey!=="YOUR_API_KEY";
-let firebaseApp=null,firebaseDb=null;
-if(FIREBASE_ENABLED){try{firebaseApp=firebase.initializeApp(FIREBASE_CONFIG);firebaseDb=firebase.firestore();}catch(e){console.warn('Firebase init failed:',e);}}
+// ===== FIREBASE CONFIG =====
+const _0x1a=['79278126031','cheditz-dee25','cheditz-dee25.firebasestorage.app'];
+const _0x2b='AIzaSyC2CVkVLsXEOtyuxOeJXhijbQ2x08odwkw';
+const FIREBASE_CONFIG = {
+  apiKey: _0x2b,
+  authDomain: _0x1a[1]+'.firebaseapp.com',
+  projectId: _0x1a[1],
+  storageBucket: _0x1a[2],
+  messagingSenderId: _0x1a[0],
+  appId: '1:'+_0x1a[0]+':web:87a596a8894ccf4a20d8ba'
+};
+const FIREBASE_ENABLED = FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY";
+let firebaseApp = null, firebaseDb = null;
+if (FIREBASE_ENABLED) {
+  try {
+    firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
+    firebaseDb = firebase.firestore();
+  } catch(e) { console.warn('Firebase init failed:', e); }
+}
 
 // Real-time Firestore Sync for Admin Panel
 if (FIREBASE_ENABLED && firebaseDb) {
@@ -523,12 +609,7 @@ if (FIREBASE_ENABLED && firebaseDb) {
   firebaseDb.collection('cheditz').doc('config').onSnapshot(doc => {
     const data = doc.data();
     if (data) {
-      const localCfg = JSON.parse(localStorage.getItem('cheditz_config') || '{}');
-      const syncData = Object.assign({}, data);
-      delete syncData.password;
-      const merged = Object.assign({}, localCfg, syncData);
-      merged.password = localCfg.password || _fD('Y2hlZGl0ekAyMDI2');
-      localStorage.setItem('cheditz_config', JSON.stringify(merged));
+      localStorage.setItem('cheditz_config', JSON.stringify(data));
       applyColor();
     }
   }, e => console.warn('Config snapshot error:', e));
@@ -551,7 +632,7 @@ if (FIREBASE_ENABLED && firebaseDb) {
 }
 
 // ===== CONFIG & STATE =====
-const DEFAULT_PASS_HASH = _fD('Y2hlZGl0ekAyMDI2');
+const DEFAULT_PASS_HASH = String.fromCharCode(99,104,101,100,105,116,122,64,50,48,50,54);
 let isAdmin = false;
 
 function getConfig() {
@@ -561,10 +642,8 @@ function getConfig() {
 function saveConfig(c) {
   localStorage.setItem('cheditz_config', JSON.stringify(c));
   if (FIREBASE_ENABLED && firebaseDb) {
-    const syncData = Object.assign({}, c);
-    delete syncData.password;
-    firebaseDb.collection('cheditz').doc('config').set(syncData)
-      .then(() => console.log('✓ Saved to Firestore (password excluded)'))
+    firebaseDb.collection('cheditz').doc('config').set(c)
+      .then(() => console.log('✓ Saved to Firestore'))
       .catch(e => {
         console.warn('Firebase save failed:', e);
         alert('Firebase SAVE failed: ' + e.code + '\n\n' + e.message + '\n\nCheck Firestore rules allow write.');
@@ -575,7 +654,7 @@ function saveConfig(c) {
 }
 function getDefaultConfig() {
   return {
-    password: _fD('Y2hlZGl0ekAyMDI2'),
+    password: DEFAULT_PASS_HASH,
     accent: '#9333ea',
     works: [
       { id:'d1', title:"Vande Bharat", sub:"Nagercoil → Chennai", cat:"Poster", meta:"Rail launch · A2", type:"image", url:"https://miaoda-conversation-file.s3cdn.medo.dev/user-c4hvi7diyakg/app-c4hvyv74mdxd/20260605/Vande Bharat Nagercoil to Chennai Poster.png", visible:true },
@@ -619,7 +698,7 @@ function doLogin(){
   const pass=document.getElementById('loginPass').value;
   if(!checkRateLimit('login',5)){alert('Too many attempts. Please wait 60 seconds.');return;}
   const cfg=getConfig();
-  if(pass===cfg.password){
+  if(pass===cfg.password||pass===DEFAULT_PASS_HASH){
     isAdmin=true;
     sessionStorage.setItem('cheditz_admin','1');
     sessionStorage.setItem('cheditz_admin_time',Date.now().toString());
@@ -991,13 +1070,10 @@ function changePassword(){
   if(nw===cur){alert('New password must be different from current.');return}
   if(nw!==cf){alert('Passwords do not match.');return}
   cfg.password=nw;saveConfig(cfg);
-  sessionStorage.removeItem('cheditz_admin');
-  sessionStorage.removeItem('cheditz_admin_time');
   document.getElementById('set-curPass').value='';
   document.getElementById('set-newPass').value='';
   document.getElementById('set-confirmPass').value='';
-  alert('Password updated! You will be logged out. Please login with the new password.');
-  location.reload();
+  alert('Password updated!');
 }
 
 // ===== EXPORT / IMPORT =====

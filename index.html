@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Cheditz — Photo, Video & Document Editing</title>
 <meta name="description" content="Cheditz — cinematic photo, video, and document editing on demand." />
 <link rel="icon" type="image/png" href="favicon.png?v=2" />
@@ -936,6 +936,93 @@ body:hover .cursor-glow{opacity:1}
   .chat-fab{bottom:max(1.5rem,env(safe-area-inset-bottom))}
   .chat-window{bottom:max(5.5rem,calc(env(safe-area-inset-bottom) + 4rem))}
 }
+
+
+/* ===== CHEDITZ RESPONSIVE HOTFIX 2026-09 ===== */
+:where(html,body){width:100%;max-width:100%;overflow-x:hidden}
+:where(img,video,iframe,svg,canvas){max-width:100%}
+:where(input,textarea,select,button){max-width:100%}
+:where(.wrap,.hero,.sec,.order-grid,.contact-grid,.tools-grid,.trends-grid,.testi-grid,.pricing-grid,.process-steps,.stats-row){min-width:0}
+:where(.wrap,.order-grid>*,.contact-grid>*,.tools-grid>*,.trends-grid>*,.testi-grid>*,.pricing-grid>*,.process-steps>*,.stats-row>*){min-width:0}
+:where(h1,h2,h3,p,a,span,li,label,.work-title,.contact-link strong,.contact-link span){overflow-wrap:anywhere}
+
+@media (max-width: 767.98px){
+  html{font-size:16px;-webkit-text-size-adjust:100%}
+  body{width:100%;overflow-x:clip}
+  .wrap{width:100%;max-width:100%;padding-inline:clamp(.9rem,4vw,1.25rem)}
+  .nav{top:max(.5rem,env(safe-area-inset-top));width:calc(100% - 1rem);max-width:none;padding:.45rem .7rem}
+  .nav .wrap{padding:0;gap:.5rem;justify-content:space-between;min-width:0}
+  .nav-logo{min-width:0;flex:0 1 auto}
+  .nav-logo img{max-width:min(150px,42vw);height:auto !important}
+  .nav-right{gap:.35rem;flex-shrink:0}
+  .nav-cta{white-space:nowrap;padding:.45rem .7rem;font-size:.56rem}
+  .mob-toggle{flex-shrink:0}
+  .mob-menu{padding:max(4.5rem,calc(env(safe-area-inset-top) + 4rem)) 1.25rem max(2rem,env(safe-area-inset-bottom));overflow-y:auto}
+
+  .hero{min-height:100svh;padding:max(6rem,calc(env(safe-area-inset-top) + 5.5rem)) 0 3rem}
+  .hero h1{font-size:clamp(2rem,11vw,3.25rem);line-height:.96;letter-spacing:-.035em;max-width:100%}
+  .hero-tag{font-size:.55rem;letter-spacing:.18em;gap:.6rem;margin-bottom:1.25rem}
+  .hero-tag::before{width:24px}
+  .hero-sub{max-width:100%;font-size:.9rem;line-height:1.7}
+  .hero-btns{display:grid;grid-template-columns:1fr;gap:.75rem;width:100%}
+  .hero-btns .btn{width:100%;justify-content:center;min-height:46px}
+
+  .sec{padding:3.25rem 0}
+  .sec-title{font-size:clamp(1.75rem,8vw,2.6rem);line-height:1.05}
+  .sec-desc{font-size:.9rem;max-width:100%}
+
+  .work-card{flex-basis:calc(100vw - 2rem) !important;max-width:calc(100vw - 2rem)}
+  .work-info{gap:.75rem;align-items:flex-start}
+  .work-title{font-size:1rem}
+
+  .svc-head-left{gap:.75rem;min-width:0}
+  .svc-num{width:1.4rem;flex-shrink:0}
+  .svc-name{min-width:0;overflow-wrap:anywhere}
+  .svc-content{grid-template-columns:1fr !important;padding:0 0 1.5rem !important}
+
+  .stats-row{grid-template-columns:1fr 1fr !important}
+  .process-steps,.pricing-grid,.testi-grid,.order-grid,.tools-grid,.trends-grid,.contact-grid{grid-template-columns:1fr !important}
+  .price-card,.order-form,.tool-card,.trend-card,.testi-card{min-width:0}
+  .order-form{padding:1.25rem}
+  .ff-row,.live-card-grid{grid-template-columns:1fr !important}
+  .ff input,.ff textarea,.ff select{font-size:16px}
+  .resolution-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+
+  .contact-link{padding:1.1rem 0}
+  .hours-box{padding:1.1rem}
+  footer .wrap{flex-direction:column;align-items:flex-start}
+  footer .wrap > div{max-width:100%;flex-wrap:wrap}
+
+  .chat-window{left:.75rem;right:.75rem;bottom:max(5rem,calc(env(safe-area-inset-bottom) + 4.5rem));width:auto;height:min(70svh,500px)}
+  .chat-fab{right:max(.9rem,env(safe-area-inset-right));bottom:max(.9rem,env(safe-area-inset-bottom))}
+  #waBtn{left:max(.9rem,env(safe-area-inset-left));bottom:max(.9rem,env(safe-area-inset-bottom))}
+  #scrollTop{left:max(.9rem,env(safe-area-inset-left));bottom:max(5rem,calc(env(safe-area-inset-bottom) + 4.5rem))}
+  .share-panel{left:max(.5rem,env(safe-area-inset-left))}
+}
+
+@media (max-width: 390px){
+  .nav-logo img{max-width:125px}
+  .nav-cta{padding:.4rem .55rem;font-size:.5rem}
+  .hero h1{font-size:clamp(1.85rem,10.5vw,2.6rem)}
+  .stats-row{grid-template-columns:1fr !important}
+  .resolution-grid{grid-template-columns:1fr 1fr}
+}
+
+@media (min-width: 768px) and (max-width: 1023.98px){
+  .wrap{padding-inline:2rem}
+  .nav{width:calc(100% - 2rem)}
+  .nav .wrap{gap:1rem;padding:0}
+  .nav-links{gap:1.1rem}
+  .nav-links a{font-size:.68rem}
+  .hero h1{font-size:clamp(3.25rem,8vw,5.5rem)}
+  .pricing-grid,.testi-grid,.tools-grid,.trends-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+  .process-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .process-step:last-child{grid-column:1/-1}
+  .order-grid,.contact-grid{grid-template-columns:1fr !important}
+  .svc-content{grid-template-columns:1.5fr 1fr !important}
+  .svc-price-box{grid-column:1/-1}
+}
+
 </style>
 <script type="application/ld+json">
 {
