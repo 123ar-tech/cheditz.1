@@ -915,6 +915,159 @@ function delWork(i){if(!confirm('Delete this work?'))return;const cfg=getConfig(
 function getOrders(){try{return JSON.parse(localStorage.getItem('cheditz_orders'))||[]}catch{return[]}}
 function saveOrders(orders){localStorage.setItem('cheditz_orders',JSON.stringify(orders))}
 
+// ===== RECEIPT NUMBER GENERATOR =====
+function generateReceiptNumber(){
+  const d=new Date();
+  const yy=String(d.getFullYear()).slice(-2);
+  const mm=String(d.getMonth()+1).padStart(2,'0');
+  const dd=String(d.getDate()).padStart(2,'0');
+  const seq=String(Math.floor(Math.random()*9999)+1).padStart(4,'0');
+  return 'CHZ-'+yy+mm+dd+'-'+seq;
+}
+
+// ===== RECEIPT GENERATOR =====
+function generateReceipt(order){
+  const receiptNum=order.receiptNumber||generateReceiptNumber();
+  const orderDate=order.date?new Date(order.date):new Date();
+  const dateStr=orderDate.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  const timeStr=orderDate.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  const budgetMap={'₹15 – ₹20':'₹15 – ₹20','₹20 – ₹25':'₹20 – ₹25','₹25 – ₹50':'₹25 – ₹50','₹50+':'₹50+','Not sure yet':'To be confirmed'};
+  const budgetDisplay=budgetMap[order.budget]||order.budget||'To be confirmed';
+  const briefText=(order.description||'').length>300?(order.description||'').substring(0,300)+'...':(order.description||'No brief provided');
+  const statusColor=order.status==='completed'?'#22c55e':'#f97316';
+  const statusLabel=order.status==='completed'?'Completed':'Pending';
+  const receiptHTML=`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Receipt ${receiptNum} — Cheditz</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#f5f5f5;color:#1a1a1a;padding:2rem}
+.receipt{max-width:640px;margin:0 auto;background:#fff;border:1px solid #e0e0e0;overflow:hidden}
+.receipt-header{background:#0a0a0a;color:#fff;padding:2rem 2.5rem;display:flex;align-items:center;justify-content:space-between}
+.receipt-brand{display:flex;align-items:center;gap:0.75rem}
+.receipt-logo{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;letter-spacing:-0.02em}
+.receipt-logo span{color:#c8ff00}
+.receipt-tag{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:#999;font-family:'Inter',sans-serif}
+.receipt-title-block{text-align:right}
+.receipt-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase}
+.receipt-num{font-size:0.75rem;color:#c8ff00;margin-top:0.3rem;font-weight:600}
+.receipt-body{padding:2rem 2.5rem}
+.receipt-row{display:flex;justify-content:space-between;padding:0.7rem 0;border-bottom:1px solid #f0f0f0;font-size:0.85rem}
+.receipt-row:last-child{border-bottom:none}
+.receipt-label{color:#666;font-weight:500}
+.receipt-val{font-weight:600;text-align:right;max-width:60%}
+.receipt-divider{height:1px;background:#e0e0e0;margin:1.5rem 0}
+.receipt-section-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;margin-bottom:1rem;color:#0a0a0a}
+.receipt-brief{font-size:0.82rem;color:#444;line-height:1.7;background:#f9f9f9;padding:1rem;border:1px solid #eee;word-break:break-word}
+.receipt-status{display:inline-flex;align-items:center;gap:0.4rem;padding:0.3rem 0.8rem;border-radius:100px;font-size:0.7rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase}
+.receipt-status-dot{width:6px;height:6px;border-radius:50%}
+.receipt-footer{background:#f9f9f9;border-top:1px solid #e0e0e0;padding:1.5rem 2.5rem;text-align:center}
+.receipt-footer-text{font-size:0.7rem;color:#999;line-height:1.8}
+.receipt-footer-text strong{color:#333}
+.receipt-actions{padding:1.5rem 2.5rem;border-top:1px solid #e0e0e0;display:flex;gap:0.75rem;justify-content:center;background:#fafafa}
+.receipt-btn{padding:0.7rem 1.5rem;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:600;border:none;cursor:pointer;transition:all .2s;letter-spacing:0.03em}
+.receipt-btn-print{background:#0a0a0a;color:#fff}
+.receipt-btn-print:hover{background:#333}
+.receipt-btn-close{background:transparent;color:#666;border:1px solid #ddd}
+.receipt-btn-close:hover{border-color:#999;color:#333}
+@media print{
+  body{background:#fff;padding:0}
+  .receipt{border:none;box-shadow:none}
+  .receipt-actions{display:none !important}
+  .receipt-header{background:#0a0a0a !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .receipt-status{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+@media(max-width:600px){
+  body{padding:1rem}
+  .receipt-header,.receipt-body,.receipt-footer,.receipt-actions{padding-left:1.25rem;padding-right:1.25rem}
+  .receipt-row{flex-direction:column;gap:0.2rem}
+  .receipt-val{text-align:left;max-width:100%}
+}
+</style>
+</head>
+<body>
+<div class="receipt">
+  <div class="receipt-header">
+    <div class="receipt-brand">
+      <div>
+        <div class="receipt-logo">chedi<span>t</span>z</div>
+        <div class="receipt-tag">Photo · Video · Document Editing</div>
+      </div>
+    </div>
+    <div class="receipt-title-block">
+      <div class="receipt-title">Receipt</div>
+      <div class="receipt-num">${esc(receiptNum)}</div>
+    </div>
+  </div>
+  <div class="receipt-body">
+    <div class="receipt-row">
+      <span class="receipt-label">Date</span>
+      <span class="receipt-val">${esc(dateStr)}</span>
+    </div>
+    <div class="receipt-row">
+      <span class="receipt-label">Time</span>
+      <span class="receipt-val">${esc(timeStr)}</span>
+    </div>
+    <div class="receipt-row">
+      <span class="receipt-label">Status</span>
+      <span class="receipt-val"><span class="receipt-status" style="background:${statusColor}20;color:${statusColor}"><span class="receipt-status-dot" style="background:${statusColor}"></span>${statusLabel}</span></span>
+    </div>
+    <div class="receipt-divider"></div>
+    <div class="receipt-section-title">Customer Details</div>
+    <div class="receipt-row">
+      <span class="receipt-label">Name</span>
+      <span class="receipt-val">${esc(order.name||'')}</span>
+    </div>
+    <div class="receipt-row">
+      <span class="receipt-label">Email</span>
+      <span class="receipt-val">${esc(order.email||'')}</span>
+    </div>
+    ${order.phone?`<div class="receipt-row"><span class="receipt-label">Phone</span><span class="receipt-val">${esc(order.phone)}</span></div>`:''}
+    <div class="receipt-divider"></div>
+    <div class="receipt-section-title">Service Details</div>
+    <div class="receipt-row">
+      <span class="receipt-label">Service</span>
+      <span class="receipt-val">${esc(order.service||'')}</span>
+    </div>
+    <div class="receipt-row">
+      <span class="receipt-label">Deadline</span>
+      <span class="receipt-val">${esc(order.deadline||'')}</span>
+    </div>
+    <div class="receipt-row">
+      <span class="receipt-label">Budget</span>
+      <span class="receipt-val">${esc(budgetDisplay)}</span>
+    </div>
+    <div class="receipt-divider"></div>
+    <div class="receipt-section-title">Project Brief</div>
+    <div class="receipt-brief">${esc(briefText)}</div>
+  </div>
+  <div class="receipt-footer">
+    <div class="receipt-footer-text">
+      <strong>Cheditz</strong> — Photo, Video & Document Editing<br>
+      cheditz94@gmail.com · @cheditz1 · Mon–Sat 9AM–7PM IST<br>
+      Thank you for your order!
+    </div>
+  </div>
+  <div class="receipt-actions">
+    <button class="receipt-btn receipt-btn-print" onclick="window.print()">Save as PDF / Print</button>
+    <button class="receipt-btn receipt-btn-close" onclick="window.close()">Close</button>
+  </div>
+</div>
+</body>
+</html>`;
+  const w=window.open('','_blank');
+  if(w){
+    w.document.write(receiptHTML);
+    w.document.close();
+  }else{
+    alert('Please allow pop-ups to view the receipt.');
+  }
+}
+
 function renderOrdersList(){
   const orders=getOrders(),el=document.getElementById('ordersList');
   const total=orders.length;
@@ -926,14 +1079,17 @@ function renderOrdersList(){
   if(!orders.length){el.innerHTML='<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.75rem">No orders yet</div>';return}
   el.innerHTML=orders.map((o,i)=>{
     const isComplete=o.status==='completed';
+    const receiptNum=o.receiptNumber||'—';
     return`<div class="wl-item">
       <div class="wl-info">
         <div class="wl-title">${esc(o.name||'Unknown')} — ${esc(o.service||'Service')}</div>
         <div class="wl-sub">${esc(o.email||'')} · ${esc(o.date||'')}</div>
         <div class="wl-sub" style="margin-top:4px">${esc(o.budget||'')} · ${esc(o.deadline||'No deadline')}</div>
+        <div class="wl-sub" style="margin-top:4px;font-family:'Fira Code',monospace;font-size:0.55rem;color:var(--acc)">Receipt: ${esc(receiptNum)}</div>
         <span class="wl-vis ${isComplete?'shown':'hidden'}">${isComplete?'Completed':'Pending'}</span>
       </div>
       <div class="wl-btns">
+        <button class="wl-btn" onclick="generateReceipt(getOrders()[${i}])" title="View Receipt" style="color:var(--acc)">📄</button>
         <button class="wl-btn" onclick="toggleOrderStatus(${i})" title="${isComplete?'Mark Pending':'Mark Complete'}">${isComplete?'🔄':'✓'}</button>
         <button class="wl-btn del" onclick="delOrder(${i})" title="Delete">✕</button>
       </div>
