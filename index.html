@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Cheditz — Photo, Video & Document Editing</title>
 <meta name="description" content="Cheditz — cinematic photo, video, and document editing on demand." />
 <link rel="icon" type="image/png" href="favicon.png?v=2" />
@@ -119,28 +119,7 @@ img{max-width:100%;display:block}
 
 @media(prefers-reduced-motion:reduce){#node-bg,.bg-shape,.bg-aurora::before,.bg-aurora::after,.bg-orb,.bg-pulse,.bg-scanlines{display:none}}
 
-/* Mobile: disable heavy backgrounds, add light bg effect */
-@media(max-width:768px){
-  #node-bg,.bg-node-grid,.bg-shapes,.bg-aurora,.bg-orbs,.bg-pulse,.bg-scanlines,.bg-grain,.bg-vignette,.bg-corner-tl,.bg-corner-br,.bg-corner-tr,.bg-corner-bl{display:none !important}
-  body{background:#0a0a0a}
-  body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-    background:
-      radial-gradient(ellipse 500px 400px at 15% 15%,rgba(200,255,0,0.07),transparent 60%),
-      radial-gradient(ellipse 400px 400px at 85% 25%,rgba(168,85,247,0.05),transparent 60%),
-      radial-gradient(ellipse 350px 350px at 50% 80%,rgba(56,189,248,0.04),transparent 60%),
-      radial-gradient(ellipse 300px 200px at 70% 50%,rgba(244,63,94,0.03),transparent 60%);
-    animation:mobGlow 8s ease-in-out infinite alternate}
-  body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-    background-image:radial-gradient(circle 1px,rgba(255,255,255,0.03) 1px,transparent 1px);
-    background-size:30px 30px}
-  @keyframes mobGlow{
-    0%{opacity:0.5;filter:hue-rotate(0deg)}
-    33%{opacity:0.9;filter:hue-rotate(10deg)}
-    66%{opacity:0.7;filter:hue-rotate(-8deg)}
-    100%{opacity:0.5;filter:hue-rotate(5deg)}
-  }
-}
-
+/* Mobile effect overrides appear at the end of this stylesheet. */
 /* Loader */
 #loader{position:fixed;inset:0;z-index:99999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;transition:opacity .8s,visibility .8s}
 #loader.hide{opacity:0;visibility:hidden}
@@ -370,6 +349,37 @@ img{max-width:100%;display:block}
 .live-card-project{font-size:0.8rem;color:var(--dim);line-height:1.4}
 .live-card-project strong{color:var(--txt)}
 @media(max-width:768px){.live-card-grid{gap:0.75rem}.live-card{padding:0 1rem}.live-card.visible{padding:1.25rem}}
+
+/* Receipt Modal */
+.receipt-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:99998;display:none;align-items:center;justify-content:center;padding:1rem}
+.receipt-overlay.show{display:flex}
+.receipt-box{background:var(--bg);border:1px solid var(--edge);border-radius:16px;width:min(480px,95vw);max-height:90vh;overflow-y:auto;position:relative;animation:receiptIn .4s cubic-bezier(.16,1,.3,1)}
+@keyframes receiptIn{from{opacity:0;transform:translateY(20px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+.receipt-header{padding:2rem 2rem 1rem;text-align:center;border-bottom:1px solid var(--edge);position:relative}
+.receipt-header .receipt-logo{font-size:1.2rem;font-weight:800;letter-spacing:0.1em;color:var(--acc);margin-bottom:0.25rem}
+.receipt-header .receipt-tagline{font-size:0.6rem;font-family:'JetBrains Mono',monospace;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase}
+.receipt-header .receipt-id{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--acc);background:rgba(200,255,0,0.08);border:1px solid rgba(200,255,0,0.15);border-radius:6px;padding:0.3rem 0.8rem;display:inline-block;margin-top:0.75rem}
+.receipt-body{padding:1.5rem 2rem}
+.receipt-section-title{font-family:'JetBrains Mono',monospace;font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem;padding-bottom:0.4rem;border-bottom:1px solid var(--edge)}
+.receipt-row{display:flex;justify-content:space-between;align-items:flex-start;padding:0.5rem 0;font-size:0.8rem}
+.receipt-row .r-label{color:var(--muted);flex-shrink:0;min-width:90px}
+.receipt-row .r-value{color:var(--txt);font-weight:500;text-align:right;word-break:break-word;max-width:60%}
+.receipt-row .r-value.accent{color:var(--acc);font-weight:700}
+.receipt-divider{height:1px;background:var(--edge);margin:0.75rem 0}
+.receipt-status{display:inline-flex;align-items:center;gap:0.4rem;font-size:0.7rem;font-weight:600;padding:0.3rem 0.8rem;border-radius:20px;background:rgba(200,255,0,0.1);color:var(--acc);border:1px solid rgba(200,255,0,0.2)}
+.receipt-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--acc)}
+.receipt-footer{padding:1rem 2rem 1.5rem;text-align:center;border-top:1px solid var(--edge)}
+.receipt-footer p{font-size:0.65rem;color:var(--muted);line-height:1.6}
+.receipt-actions{display:flex;gap:0.75rem;margin-top:1rem;justify-content:center}
+.receipt-btn{padding:0.6rem 1.2rem;border-radius:8px;font-size:0.7rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;display:flex;align-items:center;gap:0.4rem}
+.receipt-btn-print{background:var(--acc);color:var(--bg)}
+.receipt-btn-print:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.receipt-btn-close{background:var(--raised);color:var(--txt);border:1px solid var(--edge)}
+.receipt-btn-close:hover{border-color:var(--acc);color:var(--acc)}
+.receipt-close{position:absolute;top:1rem;right:1rem;width:28px;height:28px;border-radius:50%;background:var(--raised);border:1px solid var(--edge);color:var(--dim);font-size:0.8rem;cursor:pointer;display:grid;place-items:center;transition:all .2s}
+.receipt-close:hover{border-color:var(--acc);color:var(--acc)}
+@media print{.receipt-overlay{position:static;background:none;backdrop-filter:none;padding:0}.receipt-box{border:none;border-radius:0;max-height:none;width:100%;box-shadow:none}.receipt-actions,.receipt-close{display:none!important}.receipt-footer p{color:#666}}
+@media(max-width:480px){.receipt-header{padding:1.5rem 1.25rem 0.75rem}.receipt-body{padding:1.25rem}.receipt-footer{padding:0.75rem 1.25rem 1.25rem}}
 
 /* Order Timeline */
 .order-timeline{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2rem;position:relative;padding:0 1rem}
@@ -936,93 +946,46 @@ body:hover .cursor-glow{opacity:1}
   .chat-fab{bottom:max(1.5rem,env(safe-area-inset-bottom))}
   .chat-window{bottom:max(5.5rem,calc(env(safe-area-inset-bottom) + 4rem))}
 }
-
-
-/* ===== CHEDITZ RESPONSIVE HOTFIX 2026-09 ===== */
-:where(html,body){width:100%;max-width:100%;overflow-x:hidden}
-:where(img,video,iframe,svg,canvas){max-width:100%}
-:where(input,textarea,select,button){max-width:100%}
-:where(.wrap,.hero,.sec,.order-grid,.contact-grid,.tools-grid,.trends-grid,.testi-grid,.pricing-grid,.process-steps,.stats-row){min-width:0}
-:where(.wrap,.order-grid>*,.contact-grid>*,.tools-grid>*,.trends-grid>*,.testi-grid>*,.pricing-grid>*,.process-steps>*,.stats-row>*){min-width:0}
-:where(h1,h2,h3,p,a,span,li,label,.work-title,.contact-link strong,.contact-link span){overflow-wrap:anywhere}
-
-@media (max-width: 767.98px){
-  html{font-size:16px;-webkit-text-size-adjust:100%}
-  body{width:100%;overflow-x:clip}
-  .wrap{width:100%;max-width:100%;padding-inline:clamp(.9rem,4vw,1.25rem)}
-  .nav{top:max(.5rem,env(safe-area-inset-top));width:calc(100% - 1rem);max-width:none;padding:.45rem .7rem}
-  .nav .wrap{padding:0;gap:.5rem;justify-content:space-between;min-width:0}
-  .nav-logo{min-width:0;flex:0 1 auto}
-  .nav-logo img{max-width:min(150px,42vw);height:auto !important}
-  .nav-right{gap:.35rem;flex-shrink:0}
-  .nav-cta{white-space:nowrap;padding:.45rem .7rem;font-size:.56rem}
-  .mob-toggle{flex-shrink:0}
-  .mob-menu{padding:max(4.5rem,calc(env(safe-area-inset-top) + 4rem)) 1.25rem max(2rem,env(safe-area-inset-bottom));overflow-y:auto}
-
-  .hero{min-height:100svh;padding:max(6rem,calc(env(safe-area-inset-top) + 5.5rem)) 0 3rem}
-  .hero h1{font-size:clamp(2rem,11vw,3.25rem);line-height:.96;letter-spacing:-.035em;max-width:100%}
-  .hero-tag{font-size:.55rem;letter-spacing:.18em;gap:.6rem;margin-bottom:1.25rem}
-  .hero-tag::before{width:24px}
-  .hero-sub{max-width:100%;font-size:.9rem;line-height:1.7}
-  .hero-btns{display:grid;grid-template-columns:1fr;gap:.75rem;width:100%}
-  .hero-btns .btn{width:100%;justify-content:center;min-height:46px}
-
-  .sec{padding:3.25rem 0}
-  .sec-title{font-size:clamp(1.75rem,8vw,2.6rem);line-height:1.05}
-  .sec-desc{font-size:.9rem;max-width:100%}
-
-  .work-card{flex-basis:calc(100vw - 2rem) !important;max-width:calc(100vw - 2rem)}
-  .work-info{gap:.75rem;align-items:flex-start}
-  .work-title{font-size:1rem}
-
-  .svc-head-left{gap:.75rem;min-width:0}
-  .svc-num{width:1.4rem;flex-shrink:0}
-  .svc-name{min-width:0;overflow-wrap:anywhere}
-  .svc-content{grid-template-columns:1fr !important;padding:0 0 1.5rem !important}
-
-  .stats-row{grid-template-columns:1fr 1fr !important}
-  .process-steps,.pricing-grid,.testi-grid,.order-grid,.tools-grid,.trends-grid,.contact-grid{grid-template-columns:1fr !important}
-  .price-card,.order-form,.tool-card,.trend-card,.testi-card{min-width:0}
-  .order-form{padding:1.25rem}
-  .ff-row,.live-card-grid{grid-template-columns:1fr !important}
-  .ff input,.ff textarea,.ff select{font-size:16px}
-  .resolution-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-
-  .contact-link{padding:1.1rem 0}
-  .hours-box{padding:1.1rem}
-  footer .wrap{flex-direction:column;align-items:flex-start}
-  footer .wrap > div{max-width:100%;flex-wrap:wrap}
-
-  .chat-window{left:.75rem;right:.75rem;bottom:max(5rem,calc(env(safe-area-inset-bottom) + 4.5rem));width:auto;height:min(70svh,500px)}
-  .chat-fab{right:max(.9rem,env(safe-area-inset-right));bottom:max(.9rem,env(safe-area-inset-bottom))}
-  #waBtn{left:max(.9rem,env(safe-area-inset-left));bottom:max(.9rem,env(safe-area-inset-bottom))}
-  #scrollTop{left:max(.9rem,env(safe-area-inset-left));bottom:max(5rem,calc(env(safe-area-inset-bottom) + 4.5rem))}
-  .share-panel{left:max(.5rem,env(safe-area-inset-left))}
+/* Mobile: desktop palette and node motif without canvas or filter animation. */
+@media(max-width:768px), (hover:none) and (pointer:coarse){
+  #node-bg,.bg-aurora,.bg-orbs,.bg-pulse,.bg-scanlines,.bg-grain,.bg-vignette,.bg-corner{display:none !important}
+  body{background:#0a0a0a}
+  body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(ellipse at 12% 18%,rgba(56,189,248,.09),transparent 55%),radial-gradient(ellipse at 88% 35%,rgba(168,85,247,.075),transparent 55%),radial-gradient(ellipse at 35% 85%,rgba(52,211,153,.055),transparent 55%),radial-gradient(ellipse at 95% 95%,rgba(251,191,36,.035),transparent 45%)}
+  body::after{content:none}
+  .bg-node-grid{display:block !important;background-size:44px 44px;opacity:.65}
+  .bg-shapes{display:block !important;contain:paint}
+  .bg-shape{display:none;animation:none}
+  .bg-shape:nth-child(-n+3){display:block;opacity:.7;animation:mobileDrift 22s ease-in-out infinite alternate}
+  .bg-shape:nth-child(2){animation-delay:-8s;animation-duration:27s}
+  .bg-shape:nth-child(3){animation-delay:-15s;animation-duration:25s}
+  .mobile-nodes{display:block;position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.45}
+  .nav,.nav.scrolled{background:rgba(10,10,10,.97);backdrop-filter:none;-webkit-backdrop-filter:none;animation:navIslandIn .6s both;border-color:rgba(168,85,247,.5);box-shadow:0 4px 18px rgba(0,0,0,.35);will-change:auto}
+  .nav::before{content:none}
+  .receipt-overlay{background:rgba(0,0,0,.9);backdrop-filter:none;-webkit-backdrop-filter:none}
+  .blur-in,.blur-in.vis{filter:none;transition-property:transform,opacity}
+  .parallax-layer{transform:none !important}
 }
+@keyframes mobileDrift{from{transform:translate(0,0) rotate(0deg);opacity:.45}to{transform:translate(12px,-24px) rotate(35deg);opacity:.8}}
 
-@media (max-width: 390px){
-  .nav-logo img{max-width:125px}
-  .nav-cta{padding:.4rem .55rem;font-size:.5rem}
-  .hero h1{font-size:clamp(1.85rem,10.5vw,2.6rem)}
-  .stats-row{grid-template-columns:1fr !important}
-  .resolution-grid{grid-template-columns:1fr 1fr}
+/* Keep narrow navigation and form content within the phone viewport. */
+.mobile-nodes{display:none}
+@media(max-width:768px), (hover:none) and (pointer:coarse){.mobile-nodes{display:block}}
+@media(max-width:768px){
+  .nav .wrap{gap:clamp(.4rem,2vw,1rem);padding:0;justify-content:space-between}
+  .nav-right{gap:.5rem}.nav-logo,.nav-right{flex-shrink:0}
+  .hero-tag{letter-spacing:clamp(.06em,.5vw,.2em);font-size:clamp(.5rem,2vw,.65rem)}
+  .hero-btns{flex-wrap:wrap}.ff-row>*,.order-grid>*,.contact-grid>*{min-width:0}
+  .contact-link{overflow-wrap:anywhere}
 }
-
-@media (min-width: 768px) and (max-width: 1023.98px){
-  .wrap{padding-inline:2rem}
-  .nav{width:calc(100% - 2rem)}
-  .nav .wrap{gap:1rem;padding:0}
-  .nav-links{gap:1.1rem}
-  .nav-links a{font-size:.68rem}
-  .hero h1{font-size:clamp(3.25rem,8vw,5.5rem)}
-  .pricing-grid,.testi-grid,.tools-grid,.trends-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
-  .process-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .process-step:last-child{grid-column:1/-1}
-  .order-grid,.contact-grid{grid-template-columns:1fr !important}
-  .svc-content{grid-template-columns:1.5fr 1fr !important}
-  .svc-price-box{grid-column:1/-1}
+html.effects-paused *,html.effects-paused *::before,html.effects-paused *::after{animation-play-state:paused !important}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto !important}
+  *,*::before,*::after{animation:none !important;transition:none !important}
+  .rv,.blur-in,.hero-split-inner,.stagger-item,.process-step,.reveal-mask{opacity:1 !important;transform:none !important;filter:none !important;clip-path:none !important}
+  .nav{opacity:1;transform:none}.parallax-layer{transform:none !important}
+  .bg-shape{opacity:.6}.cursor-glow{display:none !important}
 }
-
 </style>
 <script type="application/ld+json">
 {
@@ -1067,6 +1030,11 @@ body:hover .cursor-glow{opacity:1}
 <div class="bg-corner bg-corner-br" aria-hidden="true"></div>
 <div class="bg-corner bg-corner-tr" aria-hidden="true"></div>
 <div class="bg-corner bg-corner-bl" aria-hidden="true"></div>
+<svg class="mobile-nodes" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+  <g fill="none" stroke="white" stroke-opacity=".13" stroke-width=".6"><path d="M30 125 Q130 100 165 260 T335 390 M165 260 Q80 350 55 475 M335 390 Q240 500 275 640 L110 725"/></g>
+  <g font-family="monospace" font-size="7" fill="white" fill-opacity=".4"><text x="40" y="128">INPUT</text><text x="175" y="263">COLOR</text><text x="290" y="380">FX</text><text x="65" y="478">TRANSFORM</text><text x="285" y="643">RENDER</text></g>
+  <circle cx="30" cy="125" r="3" fill="#38bdf8"/><circle cx="165" cy="260" r="3" fill="#a855f7"/><circle cx="335" cy="390" r="3" fill="#f43f5e"/><circle cx="55" cy="475" r="3" fill="#34d399"/><circle cx="275" cy="640" r="3" fill="#fbbf24"/><circle cx="110" cy="725" r="2" fill="#38bdf8"/>
+</svg>
 <canvas id="node-bg" aria-hidden="true"></canvas>
 <div class="bg-grain" aria-hidden="true"></div>
 <div class="bg-vignette" aria-hidden="true"></div>
@@ -1091,7 +1059,7 @@ body:hover .cursor-glow{opacity:1}
 </div>
 
 <!-- SCROLL TO TOP -->
-<button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+<button id="scrollTop" onclick="window.scrollTo({top:0,behavior:reducedMotion.matches?'instant':'smooth'})" title="Back to top">↑</button>
 
 <!-- WHATSAPP -->
 <a id="waBtn" class="float-pulse" href="https://wa.me/918129021975?text=Hi%20Cheditz!%20I%27m%20interested%20in%20your%20editing%20services." target="_blank" rel="noopener noreferrer" title="Chat on WhatsApp">💬</a>
@@ -1674,22 +1642,6 @@ body:hover .cursor-glow{opacity:1}
           </div>
         </div>
       </form>
-
-      <!-- ORDER SUCCESS CARD (hidden by default) -->
-      <div id="orderSuccessCard" style="display:none;margin-top:1.5rem;background:var(--surface);border:1px solid rgba(34,197,94,0.3);padding:2rem;text-align:center;border-radius:12px">
-        <div style="font-size:2.5rem;margin-bottom:0.75rem">✅</div>
-        <h3 style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;margin-bottom:0.5rem">Order Submitted!</h3>
-        <p style="color:var(--dim);font-size:0.9rem;margin-bottom:1.5rem">Your brief has been sent. We'll reply with a quote within hours.</p>
-        <div style="background:var(--raised);border:1px solid var(--edge);padding:1rem 1.5rem;display:inline-flex;flex-direction:column;gap:0.5rem;margin-bottom:1.5rem;text-align:left">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--acc)">Receipt Number</div>
-          <div id="successReceiptNum" style="font-size:1.2rem;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--txt)"></div>
-          <div style="font-size:0.75rem;color:var(--muted)" id="successOrderDate"></div>
-        </div>
-        <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap">
-          <button class="btn btn-acc" onclick="generateReceipt(window._lastOrderData||{})" style="font-size:0.75rem">📄 View / Save Receipt</button>
-          <button class="btn btn-ghost" onclick="document.getElementById('orderSuccessCard').style.display='none'" style="font-size:0.75rem">Close</button>
-        </div>
-      </div>
     </div>
   </div>
 </section>
@@ -1747,6 +1699,41 @@ body:hover .cursor-glow{opacity:1}
   </div>
 </section>
 
+<!-- Receipt Modal -->
+<div class="receipt-overlay" id="receiptOverlay">
+  <div class="receipt-box" id="receiptBox">
+    <button class="receipt-close" onclick="closeReceipt()" title="Close">✕</button>
+    <div class="receipt-header">
+      <div class="receipt-logo">Cheditz</div>
+      <div class="receipt-tagline">Order Receipt</div>
+      <div class="receipt-id" id="receiptId">—</div>
+    </div>
+    <div class="receipt-body">
+      <div class="receipt-section-title">Order Details</div>
+      <div class="receipt-row"><span class="r-label">Name</span><span class="r-value" id="rName">—</span></div>
+      <div class="receipt-row"><span class="r-label">Email</span><span class="r-value" id="rEmail">—</span></div>
+      <div class="receipt-row"><span class="r-label">Phone</span><span class="r-value" id="rPhone">—</span></div>
+      <div class="receipt-divider"></div>
+      <div class="receipt-row"><span class="r-label">Service</span><span class="r-value accent" id="rService">—</span></div>
+      <div class="receipt-row"><span class="r-label">Deadline</span><span class="r-value" id="rDeadline">—</span></div>
+      <div class="receipt-row"><span class="r-label">Budget</span><span class="r-value" id="rBudget">—</span></div>
+      <div class="receipt-divider"></div>
+      <div class="receipt-row"><span class="r-label">Status</span><span class="r-value" id="rStatus"><span class="receipt-status">Pending</span></span></div>
+      <div class="receipt-row"><span class="r-label">Date</span><span class="r-value" id="rDate">—</span></div>
+      <div class="receipt-divider"></div>
+      <div class="receipt-section-title" style="margin-top:0.5rem">Project Brief</div>
+      <p style="font-size:0.78rem;color:var(--dim);line-height:1.7;margin-top:0.25rem;word-break:break-word" id="rBrief">—</p>
+    </div>
+    <div class="receipt-footer">
+      <p>Thank you for choosing Cheditz.<br/>We'll review your brief and get back to you shortly.</p>
+      <div class="receipt-actions">
+        <button class="receipt-btn receipt-btn-print" onclick="printReceipt()">🖨 Print</button>
+        <button class="receipt-btn receipt-btn-close" onclick="closeReceipt()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <footer>
   <div class="wrap">
@@ -1760,6 +1747,15 @@ body:hover .cursor-glow{opacity:1}
 </footer>
 
 <script>
+function publicConfig(value){const clean={};for(const key of ['accent','works','content','services','contact','testimonials'])if(value&&Object.prototype.hasOwnProperty.call(value,key))clean[key]=value[key];return clean;}
+// Remove legacy credentials and private order caches from this browser.
+try{const old=localStorage.getItem('cheditz_config');if(old)localStorage.setItem('cheditz_config',JSON.stringify(publicConfig(JSON.parse(old))));localStorage.removeItem('cheditz_orders');sessionStorage.removeItem('cheditz_admin');sessionStorage.removeItem('cheditz_admin_time');}catch{localStorage.removeItem('cheditz_config');}
+
+const reducedMotion=matchMedia("(prefers-reduced-motion:reduce)");
+const lightBackground=matchMedia("(max-width:768px), (hover:none) and (pointer:coarse)");
+const canAnimateEffects=()=>!reducedMotion.matches&&!lightBackground.matches&&!document.hidden;
+document.addEventListener("visibilitychange",()=>document.documentElement.classList.toggle("effects-paused",document.hidden));
+
 // ===== SOCIAL SHARE =====
 const shareUrl=encodeURIComponent(window.location.href);
 const shareTitle=encodeURIComponent('Cheditz — Photo, Video & Document Editing');
@@ -1780,9 +1776,9 @@ let firebaseApp=null,firebaseDb=null;
 if(FIREBASE_ENABLED){try{firebaseApp=firebase.initializeApp(FIREBASE_CONFIG);firebaseDb=firebase.firestore();}catch(e){console.warn('Firebase init failed:',e);}}
 
 // ===== CONFIG =====
-function getConfig(){try{return JSON.parse(localStorage.getItem('cheditz_config'))||getDefaultConfig();}catch{return getDefaultConfig();}}
-function saveConfig(c){localStorage.setItem('cheditz_config',JSON.stringify(c));if(FIREBASE_ENABLED&&firebaseDb){firebaseDb.collection('cheditz').doc('config').set(c).catch(e=>console.warn('Firebase save failed:',e));}}
-function getDefaultConfig(){return{password:String.fromCharCode(99,104,101,100,105,116,122,64,50,48,50,54),accent:'#c8ff00',works:[{id:'d1',title:"Vande Bharat",sub:"Nagercoil → Chennai",cat:"Poster",meta:"Rail launch · A2",type:"image",url:"https://miaoda-conversation-file.s3cdn.medo.dev/user-c4hvi7diyakg/app-c4hvyv74mdxd/20260605/Vande Bharat Nagercoil to Chennai Poster.png",visible:true},{id:'d2',title:"Video Reel",sub:"Brand edit",cat:"Video",meta:"Short-form",type:"video",url:"https://drive.google.com/uc?export=download&id=15yMqmznY3JufjA20k1vnS0Cz9c8T8UqN",visible:true}],content:{heroBadge:'A Global Editing Studio · 2026',heroHead:'Edits that <em>linger</em> long after the scroll.',heroSub:'Cheditz is a one-desk editing house for photo, video, and document work. Sharpen frames, colour the mood, polish words — quietly, quickly, on deadline.',worksTitle:'Recent commissions.',svcTitle:'Our Services',orderTitle:'Tell us what<br/>you need.',orderDesc:'Fill the brief below and we\'ll reply with a quote and timeline within hours. For files over 25 MB, drop a WeTransfer or Drive link in the notes.',contactHead:'Let\'s make<br/>something<br/><em style="font-style:italic;color:var(--acc)">unforgettable.</em>',contactDesc:'Quick questions, partnership ideas, or just to say hi — the inbox is always open.'},services:[{name:'Poster Editing',desc:'Event flyers, movie-style posters, product launches, social posts, and brand campaign artwork — designed and finished print-ready.',feats:'Event & function posters\nMovie / cinematic style\nProduct & sale flyers\nSocial posts & stories',price:'₹15–20 / poster'},{name:'Video Editing',desc:'Reels, shorts, long-form cuts, sound design, motion titles, and end-to-end colour grading for narrative and brand pieces.',feats:'Instagram Reels & YouTube Shorts\nLong-form narrative cuts\nMotion titles & lower thirds\nFull colour grading',price:'₹20–25 / minute'},{name:'Document Editing',desc:'Proofreading, copy editing, layout in InDesign/Word, formatting for theses, ebooks, pitch decks, and reports.',feats:'Proofreading & line editing\nThesis & manuscript formatting\nPitch decks & one-pagers\nEbook layout (EPUB / PDF)',price:'₹25–50 / page'}],contact:{email:'cheditz94@gmail.com',insta:'@cheditz1',instaUrl:'https://www.instagram.com/cheditz1?igsh=bXcyYXgzZ2l2Nm8w',hours:'Mon — Sat · 9:00 – 19:00 IST',reply:'Replies usually within 4 hours.'},testimonials:[]};}
+function getConfig(){try{return publicConfig(JSON.parse(localStorage.getItem('cheditz_config'))||getDefaultConfig());}catch{return getDefaultConfig();}}
+function saveConfig(c){localStorage.setItem('cheditz_config',JSON.stringify(publicConfig(c)));}
+function getDefaultConfig(){return{accent:'#c8ff00',works:[{id:'d1',title:"Vande Bharat",sub:"Nagercoil → Chennai",cat:"Poster",meta:"Rail launch · A2",type:"image",url:"https://miaoda-conversation-file.s3cdn.medo.dev/user-c4hvi7diyakg/app-c4hvyv74mdxd/20260605/Vande Bharat Nagercoil to Chennai Poster.png",visible:true},{id:'d2',title:"Video Reel",sub:"Brand edit",cat:"Video",meta:"Short-form",type:"video",url:"https://drive.google.com/uc?export=download&id=15yMqmznY3JufjA20k1vnS0Cz9c8T8UqN",visible:true}],content:{heroBadge:'A Global Editing Studio · 2026',heroHead:'Edits that <em>linger</em> long after the scroll.',heroSub:'Cheditz is a one-desk editing house for photo, video, and document work. Sharpen frames, colour the mood, polish words — quietly, quickly, on deadline.',worksTitle:'Recent commissions.',svcTitle:'Our Services',orderTitle:'Tell us what<br/>you need.',orderDesc:'Fill the brief below and we\'ll reply with a quote and timeline within hours. For files over 25 MB, drop a WeTransfer or Drive link in the notes.',contactHead:'Let\'s make<br/>something<br/><em style="font-style:italic;color:var(--acc)">unforgettable.</em>',contactDesc:'Quick questions, partnership ideas, or just to say hi — the inbox is always open.'},services:[{name:'Poster Editing',desc:'Event flyers, movie-style posters, product launches, social posts, and brand campaign artwork — designed and finished print-ready.',feats:'Event & function posters\nMovie / cinematic style\nProduct & sale flyers\nSocial posts & stories',price:'₹15–20 / poster'},{name:'Video Editing',desc:'Reels, shorts, long-form cuts, sound design, motion titles, and end-to-end colour grading for narrative and brand pieces.',feats:'Instagram Reels & YouTube Shorts\nLong-form narrative cuts\nMotion titles & lower thirds\nFull colour grading',price:'₹20–25 / minute'},{name:'Document Editing',desc:'Proofreading, copy editing, layout in InDesign/Word, formatting for theses, ebooks, pitch decks, and reports.',feats:'Proofreading & line editing\nThesis & manuscript formatting\nPitch decks & one-pagers\nEbook layout (EPUB / PDF)',price:'₹25–50 / page'}],contact:{email:'cheditz94@gmail.com',insta:'@cheditz1',instaUrl:'https://www.instagram.com/cheditz1?igsh=bXcyYXgzZ2l2Nm8w',hours:'Mon — Sat · 9:00 – 19:00 IST',reply:'Replies usually within 4 hours.'},testimonials:[]};}
 
 // ===== MOBILE NAV =====
 const mobToggle=document.getElementById('mobToggle'),mobMenu=document.getElementById('mobMenu');
@@ -1796,7 +1792,7 @@ initReveal();
 
 // ===== MAGNETIC PULL EFFECT =====
 (function(){
-  if(window.innerWidth<769||matchMedia('(hover:none)').matches)return;
+  if(!canAnimateEffects()||matchMedia('(hover:none)').matches)return;
   const magneticEls=document.querySelectorAll('.work-card,.price-card,.testi-card,.tool-card,.trend-card,.order-feat');
   magneticEls.forEach(function(el){
     el.addEventListener('mousemove',function(e){
@@ -1839,160 +1835,6 @@ function playDriveVideo(el){const fileId=el.dataset.fileid;el.innerHTML=`<iframe
 function playDirectVideo(el){const url=el.dataset.url;el.innerHTML=`<video src="${url}" autoplay controls playsinline style="width:100%;height:100%;object-fit:cover;display:block;background:#000"></video>`;}
 function videoFallback(w){return`<div style="width:100%;aspect-ratio:3/4;background:var(--raised);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0.5rem;color:var(--muted)"><span style="font-size:2rem">🎬</span><span style="font-size:0.7rem;font-family:'JetBrains Mono',monospace">Video unavailable</span></div>`}
 
-// ===== RECEIPT NUMBER GENERATOR =====
-function generateReceiptNumber(){
-  const d=new Date();
-  const yy=String(d.getFullYear()).slice(-2);
-  const mm=String(d.getMonth()+1).padStart(2,'0');
-  const dd=String(d.getDate()).padStart(2,'0');
-  const seq=String(Math.floor(Math.random()*9999)+1).padStart(4,'0');
-  return 'CHZ-'+yy+mm+dd+'-'+seq;
-}
-
-// ===== RECEIPT GENERATOR =====
-function generateReceipt(order){
-  const receiptNum=order.receiptNumber||generateReceiptNumber();
-  const orderDate=order.date?new Date(order.date):new Date();
-  const dateStr=orderDate.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
-  const timeStr=orderDate.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
-  const budgetMap={'₹15 – ₹20':'₹15 – ₹20','₹20 – ₹25':'₹20 – ₹25','₹25 – ₹50':'₹25 – ₹50','₹50+':'₹50+','Not sure yet':'To be confirmed'};
-  const budgetDisplay=budgetMap[order.budget]||order.budget||'To be confirmed';
-  const briefText=(order.description||'').length>300?(order.description||'').substring(0,300)+'...':(order.description||'No brief provided');
-  const statusColor=order.status==='completed'?'#22c55e':'#f97316';
-  const statusLabel=order.status==='completed'?'Completed':'Pending';
-  const receiptHTML=`<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Receipt ${receiptNum} — Cheditz</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',system-ui,sans-serif;background:#f5f5f5;color:#1a1a1a;padding:2rem}
-.receipt{max-width:640px;margin:0 auto;background:#fff;border:1px solid #e0e0e0;overflow:hidden}
-.receipt-header{background:#0a0a0a;color:#fff;padding:2rem 2.5rem;display:flex;align-items:center;justify-content:space-between}
-.receipt-brand{display:flex;align-items:center;gap:0.75rem}
-.receipt-logo{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;letter-spacing:-0.02em}
-.receipt-logo span{color:#c8ff00}
-.receipt-tag{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:#999;font-family:'Inter',sans-serif}
-.receipt-title-block{text-align:right}
-.receipt-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase}
-.receipt-num{font-size:0.75rem;color:#c8ff00;margin-top:0.3rem;font-weight:600}
-.receipt-body{padding:2rem 2.5rem}
-.receipt-row{display:flex;justify-content:space-between;padding:0.7rem 0;border-bottom:1px solid #f0f0f0;font-size:0.85rem}
-.receipt-row:last-child{border-bottom:none}
-.receipt-label{color:#666;font-weight:500}
-.receipt-val{font-weight:600;text-align:right;max-width:60%}
-.receipt-divider{height:1px;background:#e0e0e0;margin:1.5rem 0}
-.receipt-section-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;margin-bottom:1rem;color:#0a0a0a}
-.receipt-brief{font-size:0.82rem;color:#444;line-height:1.7;background:#f9f9f9;padding:1rem;border:1px solid #eee;word-break:break-word}
-.receipt-status{display:inline-flex;align-items:center;gap:0.4rem;padding:0.3rem 0.8rem;border-radius:100px;font-size:0.7rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase}
-.receipt-status-dot{width:6px;height:6px;border-radius:50%}
-.receipt-footer{background:#f9f9f9;border-top:1px solid #e0e0e0;padding:1.5rem 2.5rem;text-align:center}
-.receipt-footer-text{font-size:0.7rem;color:#999;line-height:1.8}
-.receipt-footer-text strong{color:#333}
-.receipt-actions{padding:1.5rem 2.5rem;border-top:1px solid #e0e0e0;display:flex;gap:0.75rem;justify-content:center;background:#fafafa}
-.receipt-btn{padding:0.7rem 1.5rem;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:600;border:none;cursor:pointer;transition:all .2s;letter-spacing:0.03em}
-.receipt-btn-print{background:#0a0a0a;color:#fff}
-.receipt-btn-print:hover{background:#333}
-.receipt-btn-close{background:transparent;color:#666;border:1px solid #ddd}
-.receipt-btn-close:hover{border-color:#999;color:#333}
-@media print{
-  body{background:#fff;padding:0}
-  .receipt{border:none;box-shadow:none}
-  .receipt-actions{display:none !important}
-  .receipt-header{background:#0a0a0a !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .receipt-status{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-}
-@media(max-width:600px){
-  body{padding:1rem}
-  .receipt-header,.receipt-body,.receipt-footer,.receipt-actions{padding-left:1.25rem;padding-right:1.25rem}
-  .receipt-row{flex-direction:column;gap:0.2rem}
-  .receipt-val{text-align:left;max-width:100%}
-}
-</style>
-</head>
-<body>
-<div class="receipt">
-  <div class="receipt-header">
-    <div class="receipt-brand">
-      <div>
-        <div class="receipt-logo">chedi<span>t</span>z</div>
-        <div class="receipt-tag">Photo · Video · Document Editing</div>
-      </div>
-    </div>
-    <div class="receipt-title-block">
-      <div class="receipt-title">Receipt</div>
-      <div class="receipt-num">${esc(receiptNum)}</div>
-    </div>
-  </div>
-  <div class="receipt-body">
-    <div class="receipt-row">
-      <span class="receipt-label">Date</span>
-      <span class="receipt-val">${esc(dateStr)}</span>
-    </div>
-    <div class="receipt-row">
-      <span class="receipt-label">Time</span>
-      <span class="receipt-val">${esc(timeStr)}</span>
-    </div>
-    <div class="receipt-row">
-      <span class="receipt-label">Status</span>
-      <span class="receipt-val"><span class="receipt-status" style="background:${statusColor}20;color:${statusColor}"><span class="receipt-status-dot" style="background:${statusColor}"></span>${statusLabel}</span></span>
-    </div>
-    <div class="receipt-divider"></div>
-    <div class="receipt-section-title">Customer Details</div>
-    <div class="receipt-row">
-      <span class="receipt-label">Name</span>
-      <span class="receipt-val">${esc(order.name||'')}</span>
-    </div>
-    <div class="receipt-row">
-      <span class="receipt-label">Email</span>
-      <span class="receipt-val">${esc(order.email||'')}</span>
-    </div>
-    ${order.phone?`<div class="receipt-row"><span class="receipt-label">Phone</span><span class="receipt-val">${esc(order.phone)}</span></div>`:''}
-    <div class="receipt-divider"></div>
-    <div class="receipt-section-title">Service Details</div>
-    <div class="receipt-row">
-      <span class="receipt-label">Service</span>
-      <span class="receipt-val">${esc(order.service||'')}</span>
-    </div>
-    <div class="receipt-row">
-      <span class="receipt-label">Deadline</span>
-      <span class="receipt-val">${esc(order.deadline||'')}</span>
-    </div>
-    <div class="receipt-row">
-      <span class="receipt-label">Budget</span>
-      <span class="receipt-val">${esc(budgetDisplay)}</span>
-    </div>
-    <div class="receipt-divider"></div>
-    <div class="receipt-section-title">Project Brief</div>
-    <div class="receipt-brief">${esc(briefText)}</div>
-  </div>
-  <div class="receipt-footer">
-    <div class="receipt-footer-text">
-      <strong>Cheditz</strong> — Photo, Video & Document Editing<br>
-      cheditz94@gmail.com · @cheditz1 · Mon–Sat 9AM–7PM IST<br>
-      Thank you for your order!
-    </div>
-  </div>
-  <div class="receipt-actions">
-    <button class="receipt-btn receipt-btn-print" onclick="window.print()">Save as PDF / Print</button>
-    <button class="receipt-btn receipt-btn-close" onclick="window.close()">Close</button>
-  </div>
-</div>
-</body>
-</html>`;
-  const w=window.open('','_blank');
-  if(w){
-    w.document.write(receiptHTML);
-    w.document.close();
-  }else{
-    alert('Please allow pop-ups to view your receipt.');
-  }
-  return receiptNum;
-}
-
 // ===== ORDER FORM =====
 document.getElementById('orderForm').addEventListener('submit', async e => {
   e.preventDefault();
@@ -2006,7 +1848,7 @@ document.getElementById('orderForm').addEventListener('submit', async e => {
   if(!isValidEmail(rawEmail)){alert('Please enter a valid email address.');return;}
   if(rawPhone&&!isValidPhone(rawPhone)){alert('Please enter a valid phone number.');return;}
   if(rawBrief.length<10||rawBrief.length>5000){alert('Project brief must be 10-5000 characters.');return;}
-  const receiptNum=generateReceiptNumber();
+  const now = new Date();
   const orderData = {
     name: sanitizeHTML(rawName),
     email: sanitizeHTML(rawEmail),
@@ -2015,51 +1857,61 @@ document.getElementById('orderForm').addEventListener('submit', async e => {
     budget: sanitizeHTML(f.get('budget')||'Not sure yet'),
     deadline: sanitizeHTML(f.get('deadline')||''),
     description: sanitizeHTML(rawBrief),
-    date: new Date().toISOString(),
-    status: 'pending',
-    receiptNumber: receiptNum
+    date: now.toISOString(),
+    status: 'pending'
   };
 
-  // Push order directly to Firestore for real-time admin sync
+  let orderId = null;
   if (FIREBASE_ENABLED && firebaseDb) {
     try {
       const docRef = await firebaseDb.collection('cheditz_orders').add(orderData);
-      orderData.id = docRef.id;
-      // Save receipt record to Firestore
-      await firebaseDb.collection('cheditz_receipts').doc(docRef.id).set({
-        receiptNumber: receiptNum,
-        orderId: docRef.id,
-        ...orderData,
-        createdAt: new Date().toISOString()
-      });
+      orderId = docRef.id;
     } catch (err) {
       console.warn('Failed to push order to Firebase:', err);
     }
   }
 
-  // Also save to localStorage as fallback
-  const localOrders=JSON.parse(localStorage.getItem('cheditz_orders')||'[]');
-  localOrders.unshift(orderData);
-  localStorage.setItem('cheditz_orders',JSON.stringify(localOrders));
+  if(!orderId){alert('Your order could not be sent. Please try again or contact us directly.');return;}
+  showReceipt({
+    id: orderId || 'CDZ-' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '-' + Math.random().toString(36).substring(2,8).toUpperCase(),
+    name: orderData.name,
+    email: orderData.email,
+    phone: orderData.phone || 'Not provided',
+    service: orderData.service,
+    deadline: orderData.deadline,
+    budget: orderData.budget,
+    brief: orderData.description,
+    date: now,
+    status: 'Pending'
+  });
 
   createConfetti();
-
-  // Show success card with receipt
-  const successCard=document.getElementById('orderSuccessCard');
-  if(successCard){
-    document.getElementById('successReceiptNum').textContent=receiptNum;
-    document.getElementById('successOrderDate').textContent=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
-    successCard.style.display='block';
-    successCard.scrollIntoView({behavior:'smooth',block:'center'});
-    // Store current order data for receipt download
-    window._lastOrderData=orderData;
-  }
-
-  const subj = `New brief — ${f.get('service')} (${f.get('deadline')})`;
-  const body = `Hi Cheditz,\n\nName: ${f.get('name')}\nEmail: ${f.get('email')}\nPhone: ${f.get('phone')||'Not provided'}\nService: ${f.get('service')}\nDeadline: ${f.get('deadline')}\nBudget: ${f.get('budget')}\nReceipt: ${receiptNum}\n\nBrief:\n${f.get('brief')}\n\n— Sent via cheditz`;
-  const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=cheditz94@gmail.com&su=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
-  window.open(gmailUrl, '_blank');
+  e.target.reset();
+  document.getElementById('liveCard').classList.remove('visible','ready');
 });
+
+function showReceipt(o) {
+  document.getElementById('receiptId').textContent = '#' + o.id;
+  document.getElementById('rName').textContent = o.name;
+  document.getElementById('rEmail').textContent = o.email;
+  document.getElementById('rPhone').textContent = o.phone;
+  document.getElementById('rService').textContent = o.service;
+  document.getElementById('rDeadline').textContent = o.deadline;
+  document.getElementById('rBudget').textContent = o.budget;
+  document.getElementById('rBrief').textContent = o.brief;
+  document.getElementById('rStatus').innerHTML = '<span class="receipt-status">' + o.status + '</span>';
+  const d = o.date;
+  document.getElementById('rDate').textContent = d.toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'}) + ' · ' + d.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'});
+  document.getElementById('receiptOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeReceipt() {
+  document.getElementById('receiptOverlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+function printReceipt() {
+  window.print();
+}
 
 // ===== AI BRIEF =====
 (function(){const input=document.getElementById('briefInput');const sugBox=document.getElementById('briefSuggestions');const sugList=document.getElementById('briefSugList');if(!input||!sugBox||!sugList)return;const RULES=[{keywords:['poster','flyer','banner','social'],icon:'🎨',title:'Include dimensions',desc:'Mention print size (A2, A3) or digital dimensions (1080x1080, 1080x1920) for best results.',tag:'Format'},{keywords:['poster','flyer','banner','event'],icon:'🎯',title:'Specify colour mood',desc:'Mention mood: vibrant, pastel, dark & moody, minimal, cinematic, etc.',tag:'Style'},{keywords:['video','reel','edit','youtube','short'],icon:'🎬',title:'Mention duration',desc:'State target length: 15s reel, 60s reel, 3-min YouTube, etc.',tag:'Duration'},{keywords:['video','reel','youtube','motion'],icon:'🎵',title:'Audio preferences',desc:'Include music style, voiceover needs, or if you\'ll provide audio tracks.',tag:'Audio'},{keywords:['video','reel','youtube'],icon:'📱',title:'Platform spec',desc:'Specify platform: Instagram Reels, YouTube Shorts, TikTok, YouTube long-form.',tag:'Platform'},{keywords:['document','pdf','thesis','report','ebook'],icon:'📄',title:'Page count & format',desc:'Mention approximate page/word count and output format (PDF, EPUB, DOCX).',tag:'Format'},{keywords:['document','thesis','report','pitch'],icon:'📐',title:'Layout preferences',desc:'Specify: column layout, margins, font preferences, header/footer style.',tag:'Layout'},{keywords:['logo','brand','identity'],icon:'✨',title:'Brand references',desc:'Share links to styles you like — Pinterest boards, competitor logos, colour palettes.',tag:'Reference'},{keywords:['photo','retouch','color','colour','grade'],icon:'🖼️',title:'Reference images',desc:'Attach or link reference images showing the look you\'re going for.',tag:'Reference'},{keywords:['colour','color','grade','tone'],icon:'🎨',title:'Colour direction',desc:'Specify: warm tones, cool tones, high contrast, desaturated, film look, etc.',tag:'Style'},{keywords:['rushed','urgent','asap','quick','soon'],icon:'⚡',title:'Rush delivery note',desc:'Rush orders are fixed ₹50 rate. Mention exact deadline for accurate quote.',tag:'Pricing'},{keywords:['client','brand','company','business'],icon:'💼',title:'Client context',desc:'Share brand guidelines, target audience, and campaign goals if available.',tag:'Context'},{keywords:['social','instagram','facebook','linkedin'],icon:'📱',title:'Social specs',desc:'Mention: feed post, story, cover photo, or profile picture dimensions.',tag:'Format'},{keywords:['wedding','birthday','invitation','function'],icon:'🎉',title:'Event details',desc:'Include: event name, date, venue, theme, and any mandatory elements.',tag:'Details'},{keywords:['resume','cv','portfolio'],icon:'📋',title:'Content sections',desc:'List sections: experience, education, skills, projects. Share existing content.',tag:'Content'},{keywords:['colour','palette','theme','tone','mood'],icon:'🎭',title:'Visual direction',desc:'Describe the feeling: professional, playful, luxury, rustic, modern, etc.',tag:'Style'},{keywords:['file','drive','wetransfer','link','download'],icon:'🔗',title:'File sharing tip',desc:'For files over 25MB, use Google Drive, WeTransfer, or Dropbox links.',tag:'Files'},{keywords:['revision','change','tweak','adjust'],icon:'🔄',title:'Revision policy',desc:'Two revision rounds are included. Additional rounds are billed separately.',tag:'Policy'},{keywords:['budget','price','cost','cheap','expensive'],icon:'💰',title:'Budget guidance',desc:'Share your budget range so we can tailor scope and suggest the best approach.',tag:'Pricing'},{keywords:['trend','trending','viral','latest','modern'],icon:'🔥',title:'Trend awareness',desc:'Current hot trends: AI edits, moody grades, vertical-first, kinetic type. Want to ride a trend?',tag:'Trends'}];let debounceTimer=null;input.addEventListener('input',function(){clearTimeout(debounceTimer);debounceTimer=setTimeout(()=>analyze(this.value),300);});input.addEventListener('focus',function(){if(this.value.trim().length>3)analyze(this.value);});document.addEventListener('click',function(e){if(!e.target.closest('.brief-assist')){sugBox.classList.remove('open');}});function analyze(text){const lower=text.toLowerCase();if(lower.trim().length<3){sugBox.classList.remove('open');return;}const matches=[];const seen=new Set();RULES.forEach(rule=>{if(rule.keywords.some(kw=>lower.includes(kw))&&!seen.has(rule.title)){matches.push(rule);seen.add(rule.title);}});if(matches.length<2){const generalTips=[{keywords:[],icon:'💡',title:'Be specific',desc:'The more detail you provide — references, dimensions, mood — the better the result.',tag:'Tip'},{keywords:[],icon:'📎',title:'Attach references',desc:'Paste links to Pinterest, Dribbble, or any visual reference that inspires you.',tag:'Tip'},{keywords:[],icon:'🎯',title:'Define the goal',desc:'Is this for social media, print, a presentation? Goal-first briefs get better results.',tag:'Tip'}];generalTips.forEach(t=>{if(!seen.has(t.title)){matches.push(t);seen.add(t.title);}});}if(matches.length===0){sugBox.classList.remove('open');return;}sugList.innerHTML=matches.slice(0,6).map(s=>`<div class="brief-sug-item" onclick="applySuggestion('${s.desc.replace(/'/g,"\\'")}')"><div class="brief-sug-icon">${s.icon}</div><div class="brief-sug-text"><div class="brief-sug-title">${s.title}</div><div class="brief-sug-desc">${s.desc}</div></div><span class="brief-sug-tag">${s.tag}</span></div>`).join('');sugBox.classList.add('open');}window.applySuggestion=function(text){const val=input.value.trim();if(val&&!val.endsWith('\n'))input.value+='\n';input.value+='→ '+text+'\n';input.focus();analyze(input.value);};})();
@@ -2096,6 +1948,7 @@ document.querySelectorAll('.smooth-in').forEach(el=>smoothObserver.observe(el));
 
 // ===== CONFETTI EFFECT =====
 function createConfetti(){
+  if(reducedMotion.matches)return;
   const colors=['#c8ff00','#00ffff','#ff00ff','#ff0000','#00ff00','#ffff00'];
   const container=document.createElement('div');
   container.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:99999';
@@ -2248,12 +2101,12 @@ function calcPrice(){const service=document.getElementById('calcService').value;
 function checkFile(){const input=document.getElementById('fileCheck');const file=input.files[0];if(!file){document.getElementById('fileResult').innerHTML='No file selected. Choose a file above to check its size and format.';return}const size=(file.size/1024/1024).toFixed(2);const ext=file.name.split('.').pop().toLowerCase();const imgExts=['jpg','jpeg','png','psd','raw','tiff','webp','svg'];const vidExts=['mp4','mov','avi','mkv','wmv','flv'];const docExts=['pdf','docx','pptx','xlsx','doc','ppt'];let type='Unknown',status='';if(imgExts.includes(ext))type='Image';else if(vidExts.includes(ext))type='Video';else if(docExts.includes(ext))type='Document';if(size>50)status='<br><span style="color:#ef4444">⚠ File too large — use Google Drive or WeTransfer to share.</span>';else if(size>25)status='<br><span style="color:#f59e0b">⚡ Large file — may take longer to process.</span>';else status='<br><span style="color:#22c55e">✓ Good — within upload limits.</span>';document.getElementById('fileResult').innerHTML=`<strong>${file.name}</strong><br>Type: ${type} · Size: <span class="highlight">${size} MB</span>${status}`;}
 function showRes(){const platform=document.getElementById('resPlatform').value;document.querySelectorAll('.res-item').forEach(item=>{item.style.display=(platform==='all'||item.dataset.platform===platform)?'':'none'});}
 let compareDragging=false;function loadCompare(){const bFile=document.getElementById('compareBefore').files[0];const aFile=document.getElementById('compareAfter').files[0];if(!bFile||!aFile)return;const bUrl=URL.createObjectURL(bFile);const aUrl=URL.createObjectURL(aFile);document.getElementById('compareBg').src=bUrl;document.getElementById('compareFg').src=aUrl;document.getElementById('compareBox').style.display='block';document.getElementById('compareResult').innerHTML='Drag the slider left ↔ right to compare your images.';const box=document.getElementById('compareBox');const overlay=document.getElementById('compareOver');const handle=document.getElementById('compareHandle');function setPos(x){const rect=box.getBoundingClientRect();let pct=((x-rect.left)/rect.width)*100;pct=Math.max(0,Math.min(100,pct));overlay.style.width=pct+'%';handle.style.left=pct+'%';}box.onmousedown=e=>{compareDragging=true;setPos(e.clientX)};box.ontouchstart=e=>{compareDragging=true;setPos(e.touches[0].clientX)};document.onmousemove=e=>{if(compareDragging)setPos(e.clientX)};document.ontouchmove=e=>{if(compareDragging)setPos(e.touches[0].clientX)};document.onmouseup=()=>compareDragging=false;document.ontouchend=()=>compareDragging=false;}
-function genPalette(){const base=document.getElementById('paletteBase').value;const r=parseInt(base.slice(1,3),16),g=parseInt(base.slice(3,5),16),b=parseInt(base.slice(5,7),16);const hsl=rgbToHsl(r,g,b);const palettes=[];for(let i=0;i<5;i++){const newH=(hsl[0]+i*30)%360;const newS=Math.max(20,Math.min(90,hsl[1]+(i%2?10:-10)));const newL=Math.max(20,Math.min(85,hsl[2]+(i*8-16)));const rgb=hslToRgb(newH,newS,newL);const hex='#'+[rgb[0],rgb[1],rgb[2]].map(x=>x.toString(16).padStart(2,'0')).join('');palettes.push(hex);}const display=document.getElementById('paletteDisplay');display.innerHTML=palettes.map(c=>`<div class="palette-chip" style="background:${c}" onclick="navigator.clipboard.writeText('${c}');document.getElementById('paletteResult').innerHTML='Copied <strong>${c}</strong> to clipboard!'" title="Click to copy"></div>`).join('');document.getElementById('paletteResult').innerHTML='Click a swatch to copy its hex code.';}
+function genPalette(){if(!document.getElementById('paletteBase'))return;const base=document.getElementById('paletteBase').value;const r=parseInt(base.slice(1,3),16),g=parseInt(base.slice(3,5),16),b=parseInt(base.slice(5,7),16);const hsl=rgbToHsl(r,g,b);const palettes=[];for(let i=0;i<5;i++){const newH=(hsl[0]+i*30)%360;const newS=Math.max(20,Math.min(90,hsl[1]+(i%2?10:-10)));const newL=Math.max(20,Math.min(85,hsl[2]+(i*8-16)));const rgb=hslToRgb(newH,newS,newL);const hex='#'+[rgb[0],rgb[1],rgb[2]].map(x=>x.toString(16).padStart(2,'0')).join('');palettes.push(hex);}const display=document.getElementById('paletteDisplay');display.innerHTML=palettes.map(c=>`<div class="palette-chip" style="background:${c}" onclick="navigator.clipboard.writeText('${c}');document.getElementById('paletteResult').innerHTML='Copied <strong>${c}</strong> to clipboard!'" title="Click to copy"></div>`).join('');document.getElementById('paletteResult').innerHTML='Click a swatch to copy its hex code.';}
 function rgbToHsl(r,g,b){r/=255;g/=255;b/=255;const max=Math.max(r,g,b),min=Math.min(r,g,b);let h,s,l=(max+min)/2;if(max===min){h=s=0}else{const d=max-min;s=l>0.5?d/(2-max-min):d/(max+min);switch(max){case r:h=((g-b)/d+(g<b?6:0))/6;break;case g:h=((b-r)/d+2)/6;break;case b:h=((r-g)/d+4)/6;break}}return[Math.round(h*360),Math.round(s*100),Math.round(l*100)]}
 function hslToRgb(h,s,l){h/=360;s/=100;l/=100;let r,g,b;if(s===0){r=g=b=l}else{const hue2rgb=(p,q,t)=>{if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p};const q=l<0.5?l*(1+s):l+s-l*s;const p=2*l-q;r=hue2rgb(p,q,h+1/3);g=hue2rgb(p,q,h);b=hue2rgb(p,q,h-1/3)}return[Math.round(r*255),Math.round(g*255),Math.round(b*255)]}
 
 // ===== ASPECT RATIO CALCULATOR =====
-function calcAspectRatio(){
+function calcAspectRatio(){if(!["arWidth","arHeight"].every(id=>document.getElementById(id)))return;
   const w=parseInt(document.getElementById('arWidth').value)||1;
   const h=parseInt(document.getElementById('arHeight').value)||1;
   const gcd=(a,b)=>b?gcd(b,a%b):a;
@@ -2281,7 +2134,7 @@ function swapDimensions(){
 }
 
 // ===== TEXT & CHARACTER COUNTER =====
-function countText(){
+function countText(){if(!["textCounterInput"].every(id=>document.getElementById(id)))return;
   const text=document.getElementById('textCounterInput').value;
   const chars=text.length;
   const words=text.trim()?text.trim().split(/\s+/).length:0;
@@ -2292,7 +2145,7 @@ function countText(){
 }
 
 // ===== GRADIENT GENERATOR =====
-function genGradient(){
+function genGradient(){if(!["gradColor1","gradColor2","gradAngle"].every(id=>document.getElementById(id)))return;
   const c1=document.getElementById('gradColor1').value;
   const c2=document.getElementById('gradColor2').value;
   const angle=document.getElementById('gradAngle').value;
@@ -2309,7 +2162,7 @@ function copyGradient(){
 }
 
 // ===== QR CODE GENERATOR =====
-function genQR(){
+function genQR(){if(!["qrInput"].every(id=>document.getElementById(id)))return;
   const text=document.getElementById('qrInput').value;
   const img=document.getElementById('qrImage');
   if(!text){img.src='';document.getElementById('qrResult').textContent='Enter text or URL above to generate QR code';return}
@@ -2333,7 +2186,7 @@ function downloadQR(){
 }
 
 // ===== FONT PREVIEW =====
-function updateFontPreview(){
+function updateFontPreview(){if(!["fontPreviewText","fontSize"].every(id=>document.getElementById(id)))return;
   const text=document.getElementById('fontPreviewText').value||'Cheditz';
   const size=document.getElementById('fontSize').value;
   document.getElementById('fontSizeValue').textContent=size;
@@ -2414,27 +2267,7 @@ document.getElementById('testiForm').addEventListener('submit',async function(e)
 });
 
 // Delete testimonial
-function deleteTestimonial(index){
-  if(!confirm('Delete this review?'))return;
-  // Try Firebase first
-  if(FIREBASE_ENABLED&&firebaseDb){
-    firebaseDb.collection('cheditz_testimonials').orderBy('date','desc').limit(50).get().then(snapshot=>{
-      const docs=snapshot.docs;
-      if(docs[index]){
-        docs[index].ref.delete().then(()=>{
-          console.log('Review deleted from Firebase');
-        }).catch(e=>console.warn('Firebase delete failed:',e));
-      }
-    });
-  }
-  // Also remove from localStorage
-  const cfg=getConfig();
-  if(cfg.testimonials&&cfg.testimonials[index]){
-    cfg.testimonials.splice(index,1);
-    saveConfig(cfg);
-    renderTestimonials(cfg.testimonials);
-  }
-}
+function deleteTestimonial(){alert('Please sign in on the admin page to manage reviews.');}
 
 // Load initial testimonials from Firebase
 if(FIREBASE_ENABLED&&firebaseDb){
@@ -2457,6 +2290,7 @@ applyColor();applyContent();applyServices();applyContact();renderWorks();genPale
 function animateCounters(){
   document.querySelectorAll('.counter').forEach(el=>{
     const target=parseInt(el.getAttribute('data-target'))||0;
+    if(reducedMotion.matches){el.textContent=target;return;}
     const duration=2000;
     const start=performance.now();
     const initial=0;
@@ -2601,8 +2435,10 @@ document.querySelectorAll('.svc-head').forEach(head=>{
 // ===== NODE GRAPH BACKGROUND =====
 (function(){
   const canvas=document.getElementById('node-bg');
-  if(!canvas||window.innerWidth<769)return;
+  if(!canvas)return;
   const ctx=canvas.getContext('2d');
+  if(!ctx)return;
+  let frame=0;
   let width,height;
   let nodes=[];
   let pulses=[];
@@ -2641,9 +2477,8 @@ document.querySelectorAll('.svc-head').forEach(head=>{
     }
   }
 
-  window.addEventListener('resize',resize);
+  window.addEventListener('resize',()=>{if(canAnimateEffects())resize()});
   window.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY});
-  resize();
 
   function getQuadraticPoint(p0,p1,p2,t){
     const oneMinusT=1-t;
@@ -2654,6 +2489,7 @@ document.querySelectorAll('.svc-head').forEach(head=>{
   }
 
   function draw(){
+    if(!canAnimateEffects()){frame=0;return;}
     ctx.clearRect(0,0,width,height);
 
     // Update nodes
@@ -2698,25 +2534,39 @@ document.querySelectorAll('.svc-head').forEach(head=>{
       ctx.font='9px monospace';ctx.fillStyle='rgba(255,255,255,0.35)';ctx.fillText(node.label,node.x+10,node.y+3);
     });
 
-    requestAnimationFrame(draw);
+    frame=requestAnimationFrame(draw);
   }
-  draw();
+  function syncBackground(){
+    cancelAnimationFrame(frame);frame=0;
+    if(canAnimateEffects()){resize();draw()}
+    else{ctx.clearRect(0,0,canvas.width,canvas.height);nodes=[];pulses=[];canvas.width=canvas.height=1}
+  }
+  reducedMotion.addEventListener('change',syncBackground);
+  lightBackground.addEventListener('change',syncBackground);
+  document.addEventListener('visibilitychange',syncBackground);
+  syncBackground();
 })();
 
 // ===== CURSOR GLOW =====
 (function(){
-  if(window.innerWidth<769||matchMedia('(hover:none)').matches)return;
+  if(!canAnimateEffects()||matchMedia('(hover:none)').matches)return;
   const glow=document.createElement('div');
   glow.className='cursor-glow';
   document.body.appendChild(glow);
   let mx=0,my=0,gx=0,gy=0;
   document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+  let glowFrame=0;
   function animate(){
+    if(!canAnimateEffects()){glowFrame=0;return;}
     gx+=(mx-gx)*0.1;gy+=(my-gy)*0.1;
-    glow.style.left=gx+'px';glow.style.top=gy+'px';
-    requestAnimationFrame(animate);
+    glow.style.left='0';glow.style.top='0';glow.style.transform=`translate(${gx}px,${gy}px) translate(-50%,-50%)`;
+    glowFrame=requestAnimationFrame(animate);
   }
-  animate();
+  function syncGlow(){cancelAnimationFrame(glowFrame);glowFrame=0;glow.style.display=canAnimateEffects()?'':'none';if(canAnimateEffects())animate()}
+  reducedMotion.addEventListener('change',syncGlow);
+  lightBackground.addEventListener('change',syncGlow);
+  document.addEventListener('visibilitychange',syncGlow);
+  syncGlow();
 })();
 
 // ===== HORIZONTAL SCROLL (Mouse Drag) =====
@@ -2793,6 +2643,7 @@ document.querySelectorAll('.magnetic').forEach(el=>{
   const layers=document.querySelectorAll('.parallax-layer');
   if(!layers.length)return;
   window.addEventListener('scroll',()=>{
+    if(!canAnimateEffects())return;
     const scrollY=window.scrollY;
     layers.forEach(layer=>{
       const speed=parseFloat(layer.dataset.speed)||0.5;
@@ -2864,7 +2715,7 @@ document.querySelectorAll('input[maxlength],textarea[maxlength]').forEach(el=>{e
 if(window.top!==window.self){window.top.location=window.self.location;}
 
 // ===== SECURITY: DEVELOPER TOOLS obfuscation (basic) =====
-(function(){const _0x=['log','warn','error','table','group','groupEnd','clear'];_0x.forEach(m=>{if(console[m]){console[m]=function(){};}});})();
+
 
 // ===== SECURITY: PREVENT form resubmission =====
 document.querySelectorAll('form').forEach(f=>{f.addEventListener('submit',function(){this.addEventListener('submit',function(e){e.preventDefault();},{once:true});},{once:true});});

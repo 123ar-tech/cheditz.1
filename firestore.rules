@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function admin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid))
+        && get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data.enabled == true;
+    }
+    function text(data, key, min, max) {
+      return data[key] is string && data[key].size() >= min && data[key].size() <= max;
+    }
+    function publicConfig(data) {
+      return data.keys().hasOnly(['accent','works','content','services','contact','testimonials']);
+    }
+    match /adminUsers/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow list, create, update, delete: if false;
+    }
+    match /cheditz/config {
+      // Legacy documents containing passwords remain private until migrated.
+      allow get: if admin() || publicConfig(resource.data);
+      allow list: if false;
+      allow create, update: if admin() && publicConfig(request.resource.data);
+      allow delete: if admin();
+    }
+    match /cheditz_orders/{id} {
+      allow read, update, delete: if admin();
+      allow create: if request.resource.data.keys().hasAll(['name','email','phone','service','budget','deadline','description','date','status'])
+        && request.resource.data.keys().hasOnly(['name','email','phone','service','budget','deadline','description','date','status'])
+        && text(request.resource.data,'name',2,600)
+        && text(request.resource.data,'email',3,320)
+        && text(request.resource.data,'phone',0,60)
+        && text(request.resource.data,'service',1,200)
+        && text(request.resource.data,'budget',0,200)
+        && text(request.resource.data,'deadline',0,100)
+        && text(request.resource.data,'description',10,30000)
+        && text(request.resource.data,'date',20,35)
+        && request.resource.data.status == 'pending';
+    }
+    match /cheditz_testimonials/{id} {
+      allow read: if true;
+      allow update, delete: if admin();
+      allow create: if request.resource.data.keys().hasAll(['name','role','rating','text','date'])
+        && request.resource.data.keys().hasOnly(['name','role','rating','text','date'])
+        && text(request.resource.data,'name',2,600)
+        && text(request.resource.data,'role',0,600)
+        && text(request.resource.data,'text',10,6000)
+        && text(request.resource.data,'date',20,35)
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1 && request.resource.data.rating <= 5;
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}
