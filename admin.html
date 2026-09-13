@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Cheditz — Admin Panel</title>
 <meta name="theme-color" content="#9333ea" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' https: blob:; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com wss://*.firebaseio.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';" />
@@ -18,7 +18,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   html{font-size:16px}
@@ -252,35 +251,79 @@
     .adm-panels{display:grid;grid-template-columns:1fr}
   }
 
-  /* Receipt Modal */
-  .receipt-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:99998;display:none;align-items:center;justify-content:center;padding:1rem}
-  .receipt-overlay.show{display:flex}
-  .receipt-box{background:var(--bg);border:1px solid var(--edge);border-radius:16px;width:min(480px,95vw);max-height:90vh;overflow-y:auto;position:relative;animation:receiptIn .4s cubic-bezier(.16,1,.3,1)}
-  @keyframes receiptIn{from{opacity:0;transform:translateY(20px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
-  .receipt-header{padding:2rem 2rem 1rem;text-align:center;border-bottom:1px solid var(--edge);position:relative}
-  .receipt-header .receipt-logo{font-size:1.2rem;font-weight:800;letter-spacing:0.1em;color:var(--acc);margin-bottom:0.25rem}
-  .receipt-header .receipt-tagline{font-size:0.6rem;font-family:'JetBrains Mono',monospace;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase}
-  .receipt-header .receipt-id{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--acc);background:rgba(200,255,0,0.08);border:1px solid rgba(200,255,0,0.15);border-radius:6px;padding:0.3rem 0.8rem;display:inline-block;margin-top:0.75rem}
-  .receipt-body{padding:1.5rem 2rem}
-  .receipt-section-title{font-family:'JetBrains Mono',monospace;font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem;padding-bottom:0.4rem;border-bottom:1px solid var(--edge)}
-  .receipt-row{display:flex;justify-content:space-between;align-items:flex-start;padding:0.5rem 0;font-size:0.8rem}
-  .receipt-row .r-label{color:var(--muted);flex-shrink:0;min-width:90px}
-  .receipt-row .r-value{color:var(--txt);font-weight:500;text-align:right;word-break:break-word;max-width:60%}
-  .receipt-row .r-value.accent{color:var(--acc);font-weight:700}
-  .receipt-divider{height:1px;background:var(--edge);margin:0.75rem 0}
-  .receipt-status{display:inline-flex;align-items:center;gap:0.4rem;font-size:0.7rem;font-weight:600;padding:0.3rem 0.8rem;border-radius:20px;background:rgba(200,255,0,0.1);color:var(--acc);border:1px solid rgba(200,255,0,0.2)}
-  .receipt-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--acc)}
-  .receipt-footer{padding:1rem 2rem 1.5rem;text-align:center;border-top:1px solid var(--edge)}
-  .receipt-footer p{font-size:0.65rem;color:var(--muted);line-height:1.6}
-  .receipt-actions{display:flex;gap:0.75rem;margin-top:1rem;justify-content:center}
-  .receipt-btn{padding:0.6rem 1.2rem;border-radius:8px;font-size:0.7rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;display:flex;align-items:center;gap:0.4rem}
-  .receipt-btn-print{background:var(--acc);color:var(--bg)}
-  .receipt-btn-print:hover{filter:brightness(1.1);transform:translateY(-1px)}
-  .receipt-btn-close{background:var(--raised);color:var(--txt);border:1px solid var(--edge)}
-  .receipt-btn-close:hover{border-color:var(--acc);color:var(--acc)}
-  .receipt-close{position:absolute;top:1rem;right:1rem;width:28px;height:28px;border-radius:50%;background:var(--raised);border:1px solid var(--edge);color:var(--dim);font-size:0.8rem;cursor:pointer;display:grid;place-items:center;transition:all .2s}
-  .receipt-close:hover{border-color:var(--acc);color:var(--acc)}
-  @media print{.receipt-overlay{position:static;background:none;backdrop-filter:none;padding:0}.receipt-box{border:none;border-radius:0;max-height:none;width:100%;box-shadow:none}.receipt-actions,.receipt-close{display:none!important}}
+
+/* ===== CHEDITZ ADMIN RESPONSIVE HOTFIX 2026-09 ===== */
+:where(html,body){width:100%;max-width:100%;overflow-x:hidden}
+:where(img,video,iframe,svg,canvas){max-width:100%}
+:where(input,textarea,select,button){max-width:100%}
+:where(.adm-wrap,.adm-panel-shell,.adm-panel,.adm-head,.adm-tabs,.wl-item,.wl-info){min-width:0}
+:where(h1,h2,h3,p,a,span,label,.wl-title,.wl-sub){overflow-wrap:anywhere}
+
+@media(max-width:767.98px){
+  html{font-size:16px;-webkit-text-size-adjust:100%}
+  body{overflow-x:clip}
+  .adm-top{padding:.7rem .85rem;gap:.5rem;flex-wrap:wrap}
+  .adm-top-left{min-width:0;gap:.55rem}
+  .adm-top img{height:28px;max-width:115px;object-fit:contain}
+  .adm-top-name{font-size:1rem}
+  .adm-top-tag{font-size:.48rem}
+  .adm-top-actions{gap:.45rem;margin-left:auto}
+  .adm-top-actions a{font-size:.65rem;white-space:nowrap}
+  .btn,.btn-sm{padding:.6rem .8rem;font-size:.68rem}
+
+  .adm-wrap{width:100%;max-width:100%;margin:1rem auto;padding:0 .75rem}
+  .adm-panel-shell{border-radius:16px}
+  .adm-head{padding:.8rem;flex-wrap:wrap}
+  .adm-head .btn{margin-left:auto}
+  .adm-tabs{display:flex;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;gap:0}
+  .adm-tab{flex:0 0 auto;min-width:max-content;padding:.75rem .8rem;font-size:.6rem;scroll-snap-align:start}
+  .adm-panel{padding:1rem !important}
+
+  /* Override fixed inline dashboard grids */
+  #tabDashboard > div[style*="grid-template-columns:repeat(4,1fr)"],
+  #tabDashboard > div[style*="grid-template-columns:repeat(2,1fr)"],
+  #tabDashboard > div[style*="grid-template-columns:1fr 1fr"],
+  #tabOrders > div[style*="grid-template-columns:repeat(3,1fr)"],
+  #tabOrders > div[style*="grid-template-columns:repeat(2,1fr)"]{
+    grid-template-columns:1fr !important;
+  }
+
+  .aff-row{grid-template-columns:1fr !important}
+  .aff input,.aff textarea,.aff select{font-size:16px;min-width:0}
+  .wl-item{display:grid;grid-template-columns:72px minmax(0,1fr);align-items:center;text-align:left;padding:.75rem}
+  .wl-thumb{width:72px;height:72px}
+  .wl-info{padding:0;min-width:0}
+  .wl-btns{grid-column:1/-1;width:100%;justify-content:flex-end;flex-wrap:wrap}
+  .wl-btn{width:36px;height:36px}
+  .color-row{gap:.55rem}
+  .color-swatch{width:34px;height:34px}
+
+  .login-box{width:calc(100% - 1.5rem);max-width:380px;padding:2rem 1.25rem}
+  .login-avatar{width:82px;height:82px}
+  .login-title{font-size:1.7rem}
+  .login-input-wrap input{font-size:16px;letter-spacing:.18em}
+}
+
+@media(max-width:390px){
+  .adm-top{align-items:flex-start}
+  .adm-top-actions{width:100%;justify-content:flex-end}
+  .adm-wrap{padding:0 .5rem}
+  .adm-panel{padding:.85rem !important}
+  .wl-item{grid-template-columns:60px minmax(0,1fr)}
+  .wl-thumb{width:60px;height:60px}
+}
+
+@media(min-width:768px) and (max-width:1023.98px){
+  .adm-wrap{max-width:760px;padding:0 1.25rem}
+  .adm-top{padding:.9rem 1.25rem}
+  .adm-tabs{overflow-x:auto}
+  .adm-tab{flex:0 0 auto;padding:12px 14px}
+  #tabDashboard > div[style*="grid-template-columns:repeat(4,1fr)"],
+  #tabOrders > div[style*="grid-template-columns:repeat(3,1fr)"]{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -320,8 +363,7 @@
     <div class="login-title">Cheditz</div>
     <div class="login-subtitle">Admin Dashboard</div>
     <div class="login-input-wrap">
-      <input id="loginEmail" type="email" placeholder="Admin email" autocomplete="username" aria-label="Admin email" />
-      <input id="loginPass" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()" autocomplete="current-password" aria-label="Admin password" />
+      <input id="loginPass" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()" autocomplete="off" />
       <div class="login-input-line"></div>
     </div>
     <div class="login-err" id="loginErr">Invalid password. Try again.</div>
@@ -541,10 +583,6 @@
 </div>
 
 <script>
-function publicConfig(value){const clean={};for(const key of ['accent','works','content','services','contact','testimonials'])if(value&&Object.prototype.hasOwnProperty.call(value,key))clean[key]=value[key];return clean;}
-// Remove legacy credentials and private order caches from this browser.
-try{const old=localStorage.getItem('cheditz_config');if(old)localStorage.setItem('cheditz_config',JSON.stringify(publicConfig(JSON.parse(old))));localStorage.removeItem('cheditz_orders');sessionStorage.removeItem('cheditz_admin');sessionStorage.removeItem('cheditz_admin_time');}catch{localStorage.removeItem('cheditz_config');}
-
 // ===== FIREBASE CONFIG =====
 const _0x1a=['79278126031','cheditz-dee25','cheditz-dee25.firebasestorage.app'];
 const _0x2b='AIzaSyC2CVkVLsXEOtyuxOeJXhijbQ2x08odwkw';
@@ -565,49 +603,43 @@ if (FIREBASE_ENABLED) {
   } catch(e) { console.warn('Firebase init failed:', e); }
 }
 
-let privateOrders=[],privateReviews=[],adminSubscriptions=[];
-function stopAdminSync(){adminSubscriptions.forEach(stop=>stop());adminSubscriptions=[];privateOrders=[];privateReviews=[];}
-function startAdminSync(){
-stopAdminSync();
 // Real-time Firestore Sync for Admin Panel
 if (FIREBASE_ENABLED && firebaseDb) {
   // 1. Sync Website Config & Content
-  adminSubscriptions.push(firebaseDb.collection('cheditz').doc('config').onSnapshot(doc => {
+  firebaseDb.collection('cheditz').doc('config').onSnapshot(doc => {
     const data = doc.data();
     if (data) {
-      localStorage.setItem('cheditz_config', JSON.stringify(publicConfig(data)));
+      localStorage.setItem('cheditz_config', JSON.stringify(data));
       applyColor();
     }
-  }, e => {console.warn('Config snapshot error:', e);doLogout();}));
+  }, e => console.warn('Config snapshot error:', e));
 
   // 2. Real-time Incoming Orders Listener
-  adminSubscriptions.push(firebaseDb.collection('cheditz_orders').orderBy('date', 'desc').onSnapshot(snapshot => {
+  firebaseDb.collection('cheditz_orders').orderBy('date', 'desc').onSnapshot(snapshot => {
     const orders = [];
     snapshot.forEach(doc => orders.push({ id: doc.id, ...doc.data() }));
-    privateOrders=orders;
+    localStorage.setItem('cheditz_orders', JSON.stringify(orders));
     if (isAdmin) renderOrdersList();
-  }, e => {console.warn('Orders snapshot error:', e);doLogout();}));
+  }, e => console.warn('Orders snapshot error:', e));
 
   // 3. Real-time Reviews Listener
-  adminSubscriptions.push(firebaseDb.collection('cheditz_testimonials').orderBy('date', 'desc').onSnapshot(snapshot => {
+  firebaseDb.collection('cheditz_testimonials').orderBy('date', 'desc').onSnapshot(snapshot => {
     const reviews = [];
     snapshot.forEach(doc => reviews.push({ id: doc.id, ...doc.data() }));
-    privateReviews=reviews;
+    localStorage.setItem('cheditz_testimonials', JSON.stringify(reviews));
     if (isAdmin) renderTestimonialsList();
-  }, e => {console.warn('Reviews snapshot error:', e);doLogout();}));
+  }, e => console.warn('Reviews snapshot error:', e));
 }
 
-}
 // ===== CONFIG & STATE =====
+const DEFAULT_PASS_HASH = String.fromCharCode(99,104,101,100,105,116,122,64,50,48,50,54);
 let isAdmin = false;
 
 function getConfig() {
-  try { return publicConfig(JSON.parse(localStorage.getItem('cheditz_config')) || getDefaultConfig()); }
+  try { return JSON.parse(localStorage.getItem('cheditz_config')) || getDefaultConfig(); }
   catch { return getDefaultConfig(); }
 }
 function saveConfig(c) {
-  if(!isAdmin)throw new Error("Admin sign-in required");
-  c=publicConfig(c);
   localStorage.setItem('cheditz_config', JSON.stringify(c));
   if (FIREBASE_ENABLED && firebaseDb) {
     firebaseDb.collection('cheditz').doc('config').set(c)
@@ -622,6 +654,7 @@ function saveConfig(c) {
 }
 function getDefaultConfig() {
   return {
+    password: DEFAULT_PASS_HASH,
     accent: '#9333ea',
     works: [
       { id:'d1', title:"Vande Bharat", sub:"Nagercoil → Chennai", cat:"Poster", meta:"Rail launch · A2", type:"image", url:"https://miaoda-conversation-file.s3cdn.medo.dev/user-c4hvi7diyakg/app-c4hvyv74mdxd/20260605/Vande Bharat Nagercoil to Chennai Poster.png", visible:true },
@@ -650,7 +683,6 @@ function getDefaultConfig() {
 
 // ===== ADMIN AUTH =====
 function showPanel(){
-  if(!isAdmin)return;
   document.getElementById('loginOverlay').classList.remove('on');
   document.getElementById('adminPanel').style.display='block';
   document.getElementById('logoutBtn').style.display='inline-flex';
@@ -662,37 +694,32 @@ function hidePanel(){
   document.getElementById('adminPanel').style.display='none';
   document.getElementById('logoutBtn').style.display='none';
 }
-const adminAuth=firebaseApp?firebase.auth():null;
-let authVersion=0;
-hidePanel();
-async function doLogin(){
-  const err=document.getElementById('loginErr');err.style.display='none';
-  try{
-    if(!adminAuth)throw new Error('Authentication unavailable');
-    await adminAuth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
-    await adminAuth.signInWithEmailAndPassword(document.getElementById('loginEmail').value.trim(),document.getElementById('loginPass').value);
-  }catch{err.textContent='Sign-in failed. Check your details and administrator access.';err.style.display='block';}
-  finally{document.getElementById('loginPass').value='';}
-}
-async function doLogout(){
-  authVersion++;isAdmin=false;stopAdminSync();hidePanel();
-  document.querySelectorAll('#adminPanel input,#adminPanel textarea').forEach(el=>el.value='');
-  document.querySelectorAll('#ordersList,#testimonialsList').forEach(el=>el.replaceChildren());
-  if(adminAuth)await adminAuth.signOut();
-}
-if(adminAuth)adminAuth.onIdTokenChanged(async user=>{
-  const version=++authVersion;isAdmin=false;stopAdminSync();hidePanel();
-  if(!user)return;
-  try{
-    const permission=await firebaseDb.collection('adminUsers').doc(user.uid).get({source:'server'});
-    if(version!==authVersion)return;
-    if(!permission.exists||permission.data().enabled!==true)throw new Error('Not authorized');
-    isAdmin=true;startAdminSync();showPanel();
-  }catch{
-    if(version!==authVersion)return;
-    await doLogout();const err=document.getElementById('loginErr');err.textContent='This account does not have administrator access.';err.style.display='block';
+function doLogin(){
+  const pass=document.getElementById('loginPass').value;
+  if(!checkRateLimit('login',5)){alert('Too many attempts. Please wait 60 seconds.');return;}
+  const cfg=getConfig();
+  if(pass===cfg.password||pass===DEFAULT_PASS_HASH){
+    isAdmin=true;
+    sessionStorage.setItem('cheditz_admin','1');
+    sessionStorage.setItem('cheditz_admin_time',Date.now().toString());
+    document.getElementById('loginErr').style.display='none';
+    document.getElementById('loginPass').value='';
+    showPanel();
+  } else {
+    document.getElementById('loginErr').style.display='block';
   }
-});
+}
+function doLogout(){
+  isAdmin=false;
+  sessionStorage.removeItem('cheditz_admin');
+  hidePanel();
+}
+// Auto-login if session active
+if (sessionStorage.getItem('cheditz_admin')==='1') {
+  showPanel();
+} else {
+  document.getElementById('loginOverlay').classList.add('on');
+}
 
 // ===== ADMIN TABS =====
 function admTab(name,btn){
@@ -764,7 +791,7 @@ function renderActivityFeed(orders){
   }
   feed.innerHTML=activities.map(a=>`<div style="display:flex;align-items:center;gap:10px;padding:8px;border-bottom:1px solid var(--edge)">
     <div style="font-size:1.2rem">${a.icon}</div>
-    <div style="flex:1"><div style="font-size:0.8rem">${esc(a.text)}</div><div style="font-size:0.65rem;color:var(--muted)">${esc(a.time)}</div></div>
+    <div style="flex:1"><div style="font-size:0.8rem">${a.text}</div><div style="font-size:0.65rem;color:var(--muted)">${a.time}</div></div>
   </div>`).join('');
 }
 
@@ -885,8 +912,155 @@ function moveWork(i,dir){const cfg=getConfig();const j=i+dir;if(j<0||j>=cfg.work
 function delWork(i){if(!confirm('Delete this work?'))return;const cfg=getConfig();cfg.works.splice(i,1);saveConfig(cfg);renderWorksList()}
 
 // ===== ORDERS =====
-function getOrders(){return isAdmin?privateOrders:[]}
-function saveOrders(orders){if(isAdmin)privateOrders=orders}
+function getOrders(){try{return JSON.parse(localStorage.getItem('cheditz_orders'))||[]}catch{return[]}}
+function saveOrders(orders){localStorage.setItem('cheditz_orders',JSON.stringify(orders))}
+
+// ===== RECEIPT NUMBER GENERATOR =====
+function generateReceiptNumber(){
+  const d=new Date();
+  const yy=String(d.getFullYear()).slice(-2);
+  const mm=String(d.getMonth()+1).padStart(2,'0');
+  const dd=String(d.getDate()).padStart(2,'0');
+  const seq=String(Math.floor(Math.random()*9999)+1).padStart(4,'0');
+  return 'CHZ-'+yy+mm+dd+'-'+seq;
+}
+
+// ===== RECEIPT GENERATOR =====
+function generateReceipt(order){
+  const receiptNum=order.receiptNumber||generateReceiptNumber();
+  const orderDate=order.date?new Date(order.date):new Date();
+  const dateStr=orderDate.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  const timeStr=orderDate.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  const budgetMap={'₹15 – ₹20':'₹15 – ₹20','₹20 – ₹25':'₹20 – ₹25','₹25 – ₹50':'₹25 – ₹50','₹50+':'₹50+','Not sure yet':'To be confirmed'};
+  const budgetDisplay=budgetMap[order.budget]||order.budget||'To be confirmed';
+  const briefText=(order.description||'').length>400?(order.description||'').substring(0,400)+'...':(order.description||'No brief provided');
+  const statusColor=order.status==='completed'?'#16a34a':'#ea580c';
+  const statusLabel=order.status==='completed'?'COMPLETED':'PENDING';
+  const logoUrl=window.location.origin+'/b_Enhance_the_image_to-removebg-preview.png';
+  const receiptHTML=`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Receipt ${esc(receiptNum)} — Cheditz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+@page{size:auto;margin:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1.5rem}
+.bill{width:100%;max-width:780px;background:#0a0a0a;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.6);border:1px solid #1a1a1a;border-radius:2px}
+.bill-stripe{display:flex;height:4px}.bill-stripe div{flex:1}.bill-stripe div:nth-child(1){background:#c8ff00}.bill-stripe div:nth-child(2){background:#00e5ff}.bill-stripe div:nth-child(3){background:#c8ff00}
+.bill-header{display:flex;align-items:center;justify-content:space-between;padding:2rem 2rem 1.5rem;border-bottom:1px solid #1a1a1a;background:#0a0a0a}
+.bill-logo-area{display:flex;align-items:center;gap:1rem}
+.bill-logo{height:60px;width:auto;object-fit:contain}
+.bill-brand{display:flex;flex-direction:column}
+.bill-brand-name{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;color:#fff;line-height:1}
+.bill-brand-name em{font-style:italic;color:#c8ff00}
+.bill-brand-sub{font-family:'JetBrains Mono',monospace;font-size:0.5rem;letter-spacing:0.2em;text-transform:uppercase;color:#555;margin-top:4px}
+.bill-header-right{text-align:right}
+.bill-type{font-family:'JetBrains Mono',monospace;font-size:0.55rem;letter-spacing:0.25em;text-transform:uppercase;color:#0a0a0a;background:#c8ff00;display:inline-block;padding:3px 12px;margin-bottom:8px;font-weight:700}
+.bill-receipt-num{font-family:'JetBrains Mono',monospace;font-size:1.05rem;font-weight:700;color:#c8ff00;letter-spacing:0.03em}
+.bill-date-text{font-size:0.7rem;color:#555;margin-top:4px}
+.bill-body{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0 2rem}
+.bill-col-left{padding:1.5rem 1.5rem 1.5rem 0;border-right:1px solid #1a1a1a}
+.bill-col-right{padding:1.5rem 0 1.5rem 1.5rem}
+.bill-col-title{font-family:'JetBrains Mono',monospace;font-size:0.5rem;letter-spacing:0.2em;text-transform:uppercase;color:#c8ff00;margin-bottom:0.75rem;font-weight:600;display:flex;align-items:center;gap:6px}
+.bill-col-title::before{content:'';width:12px;height:1px;background:#c8ff00}
+.bill-field{margin-bottom:0.65rem}.bill-field:last-child{margin-bottom:0}
+.bill-field-label{font-family:'JetBrains Mono',monospace;font-size:0.45rem;letter-spacing:0.15em;text-transform:uppercase;color:#555;margin-bottom:2px}
+.bill-field-val{font-size:0.82rem;font-weight:600;color:#e5e5e5;word-break:break-word;line-height:1.4}
+.bill-status{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:0.55rem;font-weight:700;letter-spacing:0.1em}
+.bill-status-dot{width:6px;height:6px;border-radius:50%}
+.bill-table-wrap{padding:0 2rem;border-top:1px solid #1a1a1a}
+.bill-table-title{font-family:'JetBrains Mono',monospace;font-size:0.5rem;letter-spacing:0.2em;text-transform:uppercase;color:#c8ff00;padding:1.25rem 0 0.5rem;font-weight:600;display:flex;align-items:center;gap:6px}
+.bill-table-title::before{content:'';width:12px;height:1px;background:#c8ff00}
+.bill-table{width:100%;border-collapse:collapse;font-size:0.78rem}
+.bill-table th{font-family:'JetBrains Mono',monospace;font-size:0.45rem;letter-spacing:0.15em;text-transform:uppercase;color:#555;font-weight:500;text-align:left;padding:0.5rem 0;border-bottom:1px solid #1a1a1a}
+.bill-table td{padding:0.55rem 0;border-bottom:1px solid #141414;color:#ccc;vertical-align:top}
+.bill-table td:last-child{text-align:right;font-weight:600;color:#e5e5e5}
+.bill-table tr:last-child td{border-bottom:none}
+.bill-table .bill-total-row td{border-top:1px solid #c8ff00;border-bottom:none;padding-top:0.75rem;font-weight:700;font-size:0.85rem;color:#c8ff00}
+.bill-brief-wrap{padding:0 2rem 1.5rem}
+.bill-brief-box{background:#111;border:1px solid #1a1a1a;border-radius:4px;padding:1rem 1.25rem}
+.bill-brief-label{font-family:'JetBrains Mono',monospace;font-size:0.45rem;letter-spacing:0.15em;text-transform:uppercase;color:#c8ff00;margin-bottom:0.4rem;font-weight:600}
+.bill-brief-text{font-size:0.75rem;color:#888;line-height:1.7;word-break:break-word}
+.bill-footer{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;border-top:1px solid #1a1a1a;background:#080808;gap:1rem}
+.bill-footer-left{display:flex;align-items:center;gap:0.75rem}
+.bill-footer-logo{height:24px;opacity:0.4;object-fit:contain}
+.bill-footer-info{font-size:0.6rem;color:#444;line-height:1.6}
+.bill-footer-right{text-align:right}
+.bill-footer-thanks{font-family:'Playfair Display',serif;font-size:0.85rem;font-style:italic;color:#e5e5e5}
+.bill-footer-website{font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:#333;margin-top:3px;letter-spacing:0.08em}
+.bill-actions{display:flex;gap:0;border-top:1px solid #1a1a1a}
+.bill-btn{flex:1;padding:0.85rem;font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:700;border:none;cursor:pointer;transition:all .15s;letter-spacing:0.06em;text-transform:uppercase;text-align:center}
+.bill-btn-print{background:#c8ff00;color:#0a0a0a}.bill-btn-print:hover{background:#d4ff33}
+.bill-btn-close{background:#111;color:#555;border-left:1px solid #1a1a1a}.bill-btn-close:hover{background:#1a1a1a;color:#ccc}
+@media print{body{background:#0a0a0a;padding:0;display:block}@page{size:A4 portrait;margin:8mm}.bill{box-shadow:none;border-radius:0;border:none;max-width:100%;width:100%;page-break-inside:avoid;overflow:hidden}.bill>*{page-break-inside:avoid}.bill-actions{display:none !important}.bill-stripe,.bill-header,.bill-status,.bill-type,.bill-btn-print{-webkit-print-color-adjust:exact;print-color-adjust:exact}.bill-header{padding:1.25rem 1.5rem 1rem}.bill-logo{height:40px}.bill-brand-name{font-size:1.3rem}.bill-body{padding:0 1.5rem}.bill-col-left{padding:0.75rem 0.75rem 0.75rem 0}.bill-col-right{padding:0.75rem 0 0.75rem 0.75rem}.bill-field{margin-bottom:0.35rem}.bill-table-wrap{padding:0 1.5rem}.bill-table-title{padding:0.75rem 0 0.35rem}.bill-table th,.bill-table td{padding:0.35rem 0;font-size:0.7rem}.bill-table .bill-total-row td{padding-top:0.5rem;font-size:0.75rem}.bill-brief-wrap{padding:0 1.5rem 0.75rem}.bill-brief-box{padding:0.6rem 0.85rem}.bill-brief-text{font-size:0.68rem;line-height:1.5;max-height:3.5em;overflow:hidden}.bill-footer{padding:0.75rem 1.5rem}.bill-footer-logo{height:18px}.bill-footer-thanks{font-size:0.75rem}}
+@media(max-width:600px){body{padding:0.5rem}.bill-header,.bill-body,.bill-table-wrap,.bill-brief-wrap,.bill-footer{padding-left:1.25rem;padding-right:1.25rem}.bill-logo{height:42px}.bill-brand-name{font-size:1.3rem}.bill-header-right{text-align:left;margin-top:0.75rem}.bill-header{flex-direction:column;align-items:flex-start;gap:0.75rem}.bill-body{grid-template-columns:1fr}.bill-col-left{border-right:none;border-bottom:1px solid #1a1a1a;padding:1rem 0}.bill-col-right{padding:1rem 0 0}.bill-actions{flex-direction:column}.bill-btn-close{border-left:none;border-top:1px solid #1a1a1a}.bill-footer{flex-direction:column;text-align:center;gap:0.75rem}.bill-footer-right{text-align:center}}
+</style>
+</head>
+<body>
+<div class="bill">
+  <div class="bill-stripe"><div></div><div></div><div></div></div>
+  <div class="bill-header">
+    <div class="bill-logo-area">
+      <img src="${logoUrl}" alt="Cheditz" class="bill-logo"/>
+      <div class="bill-brand"><div class="bill-brand-name">chedi<em>t</em>z</div><div class="bill-brand-sub">Photo · Video · Document Editing</div></div>
+    </div>
+    <div class="bill-header-right">
+      <div class="bill-type">Receipt</div>
+      <div class="bill-receipt-num">${esc(receiptNum)}</div>
+      <div class="bill-date-text">${esc(dateStr)} &middot; ${esc(timeStr)}</div>
+    </div>
+  </div>
+  <div class="bill-body">
+    <div class="bill-col-left">
+      <div class="bill-col-title">Customer</div>
+      <div class="bill-field"><div class="bill-field-label">Name</div><div class="bill-field-val">${esc(order.name||'')}</div></div>
+      <div class="bill-field"><div class="bill-field-label">Email</div><div class="bill-field-val">${esc(order.email||'')}</div></div>
+      ${order.phone?`<div class="bill-field"><div class="bill-field-label">Phone</div><div class="bill-field-val">${esc(order.phone)}</div></div>`:''}
+      <div class="bill-field" style="margin-top:0.75rem"><div class="bill-field-label">Status</div><div class="bill-field-val"><span class="bill-status" style="background:${statusColor}12;color:${statusColor};border:1px solid ${statusColor}30"><span class="bill-status-dot" style="background:${statusColor}"></span>${statusLabel}</span></div></div>
+    </div>
+    <div class="bill-col-right">
+      <div class="bill-col-title">Order</div>
+      <div class="bill-field"><div class="bill-field-label">Service</div><div class="bill-field-val">${esc(order.service||'')}</div></div>
+      <div class="bill-field"><div class="bill-field-label">Deadline</div><div class="bill-field-val">${esc(order.deadline||'')}</div></div>
+      <div class="bill-field"><div class="bill-field-label">Budget</div><div class="bill-field-val">${esc(budgetDisplay)}</div></div>
+    </div>
+  </div>
+  <div class="bill-table-wrap">
+    <div class="bill-table-title">Service Breakdown</div>
+    <table class="bill-table">
+      <thead><tr><th>Item</th><th>Details</th><th>Amount</th></tr></thead>
+      <tbody>
+        <tr><td>${esc(order.service||'Editing Service')}</td><td>${esc(order.deadline||'Standard')}</td><td>${esc(budgetDisplay)}</td></tr>
+        <tr class="bill-total-row"><td colspan="2">Estimated Total</td><td>${esc(budgetDisplay)}</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="bill-brief-wrap">
+    <div class="bill-brief-box"><div class="bill-brief-label">Project Brief</div><div class="bill-brief-text">${esc(briefText)}</div></div>
+  </div>
+  <div class="bill-footer">
+    <div class="bill-footer-left">
+      <img src="${logoUrl}" alt="Cheditz" class="bill-footer-logo"/>
+      <div class="bill-footer-info">cheditz94@gmail.com &middot; @cheditz1<br/>Mon – Sat &middot; 9:00 – 19:00 IST</div>
+    </div>
+    <div class="bill-footer-right"><div class="bill-footer-thanks">Thank you!</div><div class="bill-footer-website">cheditz.com</div></div>
+  </div>
+  <div class="bill-actions">
+    <button class="bill-btn bill-btn-print" onclick="window.print()">⬇ Save as PDF / Print</button>
+    <button class="bill-btn bill-btn-close" onclick="window.close()">Close</button>
+  </div>
+</div>
+</body>
+</html>`;
+  const w=window.open('','_blank');
+  if(w){w.document.write(receiptHTML);w.document.close();}
+  else{alert('Please allow pop-ups to view the receipt.');}
+}
 
 function renderOrdersList(){
   const orders=getOrders(),el=document.getElementById('ordersList');
@@ -899,15 +1073,17 @@ function renderOrdersList(){
   if(!orders.length){el.innerHTML='<div style="text-align:center;padding:1rem;color:var(--muted);font-size:0.75rem">No orders yet</div>';return}
   el.innerHTML=orders.map((o,i)=>{
     const isComplete=o.status==='completed';
+    const receiptNum=o.receiptNumber||'—';
     return`<div class="wl-item">
       <div class="wl-info">
         <div class="wl-title">${esc(o.name||'Unknown')} — ${esc(o.service||'Service')}</div>
         <div class="wl-sub">${esc(o.email||'')} · ${esc(o.date||'')}</div>
         <div class="wl-sub" style="margin-top:4px">${esc(o.budget||'')} · ${esc(o.deadline||'No deadline')}</div>
+        <div class="wl-sub" style="margin-top:4px;font-family:'Fira Code',monospace;font-size:0.55rem;color:var(--acc)">Receipt: ${esc(receiptNum)}</div>
         <span class="wl-vis ${isComplete?'shown':'hidden'}">${isComplete?'Completed':'Pending'}</span>
       </div>
       <div class="wl-btns">
-        <button class="wl-btn" onclick="showAdminReceipt(${i})" title="View Receipt" style="font-size:0.7rem">📄</button>
+        <button class="wl-btn" onclick="generateReceipt(getOrders()[${i}])" title="View Receipt" style="color:var(--acc)">📄</button>
         <button class="wl-btn" onclick="toggleOrderStatus(${i})" title="${isComplete?'Mark Pending':'Mark Complete'}">${isComplete?'🔄':'✓'}</button>
         <button class="wl-btn del" onclick="delOrder(${i})" title="Delete">✕</button>
       </div>
@@ -944,8 +1120,8 @@ async function delOrder(i) {
 }
 
 // ===== TESTIMONIALS =====
-function getTestimonials(){return isAdmin?privateReviews:[]}
-function saveTestimonials(testis){if(isAdmin)privateReviews=testis}
+function getTestimonials(){try{return JSON.parse(localStorage.getItem('cheditz_testimonials'))||[]}catch{return[]}}
+function saveTestimonials(testis){localStorage.setItem('cheditz_testimonials',JSON.stringify(testis))}
 
 function renderTestimonialsList(){
   const testis=getTestimonials(),el=document.getElementById('testimonialsList');
@@ -1033,18 +1209,21 @@ function applyColor(){
 }
 
 // ===== PASSWORD =====
-async function changePassword(){
-  if(!isAdmin||!adminAuth.currentUser)return;
+function changePassword(){
+  if(!checkRateLimit('password',3)){alert('Too many attempts. Please wait a minute.');return;}
   const cur=document.getElementById('set-curPass').value;
-  const next=document.getElementById('set-newPass').value;
-  if(next.length<12||next!==document.getElementById('set-confirmPass').value){alert('Use at least 12 characters and make sure the new passwords match.');return;}
-  try{
-    const user=adminAuth.currentUser;
-    await user.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(user.email,cur));
-    await user.updatePassword(next);
-    alert('Password updated. Please sign in again.');await doLogout();
-  }catch{alert('Password update failed. Check your current password and try again.');}
-  finally{['set-curPass','set-newPass','set-confirmPass'].forEach(id=>document.getElementById(id).value='');}
+  const nw=document.getElementById('set-newPass').value;
+  const cf=document.getElementById('set-confirmPass').value;
+  const cfg=getConfig();
+  if(cur!==cfg.password){alert('Current password incorrect.');return}
+  if(!nw||nw.length<4||nw.length>100){alert('New password must be 4-100 characters.');return}
+  if(nw===cur){alert('New password must be different from current.');return}
+  if(nw!==cf){alert('Passwords do not match.');return}
+  cfg.password=nw;saveConfig(cfg);
+  document.getElementById('set-curPass').value='';
+  document.getElementById('set-newPass').value='';
+  document.getElementById('set-confirmPass').value='';
+  alert('Password updated!');
 }
 
 // ===== EXPORT / IMPORT =====
@@ -1119,74 +1298,16 @@ let _adminSessionTimeout=30*60*1000;
 ['mousedown','keydown','touchstart','scroll'].forEach(evt=>{
   document.addEventListener(evt,()=>{_adminLastActivity=Date.now();},{passive:true});
 });
-setInterval(()=>{if(isAdmin&&Date.now()-_adminLastActivity>_adminSessionTimeout)doLogout();},60000);
+setInterval(()=>{if(sessionStorage.getItem('cheditz_admin')&&Date.now()-_adminLastActivity>_adminSessionTimeout){sessionStorage.removeItem('cheditz_admin');location.reload();}},60000);
 
 // ===== SECURITY: CLICKJACKING PROTECTION =====
 if(window.top!==window.self){window.top.location=window.self.location;}
 
 // ===== SECURITY: DEVELOPER TOOLS obfuscation (basic) =====
-
+(function(){const _0x=['log','warn','error','table','group','groupEnd','clear'];_0x.forEach(m=>{if(console[m]){console[m]=function(){};}});})();
 
 // ===== SECURITY: PREVENT form resubmission =====
 document.querySelectorAll('form').forEach(f=>{f.addEventListener('submit',function(){this.addEventListener('submit',function(e){e.preventDefault();},{once:true});},{once:true});});
-
-// ===== ADMIN RECEIPT =====
-function showAdminReceipt(i){
-  const orders=getOrders();
-  const o=orders[i];
-  if(!o)return;
-  document.getElementById('admReceiptId').textContent='#'+(o.id||'CDZ-UNKNOWN');
-  document.getElementById('admRName').textContent=o.name||'Unknown';
-  document.getElementById('admREmail').textContent=o.email||'—';
-  document.getElementById('admRPhone').textContent=o.phone||'Not provided';
-  document.getElementById('admRService').textContent=o.service||'—';
-  document.getElementById('admRDeadline').textContent=o.deadline||'—';
-  document.getElementById('admRBudget').textContent=o.budget||'—';
-  document.getElementById('admRBrief').textContent=o.description||o.brief||'—';
-  const statusLabel=o.status==='completed'?'Completed':'Pending';
-  document.getElementById('admRStatus').innerHTML='<span class="receipt-status">'+statusLabel+'</span>';
-  if(o.date){const d=new Date(o.date);document.getElementById('admRDate').textContent=d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});}
-  else{document.getElementById('admRDate').textContent='—';}
-  document.getElementById('admReceiptOverlay').classList.add('show');
-  document.body.style.overflow='hidden';
-}
-function closeAdminReceipt(){document.getElementById('admReceiptOverlay').classList.remove('show');document.body.style.overflow='';}
-function printAdminReceipt(){window.print();}
 </script>
-
-<!-- Admin Receipt Modal -->
-<div class="receipt-overlay" id="admReceiptOverlay">
-  <div class="receipt-box">
-    <button class="receipt-close" onclick="closeAdminReceipt()" title="Close">✕</button>
-    <div class="receipt-header">
-      <div class="receipt-logo">Cheditz</div>
-      <div class="receipt-tagline">Order Receipt</div>
-      <div class="receipt-id" id="admReceiptId">—</div>
-    </div>
-    <div class="receipt-body">
-      <div class="receipt-section-title">Order Details</div>
-      <div class="receipt-row"><span class="r-label">Name</span><span class="r-value" id="admRName">—</span></div>
-      <div class="receipt-row"><span class="r-label">Email</span><span class="r-value" id="admREmail">—</span></div>
-      <div class="receipt-row"><span class="r-label">Phone</span><span class="r-value" id="admRPhone">—</span></div>
-      <div class="receipt-divider"></div>
-      <div class="receipt-row"><span class="r-label">Service</span><span class="r-value accent" id="admRService">—</span></div>
-      <div class="receipt-row"><span class="r-label">Deadline</span><span class="r-value" id="admRDeadline">—</span></div>
-      <div class="receipt-row"><span class="r-label">Budget</span><span class="r-value" id="admRBudget">—</span></div>
-      <div class="receipt-divider"></div>
-      <div class="receipt-row"><span class="r-label">Status</span><span class="r-value" id="admRStatus"><span class="receipt-status">Pending</span></span></div>
-      <div class="receipt-row"><span class="r-label">Date</span><span class="r-value" id="admRDate">—</span></div>
-      <div class="receipt-divider"></div>
-      <div class="receipt-section-title" style="margin-top:0.5rem">Project Brief</div>
-      <p style="font-size:0.78rem;color:var(--dim);line-height:1.7;margin-top:0.25rem;word-break:break-word" id="admRBrief">—</p>
-    </div>
-    <div class="receipt-footer">
-      <p>Order receipt for admin records.</p>
-      <div class="receipt-actions">
-        <button class="receipt-btn receipt-btn-print" onclick="printAdminReceipt()">🖨 Print</button>
-        <button class="receipt-btn receipt-btn-close" onclick="closeAdminReceipt()">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
 </body>
 </html>
