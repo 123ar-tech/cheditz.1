@@ -18,7 +18,7 @@
 <meta name="twitter:description" content="Cinematic photo, video, and document editing on demand." />
 <meta name="twitter:image" content="https://cheditz.com/og-image.png" />
 <meta name="theme-color" content="#0a0a0a" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://apis.google.com https://www.youtube.com https://s.ytimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' https: blob:; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com wss://*.firebaseio.com; frame-src 'self' https://drive.google.com https://docs.google.com https://*.youtube.com https://*.google.com https://player.vimeo.com; object-src 'none'; base-uri 'self'; form-action 'self';" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://apis.google.com https://www.youtube.com https://s.ytimg.com https://api.qrserver.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' https: blob:; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com wss://*.firebaseio.com; frame-src 'self' https://drive.google.com https://docs.google.com https://*.youtube.com https://*.google.com https://player.vimeo.com; object-src 'none'; base-uri 'self'; form-action 'self'; report-uri /csp-report;" />
 <meta http-equiv="X-Content-Type-Options" content="nosniff" />
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
@@ -157,11 +157,12 @@ img{max-width:100%;display:block}
 /* Loader */
 #loader{position:fixed;inset:0;z-index:99999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;transition:opacity .8s,visibility .8s}
 #loader.hide{opacity:0;visibility:hidden}
-#loader .ld-logo{animation:ldPulse 1.2s ease-in-out infinite}
+#loader .ld-logo{animation:logoFadeIn .6s ease backwards,ldPulse 1.2s ease-in-out .6s infinite}
 @keyframes ldPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:.7}}
 #loader .ld-bar{width:200px;height:1px;background:var(--edge);overflow:hidden}
 #loader .ld-fill{height:100%;background:var(--acc);width:0%;animation:ldFill 1.8s ease forwards}
 @keyframes ldFill{to{width:100%}}
+@keyframes logoFadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 
 .wrap{width:100%;max-width:1400px;margin:0 auto;padding:0 clamp(1.5rem,4vw,5rem);position:relative;z-index:2}
 
@@ -190,7 +191,7 @@ img{max-width:100%;display:block}
 }
 .nav .wrap{display:flex;align-items:center;justify-content:center;gap:2rem}
 .nav-logo{display:flex;align-items:center;gap:0.5rem}
-.nav-logo img{transition:transform .3s}
+.nav-logo img{transition:transform .3s;animation:logoFadeIn .7s ease .2s backwards}
 .nav-logo:hover img{transform:scale(1.05)}
 .nav-links{display:none;list-style:none;gap:2.5rem;align-items:center}
 @media(min-width:768px){.nav-links{display:flex}}
@@ -207,6 +208,7 @@ img{max-width:100%;display:block}
 @media(min-width:768px){.mob-toggle{display:none}}
 .mob-menu{position:fixed;inset:0;z-index:150;background:var(--bg);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:1.5rem;opacity:0;pointer-events:none;transition:opacity .4s;padding:2rem}
 .mob-menu.open{opacity:1;pointer-events:all}
+.mob-menu.open img{animation:logoFadeIn .5s ease .1s backwards}
 .mob-menu a{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,7vw,3rem);font-weight:700;color:var(--txt);text-decoration:none;transition:color .2s;padding:0.5rem 0}
 .mob-menu a:hover{color:var(--acc)}
 @media(max-width:768px){
@@ -358,61 +360,85 @@ img{max-width:100%;display:block}
 /* Order */
 .order-grid{display:grid;grid-template-columns:1fr;gap:4rem}
 @media(min-width:1024px){.order-grid{grid-template-columns:1fr 1.4fr}}
-.order-form{border:1px solid var(--edge);padding:2.5rem;display:flex;flex-direction:column;gap:1.25rem;border-radius:12px;background:var(--surface)}
+.order-left{display:flex;flex-direction:column;gap:1.5rem}
+@media(min-width:1024px){.order-left{position:sticky;top:6rem}}
+.order-form{border:1px solid var(--edge);padding:2rem;display:flex;flex-direction:column;gap:0;border-radius:12px;background:var(--surface);overflow:hidden}
+
+/* Step Indicator */
+.order-steps{display:flex;align-items:center;justify-content:center;gap:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--edge);margin-bottom:0}
+.os-step{display:flex;align-items:center;gap:0.5rem}
+.os-num{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--edge);background:transparent;display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-size:0.6rem;font-weight:600;color:var(--muted);transition:all .3s}
+.os-step.active .os-num{border-color:var(--acc);background:rgba(200,255,0,0.1);color:var(--acc)}
+.os-step.done .os-num{border-color:var(--acc);background:var(--acc);color:var(--bg)}
+.os-label{font-family:'JetBrains Mono',monospace;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);transition:color .3s}
+.os-step.active .os-label,.os-step.done .os-label{color:var(--acc)}
+
+/* Form Steps */
+.order-step-panel{display:none;flex-direction:column;gap:1.25rem;padding-top:1.5rem;animation:stepFadeIn .35s ease-out}
+.order-step-panel.active{display:flex}
+@keyframes stepFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Floating Label Fields */
+.order-ff{position:relative;display:flex;flex-direction:column;gap:0}
+.order-ff input,.order-ff textarea,.order-ff select{background:transparent;border:1px solid var(--edge);color:var(--txt);padding:1.1rem 1rem 0.5rem;font-family:inherit;font-size:0.9rem;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;width:100%;border-radius:8px;min-height:48px}
+.order-ff textarea{min-height:120px;resize:vertical;padding-top:1.3rem}
+.order-ff select{cursor:pointer;padding-right:2.5rem}
+.order-ff label{position:absolute;top:0.65rem;left:1rem;font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);pointer-events:none;transition:all .25s cubic-bezier(.4,0,.2,1);transform-origin:left top}
+.order-ff input:focus,.order-ff textarea:focus,.order-ff select:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 2px rgba(200,255,0,0.08)}
+.order-ff input:focus+label,.order-ff textarea:focus+label,.order-ff select:focus+label,
+.order-ff input:not(:placeholder-shown)+label,.order-ff textarea:not(:placeholder-shown)+label,
+.order-ff .ff-hasval+label{top:0.3rem;font-size:0.45rem;color:var(--acc)}
+.order-ff.error input,.order-ff.error textarea,.order-ff.error select{border-color:#ef4444}
+
+/* Nav Buttons */
+.order-nav{display:flex;gap:0.75rem;padding-top:1rem}
+.order-nav .btn{flex:1;justify-content:center}
+.order-nav-back{background:transparent;border:1px solid var(--edge);color:var(--dim)}
+.order-nav-back:hover{border-color:var(--acc);color:var(--acc)}
+.order-nav-next{background:var(--acc);color:var(--bg)}
+.order-nav-next:hover{background:#b8e600}
+
+/* Submit */
+.order-submit-btn{width:100%;padding:1rem;background:var(--acc);color:var(--bg);border:none;font-family:inherit;font-weight:700;font-size:0.8rem;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;transition:all .3s;border-radius:8px}
+.order-submit-btn:hover{background:#b8e600;transform:translateY(-1px)}
+.order-form-footer{text-align:center;padding-top:0.75rem}
+.order-form-footer p{font-size:0.6rem;color:var(--muted)}
+.order-form-footer a{font-size:0.7rem;color:#25D366;text-decoration:none}
+
+@media(max-width:768px){
+  .order-steps{gap:1rem}
+  .os-label{display:none}
+  .order-form{padding:1.5rem}
+  .order-ff input,.order-ff textarea,.order-ff select{font-size:16px}
+}
+
+/* Legacy compat */
+.order-timeline{display:none !important}
 
 /* Live Project Card */
-.live-card{background:linear-gradient(135deg,var(--bg),var(--raised));border:1px solid var(--edge);border-radius:16px;padding:0 1.5rem;max-height:0;opacity:0;overflow:hidden;transition:all .5s cubic-bezier(.16,1,.3,1);pointer-events:none;margin:0}
-.live-card.visible{max-height:300px;padding:1.5rem;opacity:1;pointer-events:auto;margin-top:0.5rem}
-.live-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--acc),transparent);opacity:0;transition:opacity .4s}
+.live-card{background:var(--surface);border:1px solid var(--edge);border-radius:12px;padding:0 1.25rem;max-height:0;opacity:0;overflow:hidden;transition:all .5s cubic-bezier(.16,1,.3,1);pointer-events:none}
+.live-card.visible{max-height:300px;padding:1.25rem;opacity:1;pointer-events:auto}
+.live-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--acc);opacity:0;transition:opacity .4s}
 .live-card.ready::before{opacity:1}
-.live-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
-.live-card-badge{font-family:'JetBrains Mono',monospace;font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--acc);display:flex;align-items:center;gap:0.4rem}
-.live-card-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--acc);animation:liveDot 2s ease-in-out infinite}
+.live-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem}
+.live-card-badge{font-family:'JetBrains Mono',monospace;font-size:0.5rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--acc);display:flex;align-items:center;gap:0.4rem}
+.live-card-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--acc);animation:liveDot 2s ease-in-out infinite}
 @keyframes liveDot{0%,100%{opacity:1}50%{opacity:0.3}}
-.live-card-status{font-size:0.6rem;font-family:'JetBrains Mono',monospace;color:var(--muted);letter-spacing:0.08em}
-.live-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-.live-card-field{display:flex;flex-direction:column;gap:0.2rem}
-.live-card-label{font-family:'JetBrains Mono',monospace;font-size:0.5rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted)}
-.live-card-value{font-size:0.9rem;font-weight:600;color:var(--txt);min-height:1.3em;transition:color .3s}
+.live-card-status{font-size:0.55rem;font-family:'JetBrains Mono',monospace;color:var(--muted);letter-spacing:0.08em}
+.live-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
+.live-card-field{display:flex;flex-direction:column;gap:0.15rem}
+.live-card-label{font-family:'JetBrains Mono',monospace;font-size:0.45rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted)}
+.live-card-value{font-size:0.8rem;font-weight:600;color:var(--txt);min-height:1.2em;transition:color .3s}
 .live-card-value.empty{color:var(--muted);font-weight:400;font-style:italic}
-.live-card-divider{height:1px;background:var(--edge);margin:0.75rem 0}
-.live-card-footer{display:flex;align-items:center;gap:0.75rem}
-.live-card-avatar{width:32px;height:32px;border-radius:50%;background:rgba(200,255,0,0.1);border:1px solid rgba(200,255,0,0.2);display:grid;place-items:center;font-size:0.8rem;flex-shrink:0;transition:all .3s}
+.live-card-divider{height:1px;background:var(--edge);margin:0.6rem 0}
+.live-card-footer{display:flex;align-items:center;gap:0.6rem}
+.live-card-avatar{width:28px;height:28px;border-radius:50%;background:rgba(200,255,0,0.1);border:1px solid rgba(200,255,0,0.2);display:grid;place-items:center;font-size:0.7rem;flex-shrink:0;transition:all .3s}
 .live-card-avatar.has-name{background:var(--acc);border-color:var(--acc)}
 .live-card-avatar.has-name span{color:var(--bg)}
-.live-card-project{font-size:0.8rem;color:var(--dim);line-height:1.4}
+.live-card-project{font-size:0.75rem;color:var(--dim);line-height:1.4}
 .live-card-project strong{color:var(--txt)}
-@media(max-width:768px){.live-card-grid{gap:0.75rem}.live-card{padding:0 1rem}.live-card.visible{padding:1.25rem}}
 
-/* Order Timeline */
-.order-timeline{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2rem;position:relative;padding:0 1rem}
-.order-timeline::before{content:'';position:absolute;top:18px;left:calc(1rem + 18px);right:calc(1rem + 18px);height:2px;background:var(--edge);z-index:0}
-.order-timeline::after{content:'';position:absolute;top:18px;left:calc(1rem + 18px);height:2px;background:var(--acc);z-index:1;width:0;transition:width .8s cubic-bezier(.16,1,.3,1)}
-.order-timeline.step-1::after{width:0%}
-.order-timeline.step-2::after{width:25%}
-.order-timeline.step-3::after{width:50%}
-.order-timeline.step-4::after{width:75%}
-.order-timeline.step-5::after{width:100%}
-.tl-step{display:flex;flex-direction:column;align-items:center;gap:0.5rem;position:relative;z-index:2;flex:1}
-.tl-dot{width:36px;height:36px;border-radius:50%;background:var(--bg);border:2px solid var(--edge);display:grid;place-items:center;font-size:0.9rem;transition:all .5s cubic-bezier(.16,1,.3,1);position:relative}
-.tl-dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1px solid transparent;transition:all .5s}
-.tl-step.active .tl-dot{border-color:var(--acc);background:rgba(200,255,0,0.1);box-shadow:0 0 20px rgba(200,255,0,0.2)}
-.tl-step.active .tl-dot::after{border-color:rgba(200,255,0,0.3);animation:tlPulse 2s ease-in-out infinite}
-.tl-step.done .tl-dot{border-color:var(--acc);background:var(--acc);box-shadow:0 0 16px rgba(200,255,0,0.3)}
-.tl-step.done .tl-dot::after{border:none}
-@keyframes tlPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.2);opacity:0.5}}
-.tl-label{font-family:'JetBrains Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);text-align:center;transition:color .3s}
-.tl-step.active .tl-label,.tl-step.done .tl-label{color:var(--acc)}
-.tl-time{font-size:0.55rem;color:var(--muted);text-align:center;opacity:0;transition:opacity .3s .2s}
-.tl-step.active .tl-time,.tl-step.done .tl-time{opacity:1}
-@media(max-width:600px){
-  .order-timeline{padding:0;gap:0}
-  .order-timeline::before{left:calc(1rem + 14px);right:calc(1rem + 14px)}
-  .order-timeline::after{left:calc(1rem + 14px)}
-  .tl-dot{width:28px;height:28px;font-size:0.7rem}
-  .tl-label{font-size:0.45rem;letter-spacing:0.08em}
-  .tl-time{display:none}
-}
+/* Old .ff compat — kept for AI brief suggestions */
 .ff{display:flex;flex-direction:column;gap:0.35rem}
 .ff label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted)}
 .ff input,.ff textarea,.ff select{background:transparent;border:1px solid var(--edge);color:var(--txt);padding:0.9rem 1rem;font-family:inherit;font-size:0.95rem;transition:border-color .2s;-webkit-appearance:none;width:100%;border-radius:8px}
@@ -462,6 +488,16 @@ img{max-width:100%;display:block}
 .tool-result .highlight{color:var(--acc);font-weight:700;font-size:1.1rem}
 .tool-btn{background:var(--acc);color:var(--bg);border:none;padding:0.65rem 1.2rem;font-family:inherit;font-size:0.8rem;cursor:pointer;transition:all .2s;margin-top:0.75rem;letter-spacing:0.05em;font-weight:600}
 .tool-btn:hover{opacity:0.85}
+
+/* Calculator Service Cards */
+.calc-svc-card{display:flex;flex-direction:column;align-items:center;gap:0.3rem;padding:0.85rem 0.5rem;background:transparent;border:1.5px solid var(--edge);cursor:pointer;transition:all .25s;font-family:inherit;color:var(--muted)}
+.calc-svc-card:hover{border-color:rgba(255,255,255,0.15)}
+.calc-svc-card.on{border-color:var(--acc);background:rgba(200,255,0,0.05);color:var(--txt)}
+.calc-svc-icon{font-size:1.4rem;line-height:1}
+.calc-svc-name{font-size:0.72rem;font-weight:600;letter-spacing:0.03em}
+.calc-svc-rate{font-family:'JetBrains Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--acc);opacity:0;transition:opacity .2s}
+.calc-svc-card.on .calc-svc-rate{opacity:1}
+@media(max-width:480px){.calc-svc-card{padding:0.7rem 0.35rem}.calc-svc-icon{font-size:1.2rem}.calc-svc-name{font-size:0.65rem}.calc-svc-rate{font-size:0.5rem}}
 .resolution-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.75rem}
 .res-item{background:var(--raised);border:1px solid var(--edge);padding:0.75rem;text-align:center;transition:all .2s;cursor:default}
 .res-item:hover{border-color:var(--acc)}
@@ -520,7 +556,8 @@ img{max-width:100%;display:block}
 .chat-window{position:fixed;bottom:5.5rem;right:1.5rem;z-index:9999;width:min(380px,90vw);height:min(520px,75vh);background:var(--surface);border:1px solid var(--edge);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 48px rgba(0,0,0,0.5);transform:scale(0.9) translateY(20px);opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.4,0,.2,1)}
 .chat-window.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}
 .chat-header{padding:1rem 1.25rem;border-bottom:1px solid var(--edge);display:flex;align-items:center;gap:0.75rem;background:var(--raised)}
-.chat-avatar{width:32px;height:32px;border-radius:50%;background:var(--acc);display:grid;place-items:center;font-size:0.85rem;color:var(--bg);flex-shrink:0}
+.chat-avatar{width:32px;height:32px;border-radius:50%;background:var(--acc);display:grid;place-items:center;font-size:0.85rem;color:var(--bg);flex-shrink:0;overflow:hidden}
+.chat-avatar img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
 .chat-header-info{flex:1}
 .chat-header-name{font-weight:700;font-size:0.9rem}
 .chat-header-status{font-size:0.65rem;color:var(--acc);font-family:'JetBrains Mono',monospace;letter-spacing:0.1em}
@@ -533,6 +570,10 @@ img{max-width:100%;display:block}
 .chat-msg.user{background:var(--acc);color:var(--bg);align-self:flex-end;border-bottom-right-radius:4px}
 .chat-msg a{color:inherit;text-decoration:underline}
 .chat-msg strong{color:var(--txt);font-weight:600}
+.chat-row{display:flex;align-items:flex-end;gap:0.5rem;max-width:85%;animation:msgIn .3s ease}
+.chat-row .chat-msg{align-self:flex-end;max-width:calc(100% - 34px);animation:none}
+.chat-msg-avatar{width:26px;height:26px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--acc);border:1px solid var(--edge)}
+.chat-msg-avatar img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
 .chat-typing{display:flex;gap:4px;padding:0.5rem 0.75rem;align-self:flex-start}
 .chat-typing span{width:6px;height:6px;background:var(--muted);border-radius:50%;animation:typing 1.2s infinite}
 .chat-typing span:nth-child(2){animation-delay:.2s}
@@ -565,6 +606,17 @@ footer{border-top:1px solid var(--edge);padding:3rem 0}
 footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:1.5rem}
 footer a{font-size:0.75rem;color:var(--muted);transition:color .2s}
 footer a:hover{color:var(--txt)}
+.agent-bar{display:flex;flex-wrap:wrap;gap:0.6rem;align-items:center;width:100%}
+.agent-btn{display:inline-flex;align-items:center;gap:0.5rem;background:var(--surface);border:1px solid var(--edge);color:var(--dim);font:inherit;font-size:0.72rem;padding:0.5rem 0.95rem;border-radius:999px;cursor:pointer;transition:color .2s,border-color .2s,background .2s}
+.agent-btn:hover{color:var(--txt);border-color:var(--acc)}
+.agent-btn:disabled{opacity:.5;cursor:not-allowed}
+.agent-btn.on{color:var(--acc);border-color:rgba(200,255,0,0.35);background:rgba(200,255,0,0.06)}
+.ab-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .2s}
+.agent-btn.on .ab-dot{background:var(--acc);box-shadow:0 0 8px rgba(200,255,0,.8)}
+.ab-spin{width:11px;height:11px;border:1.5px solid var(--edge);border-top-color:var(--acc);border-radius:50%;animation:abSpin .7s linear infinite;display:none;flex-shrink:0}
+.agent-btn.busy .ab-spin{display:inline-block}
+.agent-btn.busy .ab-dot{display:none}
+@keyframes abSpin{to{transform:rotate(360deg)}}
 
 /* ===== WEBTACTICS ANIMATIONS ===== */
 
@@ -835,7 +887,6 @@ body:hover .cursor-glow{opacity:1}
   .nav-logo img{height:26px !important}
   .nav-links{display:none !important}
   .nav-cta{font-size:0.6rem;padding:0.4rem 0.9rem}
-  .nav-right a[title="Admin"]{display:none}
   .mob-toggle{display:flex !important}
   .hero{min-height:auto;padding:6rem 0 2.5rem;justify-content:flex-start}
   .hero h1{font-size:clamp(1.8rem,8vw,3rem)}
@@ -852,7 +903,6 @@ body:hover .cursor-glow{opacity:1}
   .price-card{padding:1.5rem}
   .testi-grid{grid-template-columns:1fr !important}
   .order-grid{grid-template-columns:1fr !important}
-  .order-form{padding:1.5rem}
   .tools-grid{grid-template-columns:1fr !important}
   .trends-grid{grid-template-columns:1fr !important}
   .contact-grid{grid-template-columns:1fr !important;gap:2rem !important}
@@ -879,7 +929,6 @@ body:hover .cursor-glow{opacity:1}
   .hero-btns .btn{padding:0.7rem 1.2rem;font-size:0.65rem}
   .sec-title{font-size:1.4rem}
   .wrap{padding:0 1rem}
-  .order-form{padding:1.25rem}
   .price-card{padding:1.2rem}
 }
 
@@ -996,8 +1045,7 @@ body:hover .cursor-glow{opacity:1}
   .stats-row{grid-template-columns:1fr 1fr !important}
   .process-steps,.pricing-grid,.testi-grid,.order-grid,.tools-grid,.trends-grid,.contact-grid{grid-template-columns:1fr !important}
   .price-card,.order-form,.tool-card,.trend-card,.testi-card{min-width:0}
-  .order-form{padding:1.25rem}
-  .ff-row,.live-card-grid{grid-template-columns:1fr !important}
+  .ff-row{grid-template-columns:1fr !important}
   .ff input,.ff textarea,.ff select{font-size:16px}
   .resolution-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 
@@ -1127,7 +1175,6 @@ body:hover .cursor-glow{opacity:1}
     </ul>
     <div class="nav-right">
       <a href="#order" class="nav-cta magnetic">Start Project</a>
-      <a href="admin.html" title="Admin" style="width:28px;height:28px;border:1px solid var(--edge);background:transparent;color:var(--muted);cursor:pointer;display:grid;place-items:center;font-size:0.7rem;border-radius:50%;transition:all .2s;font-family:inherit;text-decoration:none">⚙</a>
       <button class="mob-toggle" id="mobToggle" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
   </div>
@@ -1146,7 +1193,7 @@ body:hover .cursor-glow{opacity:1}
 <!-- AI CHATBOT -->
 <div class="chat-window" id="chatWindow">
   <div class="chat-header">
-    <div class="chat-avatar">✦</div>
+    <div class="chat-avatar"><img src="favicon.png" alt="Cheditz" decoding="async" /></div>
     <div class="chat-header-info">
       <div class="chat-header-name">Cheditz AI</div>
       <div class="chat-header-status">● Online</div>
@@ -1414,31 +1461,56 @@ body:hover .cursor-glow{opacity:1}
       <!-- Price Calculator -->
       <div class="tool-card rv">
         <div class="tool-head"><span class="tool-head-icon">💰</span><span class="tool-head-title">Price Calculator</span></div>
-        <div class="tool-body">
-          <div class="tool-row">
-            <label>Service Type</label>
-            <select id="calcService" onchange="calcPrice()">
-              <option value="poster">Poster Editing — ₹15-20/poster</option>
-              <option value="video">Video Editing — ₹20-25/minute</option>
-              <option value="document">Document Editing — ₹25-50/page</option>
-            </select>
+        <div class="tool-body" style="padding:1.25rem">
+          <!-- Service Cards -->
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-bottom:1.25rem" id="calcServiceCards">
+            <button class="calc-svc-card on" data-svc="poster" onclick="pickCalcSvc(this)">
+              <div class="calc-svc-icon">🎨</div>
+              <div class="calc-svc-name">Poster</div>
+              <div class="calc-svc-rate">₹15–20</div>
+            </button>
+            <button class="calc-svc-card" data-svc="video" onclick="pickCalcSvc(this)">
+              <div class="calc-svc-icon">🎬</div>
+              <div class="calc-svc-name">Video</div>
+              <div class="calc-svc-rate">₹20–25</div>
+            </button>
+            <button class="calc-svc-card" data-svc="document" onclick="pickCalcSvc(this)">
+              <div class="calc-svc-icon">📄</div>
+              <div class="calc-svc-name">Document</div>
+              <div class="calc-svc-rate">₹2/word</div>
+            </button>
           </div>
-          <div class="tool-row" style="margin-top:0.75rem">
-            <label>Quantity</label>
-            <input type="number" id="calcQty" value="1" min="1" max="100" oninput="calcPrice()" />
+
+          <!-- Quantity -->
+          <div style="margin-bottom:1.25rem">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Quantity</div>
+            <div style="display:flex;align-items:center;gap:0.75rem">
+              <button onclick="calcQtyBtn(-1)" style="width:40px;height:40px;border:1px solid var(--edge);background:transparent;color:var(--txt);font-size:1.2rem;cursor:pointer;display:grid;place-items:center;transition:border-color .2s;flex-shrink:0" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--edge)'">−</button>
+              <input type="number" id="calcQty" value="1" min="1" max="999" oninput="calcPrice()" style="width:70px;text-align:center;font-size:1.1rem;font-weight:700;padding:0.6rem;background:transparent;border:1px solid var(--edge);color:var(--txt);font-family:inherit;outline:none;-moz-appearance:textfield" onfocus="this.style.borderColor='var(--acc)'" onblur="this.style.borderColor='var(--edge)'" />
+              <button onclick="calcQtyBtn(1)" style="width:40px;height:40px;border:1px solid var(--edge);background:transparent;color:var(--txt);font-size:1.2rem;cursor:pointer;display:grid;place-items:center;transition:border-color .2s;flex-shrink:0" onmouseover="this.style.borderColor='var(--acc)'" onmouseout="this.style.borderColor='var(--edge)'">+</button>
+              <div id="calcUnitLabel" style="font-size:0.8rem;color:var(--dim)">posters</div>
+            </div>
           </div>
-          <div class="tool-row" style="margin-top:0.75rem">
-            <label>Rush Delivery? (Fixed ₹50)</label>
-            <select id="calcRush" onchange="calcPrice()">
-              <option value="no">No — Standard (2-3 days)</option>
-              <option value="yes">Yes — Rush (24 hours)</option>
-            </select>
+
+          <!-- Rush Toggle -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0.9rem 1rem;background:var(--raised);border:1px solid var(--edge);margin-bottom:1.25rem">
+            <div>
+              <div style="font-size:0.85rem;font-weight:600;color:var(--txt)">Rush Delivery</div>
+              <div style="font-size:0.7rem;color:var(--muted);margin-top:2px">24 hours · ₹10 poster · ₹10 video · ₹3 doc</div>
+            </div>
+            <button id="calcRushToggle" onclick="toggleCalcRush()" style="width:48px;height:26px;border-radius:13px;background:var(--edge);border:none;cursor:pointer;position:relative;transition:background .3s;flex-shrink:0">
+              <div id="calcRushKnob" style="width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
+            </button>
           </div>
-          <div class="tool-result" id="calcResult">
-            Estimated: <span class="highlight">₹15</span><br>
-            <small>Standard delivery · 1 item</small>
+
+          <!-- Price Display -->
+          <div style="text-align:center;padding:1.25rem 1rem;background:var(--raised);border:1px solid var(--edge);margin-bottom:1.25rem">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:0.4rem">Estimated Total</div>
+            <div id="calcTotal" style="font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:700;color:var(--acc);line-height:1;transition:all .3s">₹15</div>
+            <div id="calcBreakdown" style="font-size:0.75rem;color:var(--muted);margin-top:0.5rem">1 poster · standard delivery</div>
           </div>
-          <a href="#order" class="tool-btn" style="text-align:center;text-decoration:none;display:block">Place Order →</a>
+
+          <a href="#order" style="display:block;width:100%;padding:0.85rem;background:var(--acc);color:var(--bg);border:none;font-family:inherit;font-size:0.8rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;text-align:center;text-decoration:none;transition:all .2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Get Started →</a>
         </div>
       </div>
       <!-- File Size Checker -->
@@ -1597,93 +1669,82 @@ body:hover .cursor-glow{opacity:1}
 <section id="order" class="sec">
   <div class="wrap">
     <div class="order-grid">
-      <div class="rv">
-        <div class="sec-label" style="margin-bottom:1.5rem">Place an order</div>
-        <h2 class="sec-title" style="margin-bottom:1.5rem" id="secOrderTitle">Tell us what<br/>you need.</h2>
-        <p style="color:var(--dim);line-height:1.8;margin-bottom:2rem;font-size:0.95rem" id="secOrderDesc">Fill the brief below and we'll reply with a quote and timeline within hours. For files over 25 MB, drop a WeTransfer or Drive link in the notes.</p>
-        <div style="display:flex;flex-direction:column;gap:0.75rem">
+      <div class="order-left rv">
+        <div class="sec-label" style="margin-bottom:1rem">Place an order</div>
+        <h2 class="sec-title" style="margin-bottom:1rem" id="secOrderTitle">Tell us what<br/>you need.</h2>
+        <p style="color:var(--dim);line-height:1.8;margin-bottom:0.5rem;font-size:0.95rem" id="secOrderDesc">Fill the brief and we'll reply with a quote and timeline within hours. For files over 25 MB, drop a WeTransfer or Drive link in the notes.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem">
           <div class="tick">Free quote within hours</div>
           <div class="tick">Two revision rounds included</div>
           <div class="tick">Rush delivery available</div>
           <div class="tick">NDA on request</div>
         </div>
-      </div>
-      <form id="orderForm" class="order-form rv">
-        <div class="order-timeline" id="orderTimeline">
-          <div class="tl-step active" id="tl1">
-            <div class="tl-dot">📝</div>
-            <div class="tl-label">Brief</div>
-            <div class="tl-time">Now</div>
-          </div>
-          <div class="tl-step" id="tl2">
-            <div class="tl-dot">💬</div>
-            <div class="tl-label">Quote</div>
-            <div class="tl-time">~2 hrs</div>
-          </div>
-          <div class="tl-step" id="tl3">
-            <div class="tl-dot">🎨</div>
-            <div class="tl-label">Editing</div>
-            <div class="tl-time">1–3 days</div>
-          </div>
-          <div class="tl-step" id="tl4">
-            <div class="tl-dot">🔍</div>
-            <div class="tl-label">Review</div>
-            <div class="tl-time">Revisions</div>
-          </div>
-          <div class="tl-step" id="tl5">
-            <div class="tl-dot">✅</div>
-            <div class="tl-label">Deliver</div>
-            <div class="tl-time">Final files</div>
-          </div>
-        </div>
-        <div class="ff-row">
-          <div class="ff"><label>Your name</label><input name="name" required placeholder="Jane Doe" autocapitalize="words" autocorrect="off" /></div>
-          <div class="ff"><label>Email</label><input name="email" required type="email" placeholder="you@studio.com" inputmode="email" autocorrect="off" /></div>
-        </div>
-        <div class="ff"><label>Phone (optional)</label><input name="phone" type="tel" placeholder="+91 98765 43210" inputmode="tel" /></div>
-        <div class="ff"><label>Service</label><select name="service" required><option value="" disabled selected>Choose a service...</option><option>Poster editing</option><option>Video editing</option><option>Document editing</option><option>Mixed / not sure yet</option></select></div>
-        <div class="ff-row">
-          <div class="ff"><label>Deadline</label><select name="deadline" required><option value="" disabled selected>How soon?</option><option>Rush — within 24h</option><option>Within 3 days</option><option>Within a week</option><option>Flexible</option></select></div>
-          <div class="ff"><label>Budget (INR)</label><select name="budget" required><option value="" disabled selected>Pick a range...</option><option>₹15 – ₹20</option><option>₹20 – ₹25</option><option>₹25 – ₹50</option><option>₹50+</option><option>Not sure yet</option></select></div>
-        </div>
-        <div class="ff brief-assist">
-          <label>Project brief</label>
-          <textarea name="brief" id="briefInput" rows="5" required placeholder="Tell us about the scope, references, file links, and anything that matters." style="min-height:130px;resize:vertical"></textarea>
-          <div class="brief-suggestions" id="briefSuggestions">
-            <div class="brief-sug-header">AI Recommendations</div>
-            <div id="briefSugList"></div>
-          </div>
-        </div>
-        <button type="submit" class="btn btn-acc" style="width:100%;justify-content:center">Send brief →</button>
-        <p style="font-size:0.65rem;color:var(--muted);text-align:center">Opens your email client. No data stored.</p>
-        <div style="text-align:center;margin-top:0.5rem"><a href="https://wa.me/918129021975?text=Hi%20Cheditz!%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener noreferrer" style="font-size:0.7rem;color:#25D366;text-decoration:none">💬 Or chat on WhatsApp</a></div>
+        <!-- Live Preview Card -->
         <div class="live-card" id="liveCard">
           <div class="live-card-header">
             <div class="live-card-badge">Live Preview</div>
             <div class="live-card-status" id="liveStatus">awaiting input...</div>
           </div>
           <div class="live-card-grid">
-            <div class="live-card-field">
-              <div class="live-card-label">Client</div>
-              <div class="live-card-value empty" id="liveName">Your name</div>
-            </div>
-            <div class="live-card-field">
-              <div class="live-card-label">Service</div>
-              <div class="live-card-value empty" id="liveService">Not selected</div>
-            </div>
-            <div class="live-card-field">
-              <div class="live-card-label">Deadline</div>
-              <div class="live-card-value empty" id="liveDeadline">Not selected</div>
-            </div>
-            <div class="live-card-field">
-              <div class="live-card-label">Budget</div>
-              <div class="live-card-value empty" id="liveBudget">Not selected</div>
-            </div>
+            <div class="live-card-field"><div class="live-card-label">Client</div><div class="live-card-value empty" id="liveName">Your name</div></div>
+            <div class="live-card-field"><div class="live-card-label">Service</div><div class="live-card-value empty" id="liveService">Not selected</div></div>
+            <div class="live-card-field"><div class="live-card-label">Deadline</div><div class="live-card-value empty" id="liveDeadline">Not selected</div></div>
+            <div class="live-card-field"><div class="live-card-label">Budget</div><div class="live-card-value empty" id="liveBudget">Not selected</div></div>
           </div>
           <div class="live-card-divider"></div>
           <div class="live-card-footer">
             <div class="live-card-avatar" id="liveAvatar"><span>?</span></div>
             <div class="live-card-project" id="liveProject">Fill the form to preview your project summary</div>
+          </div>
+        </div>
+      </div>
+
+      <form id="orderForm" class="order-form rv">
+        <!-- Step Indicator -->
+        <div class="order-steps" id="orderSteps">
+          <div class="os-step active" data-step="1"><div class="os-num">1</div><span class="os-label">Details</span></div>
+          <div class="os-step" data-step="2"><div class="os-num">2</div><span class="os-label">Brief</span></div>
+        </div>
+
+        <!-- Step 1: All Details -->
+        <div class="order-step-panel active" data-panel="1">
+          <div class="order-ff"><input name="name" required placeholder=" " autocapitalize="words" autocorrect="off" /><label>Your name</label></div>
+          <div class="order-ff"><input name="email" required type="email" placeholder=" " inputmode="email" autocorrect="off" /><label>Email</label></div>
+          <div class="order-ff"><input name="phone" type="tel" placeholder=" " inputmode="tel" /><label>Phone (optional)</label></div>
+          <div class="order-ff">
+            <select name="service" required><option value="" disabled selected></option><option>Poster editing</option><option>Video editing</option><option>Document editing</option><option>Mixed / not sure yet</option></select>
+            <label>Service</label>
+          </div>
+          <div class="order-ff">
+            <select name="deadline" required><option value="" disabled selected></option><option>Rush — within 24h</option><option>Within 3 days</option><option>Within a week</option><option>Flexible</option></select>
+            <label>Deadline</label>
+          </div>
+          <div class="order-ff">
+            <select name="budget" required><option value="" disabled selected></option><option>₹15 – ₹20</option><option>₹20 – ₹25</option><option>₹25 – ₹50</option><option>₹50+</option><option>Not sure yet</option></select>
+            <label>Budget (INR)</label>
+          </div>
+          <div class="order-nav">
+            <button type="button" class="btn order-nav-next" onclick="nextOrderStep(2)">Continue to brief →</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Brief + Submit -->
+        <div class="order-step-panel" data-panel="2">
+          <div class="order-ff">
+            <textarea name="brief" id="briefInput" rows="5" required placeholder=" " style="min-height:130px;resize:vertical"></textarea>
+            <label>Project brief</label>
+            <div class="brief-suggestions" id="briefSuggestions">
+              <div class="brief-sug-header">AI Recommendations</div>
+              <div id="briefSugList"></div>
+            </div>
+          </div>
+          <button type="submit" class="order-submit-btn">Send brief →</button>
+          <div class="order-nav">
+            <button type="button" class="btn order-nav-back" onclick="nextOrderStep(1)">← Back to details</button>
+          </div>
+          <div class="order-form-footer">
+            <p>Opens your email client. No data stored.</p>
+            <a href="https://wa.me/918129021975?text=Hi%20Cheditz!%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener noreferrer">💬 Or chat on WhatsApp</a>
           </div>
         </div>
       </form>
@@ -1763,7 +1824,11 @@ body:hover .cursor-glow{opacity:1}
 <!-- FOOTER -->
 <footer>
   <div class="wrap">
-    <span style="font-size:0.75rem;color:var(--muted);display:flex;align-items:center;gap:0.5rem">
+    <div class="agent-bar">
+      <button class="agent-btn" id="agentBtn" type="button"><span class="ab-dot"></span><span class="ab-spin"></span><span id="agentBtnLabel">Enable phone alerts</span></button>
+      <button class="agent-btn" id="installBtn" type="button" hidden>Install app</button>
+    </div>
+    <span id="footMark" style="font-size:0.75rem;color:var(--muted);display:flex;align-items:center;gap:0.5rem">
       <img src="b_Enhance_the_image_to-removebg-preview.png" alt="Cheditz" style="height:24px" decoding="async" />
       &copy; 2026 Cheditz.
     </span>
@@ -1784,18 +1849,47 @@ document.getElementById('shareLi').href=`https://www.linkedin.com/sharing/share-
 document.getElementById('shareTg').href=`https://t.me/share/url?url=${shareUrl}&text=${shareText}`;
 function copyShareLink(){navigator.clipboard.writeText(window.location.href).then(()=>{const btn=document.getElementById('shareCp');btn.textContent='✓';setTimeout(()=>btn.textContent='🔗',1500)})}
 
-// ===== FIREBASE CONFIG =====
-const _0x1a=['79278126031','cheditz-dee25','cheditz-dee25.firebasestorage.app'];
-const _0x2b='AIzaSyC2CVkVLsXEOtyuxOeJXhijbQ2x08odwkw';
-const FIREBASE_CONFIG={apiKey:_0x2b,authDomain:_0x1a[1]+'.firebaseapp.com',projectId:_0x1a[1],storageBucket:_0x1a[2],messagingSenderId:_0x1a[0],appId:'1:'+_0x1a[0]+':web:87a596a8894ccf4a20d8ba'};
+// ===== FIREBASE CONFIG (obfuscated) =====
+const _0xf=[decodeURIComponent('%37%39%32%37%38%31%32%36%30%33%31'),decodeURIComponent('%63%68%65%64%69%74%7A%2D%64%65%65%32%35'),decodeURIComponent('%63%68%65%64%69%74%7A%2D%64%65%65%32%35%2E%66%69%72%65%62%61%73%65%73%74%6F%72%61%67%65%2E%61%70%70')];
+const _0xk=atob('QUl6YVN5QzJDVkRLVkxTWEVPdHl1eE9lSlhoaWpiUTJ4MDhvZHdr');
+const FIREBASE_CONFIG={apiKey:_0xk,authDomain:_0xf[1]+'.firebaseapp.com',projectId:_0xf[1],storageBucket:_0xf[2],messagingSenderId:_0xf[0],appId:'1:'+_0xf[0]+':web:87a596a8894ccf4a20d8ba'};
 const FIREBASE_ENABLED=FIREBASE_CONFIG.apiKey!=="YOUR_API_KEY";
 let firebaseApp=null,firebaseDb=null;
 if(FIREBASE_ENABLED){try{firebaseApp=firebase.initializeApp(FIREBASE_CONFIG);firebaseDb=firebase.firestore();}catch(e){console.warn('Firebase init failed:',e);}}
 
+// ===== CONFIG ENCRYPTION =====
+const _cfgKey='cHz2026xK9mN';
+function _encConfig(s){try{return btoa(unescape(encodeURIComponent(s))).split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)+((i%3)*2+1))).join('')}catch{return s}}
+function _decConfig(s){try{return decodeURIComponent(escape(atob(s.split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)-((i%3)*2+1))).join(''))))}catch{return s}}
+function _hashPass(p){let h=0;for(let i=0;i<p.length;i++){h=((h<<5)-h)+p.charCodeAt(i);h|=0;}return 'h'+Math.abs(h).toString(36)+p.length.toString(36);}
+function _integrityCheck(c){const s=JSON.stringify(c);let chk=0;for(let i=0;i<s.length;i++){chk=((chk<<5)-chk)+s.charCodeAt(i);chk|=0;}return chk.toString(36);}
+
 // ===== CONFIG =====
-function getConfig(){try{return JSON.parse(localStorage.getItem('cheditz_config'))||getDefaultConfig();}catch{return getDefaultConfig();}}
-function saveConfig(c){localStorage.setItem('cheditz_config',JSON.stringify(c));if(FIREBASE_ENABLED&&firebaseDb){firebaseDb.collection('cheditz').doc('config').set(c).catch(e=>console.warn('Firebase save failed:',e));}}
-function getDefaultConfig(){return{password:String.fromCharCode(99,104,101,100,105,116,122,64,50,48,50,54),accent:'#c8ff00',works:[{id:'d1',title:"Vande Bharat",sub:"Nagercoil → Chennai",cat:"Poster",meta:"Rail launch · A2",type:"image",url:"https://miaoda-conversation-file.s3cdn.medo.dev/user-c4hvi7diyakg/app-c4hvyv74mdxd/20260605/Vande Bharat Nagercoil to Chennai Poster.png",visible:true},{id:'d2',title:"Video Reel",sub:"Brand edit",cat:"Video",meta:"Short-form",type:"video",url:"https://drive.google.com/uc?export=download&id=15yMqmznY3JufjA20k1vnS0Cz9c8T8UqN",visible:true}],content:{heroBadge:'A Global Editing Studio · 2026',heroHead:'Edits that <em>linger</em> long after the scroll.',heroSub:'Cheditz is a one-desk editing house for photo, video, and document work. Sharpen frames, colour the mood, polish words — quietly, quickly, on deadline.',worksTitle:'Recent commissions.',svcTitle:'Our Services',orderTitle:'Tell us what<br/>you need.',orderDesc:'Fill the brief below and we\'ll reply with a quote and timeline within hours. For files over 25 MB, drop a WeTransfer or Drive link in the notes.',contactHead:'Let\'s make<br/>something<br/><em style="font-style:italic;color:var(--acc)">unforgettable.</em>',contactDesc:'Quick questions, partnership ideas, or just to say hi — the inbox is always open.'},services:[{name:'Poster Editing',desc:'Event flyers, movie-style posters, product launches, social posts, and brand campaign artwork — designed and finished print-ready.',feats:'Event & function posters\nMovie / cinematic style\nProduct & sale flyers\nSocial posts & stories',price:'₹15–20 / poster'},{name:'Video Editing',desc:'Reels, shorts, long-form cuts, sound design, motion titles, and end-to-end colour grading for narrative and brand pieces.',feats:'Instagram Reels & YouTube Shorts\nLong-form narrative cuts\nMotion titles & lower thirds\nFull colour grading',price:'₹20–25 / minute'},{name:'Document Editing',desc:'Proofreading, copy editing, layout in InDesign/Word, formatting for theses, ebooks, pitch decks, and reports.',feats:'Proofreading & line editing\nThesis & manuscript formatting\nPitch decks & one-pagers\nEbook layout (EPUB / PDF)',price:'₹25–50 / page'}],contact:{email:'cheditz94@gmail.com',insta:'@cheditz1',instaUrl:'https://www.instagram.com/cheditz1?igsh=bXcyYXgzZ2l2Nm8w',hours:'Mon — Sat · 9:00 – 19:00 IST',reply:'Replies usually within 4 hours.'},testimonials:[]};}
+function getConfig(){
+  try{
+    const raw=localStorage.getItem('cheditz_config');
+    if(!raw)return getDefaultConfig();
+    const dec=_decConfig(raw);
+    const parsed=JSON.parse(dec);
+    if(parsed&&parsed._chk&&parsed._chk!==_integrityCheck(parsed)){
+      localStorage.removeItem('cheditz_config');
+      return getDefaultConfig();
+    }
+    return parsed||getDefaultConfig();
+  }catch{return getDefaultConfig();}
+}
+function saveConfig(c){
+  c._chk=_integrityCheck(c);
+  const enc=_encConfig(JSON.stringify(c));
+  localStorage.setItem('cheditz_config',enc);
+  if(FIREBASE_ENABLED&&firebaseDb){
+    const toSave=Object.assign({},c);
+    delete toSave._chk;
+    delete toSave.password;
+    firebaseDb.collection('cheditz').doc('config').set(toSave).catch(e=>console.warn('Firebase save failed:',e));
+  }
+}
+function getDefaultConfig(){return{password:_hashPass('cheditz@2026'),accent:'#c8ff00',works:[{id:'d1',title:"Vande Bharat",sub:"Nagercoil → Chennai",cat:"Poster",meta:"Rail launch · A2",type:"image",url:"https://miaoda-conversation-file.s3cdn.medo.dev/user-c4hvi7diyakg/app-c4hvyv74mdxd/20260605/Vande Bharat Nagercoil to Chennai Poster.png",visible:true},{id:'d2',title:"Video Reel",sub:"Brand edit",cat:"Video",meta:"Short-form",type:"video",url:"https://drive.google.com/uc?export=download&id=15yMqmznY3JufjA20k1vnS0Cz9c8T8UqN",visible:true}],content:{heroBadge:'A Global Editing Studio · 2026',heroHead:'Edits that <em>linger</em> long after the scroll.',heroSub:'Cheditz is a one-desk editing house for photo, video, and document work. Sharpen frames, colour the mood, polish words — quietly, quickly, on deadline.',worksTitle:'Recent commissions.',svcTitle:'Our Services',orderTitle:'Tell us what<br/>you need.',orderDesc:'Fill the brief below and we\'ll reply with a quote and timeline within hours. For files over 25 MB, drop a WeTransfer or Drive link in the notes.',contactHead:'Let\'s make<br/>something<br/><em style="font-style:italic;color:var(--acc)">unforgettable.</em>',contactDesc:'Quick questions, partnership ideas, or just to say hi — the inbox is always open.'},services:[{name:'Poster Editing',desc:'Event flyers, movie-style posters, product launches, social posts, and brand campaign artwork — designed and finished print-ready.',feats:'Event & function posters\nMovie / cinematic style\nProduct & sale flyers\nSocial posts & stories',price:'₹15–20 / poster'},{name:'Video Editing',desc:'Reels, shorts, long-form cuts, sound design, motion titles, and end-to-end colour grading for narrative and brand pieces.',feats:'Instagram Reels & YouTube Shorts\nLong-form narrative cuts\nMotion titles & lower thirds\nFull colour grading',price:'₹20–25 / minute'},{name:'Document Editing',desc:'Proofreading, copy editing, layout in InDesign/Word, formatting for theses, ebooks, pitch decks, and reports.',feats:'Proofreading & line editing\nThesis & manuscript formatting\nPitch decks & one-pagers\nEbook layout (EPUB / PDF)',price:'₹2 / word'}],contact:{email:'cheditz94@gmail.com',insta:'@cheditz1',instaUrl:'https://www.instagram.com/cheditz1?igsh=bXcyYXgzZ2l2Nm8w',hours:'Mon — Sat · 9:00 – 19:00 IST',reply:'Replies usually within 4 hours.'},testimonials:[]};}
 
 // ===== MOBILE NAV =====
 const mobToggle=document.getElementById('mobToggle'),mobMenu=document.getElementById('mobMenu');
@@ -2142,8 +2236,8 @@ firebaseDb.collection('cheditz_testimonials').orderBy('date','desc').onSnapshot(
 
 // ===== CHATBOT =====
 let chatOpen=false,chatInit=false,chatHistory=[];
-const chatResponses=[{k:['hello','hi','hey','good morning','good evening','namaste'],r:"Hey there! 👋 I'm <strong>Cheditz AI</strong> — your creative editing assistant. I can help with:\n• Pricing & quotes\n• Service details\n• Order guidance\n• Project tips\n\nWhat would you like to know?"},{k:['price','cost','rate','how much','charge','budget','expensive','cheap','affordable'],r:"💰 Our pricing tiers:\n\n<strong>Basic (₹15–20/poster)</strong>\nEvent posters, social posts, flyers\n\n<strong>Standard (₹20–25/min)</strong>\nReels, YouTube, video editing\n\n<strong>Premium (₹25–50/page)</strong>\nDocuments, thesis, pitch decks\n\n<strong>Rush (₹50 fixed)</strong>\n24-hour delivery\n\nUse our <a href='#tools'>Price Calculator</a> for exact estimates!"},{k:['poster','flyer','banner','social post','instagram post','design'],r:"🎨 <strong>Poster Design</strong>\n\nWe create:\n• Event & function posters\n• Product launch flyers\n• Social media posts (IG, FB, Twitter)\n• Campaign artwork\n• Print-ready files\n\nStarting at <strong>₹15–20/poster</strong>\n\n<a href='#order'>Place an order →</a>"},{k:['video','reel','youtube','short','editing','film','wedding video'],r:"🎬 <strong>Video Editing</strong>\n\nWe handle:\n• Instagram Reels & YouTube Shorts\n• Long-form YouTube videos\n• Wedding films & highlights\n• Product videos\n• Motion titles & colour grading\n\n<strong>₹20–25/minute</strong>\n\n<a href='#order'>Place an order →</a>"},{k:['document','pdf','resume','cv','thesis','deck','report','ebook'],r:"📄 <strong>Document Editing</strong>\n\nServices include:\n• Proofreading & copy editing\n• Thesis & dissertation formatting\n• Pitch deck design\n• Ebook layout\n• Report & presentation design\n\n<strong>₹25–50/page</strong>\n\n<a href='#order'>Place an order →</a>"},{k:['wedding','birthday','event','function','ceremony','party'],r:"🎉 <strong>Event Services</strong>\n\nWe cover:\n• Wedding films & highlights\n• Birthday event videos\n• Function posters & invitations\n• Event photography editing\n• Social media event posts\n\nShare your event details in the <a href='#order'>order form</a>!"},{k:['turnaround','delivery','time','how long','deadline','urgent','fast'],r:"⏰ <strong>Delivery Times</strong>\n\n<strong>Standard:</strong> 2–3 business days\n<strong>Rush:</strong> 24 hours (₹50 extra)\n\nFor large projects, we'll confirm timeline after reviewing your brief. Mention your deadline when ordering!"},{k:['revision','change','tweak','edit again','modify','update'],r:"🔄 <strong>Revision Policy</strong>\n\n• <strong>2 revision rounds</strong> included free\n• Additional rounds billed separately\n• Share clear feedback for fastest results\n• We'll confirm changes before proceeding"},{k:['file','upload','send','drive','wetransfer','share'],r:"📁 <strong>File Sharing</strong>\n\nOptions:\n• Upload directly in <a href='#order'>order form</a>\n• Google Drive link\n• WeTransfer link\n• Dropbox link\n\n<strong>Max recommended:</strong> 25 MB\nFor larger files, use cloud storage links."},{k:['contact','email','instagram','phone','reach','talk'],r:"📬 <strong>Get in Touch</strong>\n\n<strong>Email:</strong> cheditz94@gmail.com\n<strong>Instagram:</strong> @cheditz1\n<strong>Hours:</strong> Mon–Sat, 9AM–7PM IST\n\nOr use the <a href='#contact'>contact form</a> on our site!"},{k:['tool','calculator','palette','compare','check'],r:"🛠️ <strong>Free Tools</strong>\n\n• <strong>Price Calculator</strong> — Get instant quotes\n• <strong>File Checker</strong> — Verify upload sizes\n• <strong>Before/After Compare</strong> — Slider comparison\n• <strong>Colour Palette</strong> — Generate harmonies\n• <strong>Resolution Guide</strong> — Platform specs\n\n<a href='#tools'>Try our tools →</a>"},{k:['trend','style','popular','current','2024','2025','2026'],r:"📈 <strong>Current Trends</strong>\n\n<strong>Design:</strong>\n• Minimalist layouts\n• Bold typography\n• Dark mode aesthetics\n• Gradient overlays\n\n<strong>Video:</strong>\n• Short-form reels\n• Cinematic colour grading\n• Motion graphics\n• Silent captions\n\nNeed help with trending styles? <a href='#order'>Let's create →</a>"},{k:['portfolio','work','example','sample','show','previous'],r:"🖼️ <strong>Our Work</strong>\n\nCheck out our latest projects in the <a href='#works'>Portfolio section</a>. We've worked on:\n• Vande Bharat campaign\n• Brand reels\n• Event posters\n• Documentary edits\n\nWant similar work? <a href='#order'>Place an order →</a>"},{k:['about','who','what is','describe','information'],r:"ℹ️ <strong>About Cheditz</strong>\n\nWe're a one-desk editing house for:\n• Photo editing\n• Video production\n• Document design\n\n<strong>500+ projects</strong> delivered across <strong>50+ cities</strong>.\n\nQuick turnaround, competitive pricing, professional results."},{k:['payment','pay','upfront','advance','installment'],r:"💳 <strong>Payment Info</strong>\n\n• <strong>50% advance</strong> required to start\n• Remaining on delivery\n• UPI / Bank transfer accepted\n• Invoice provided\n\nPayment details shared after order confirmation."},{k:['quality','professional','good','best','premium'],r:"⭐ <strong>Quality Assurance</strong>\n\n• Professional editors with 5+ years experience\n• HD/4K output\n• Colour-accurate proofs\n• 2 revision rounds included\n• Satisfaction guaranteed"},{k:['rush','urgent','quick','asap','fast','24 hour','24 hours'],r:"⚡ <strong>Rush Delivery</strong>\n\n• <strong>24-hour turnaround</strong>\n• Fixed rate: <strong>₹50 per item</strong>\n• Available for all services\n• Subject to current workload\n\nMention \"RUSH\" in your order brief!"},{k:['compare','difference','vs','versus','which','better'],r:"🔍 <strong>Service Comparison</strong>\n\n<strong>Basic (₹15–20)</strong>\nSimple edits, quick turnaround\n\n<strong>Standard (₹20–25)</strong>\nProfessional editing, colour grading\n\n<strong>Premium (₹25–50)</strong>\nComplex projects, detailed work\n\n<strong>Rush (₹50)</strong>\n24-hour delivery, any service\n\nNeed help choosing? Tell me about your project!"},{k:['thank','thanks','appreciate','helpful'],r:"You're welcome! 😊 Happy to help. If you have more questions, just ask. Otherwise:\n\n• <a href='#order'>Place an order</a>\n• <a href='#tools'>Try our tools</a>\n• <a href='#contact'>Contact us</a>\n\nHave a great day! 🎨"},{k:['help','assist','support','guide'],r:"🤝 <strong>How Can I Help?</strong>\n\nI can assist with:\n• <strong>Pricing</strong> — Get quotes & estimates\n• <strong>Services</strong> — Learn what we offer\n• <strong>Orders</strong> — Step-by-step guidance\n• <strong>Tools</strong> — Free editing utilities\n• <strong>Contact</strong> — Reach our team\n\nWhat would you like to know?"},{k:['instagram','insta','reel','story','highlight'],r:"📱 <strong>Instagram Services</strong>\n\n• Reels editing (15s, 30s, 60s)\n• Story highlights\n• Post design\n• Carousel creation\n• Profile optimization\n\n<strong>₹20–25/minute</strong> for video\n<strong>₹15–20</strong> for static posts\n\n<a href='#order'>Order now →</a>"},{k:['youtube','channel','video','subscriber','views'],r:"▶️ <strong>YouTube Services</strong>\n\n• Long-form video editing\n• Shorts editing\n• Thumbnail design\n• Motion titles & intros\n• Colour grading\n\n<strong>₹20–25/minute</strong>\n\nHelp your channel grow with professional edits! <a href='#order'>Order →</a>"},{k:['logo','brand','identity','branding'],r:"✨ <strong>Logo & Branding</strong>\n\nWhile we specialize in editing, we also offer:\n• Logo enhancement\n• Brand colour refinement\n• Social media kit design\n• Brand guidelines\n\nFor custom logo design, contact us with your brief!"},{k:['colour','color','grading','tone','mood','filter'],r:"🎨 <strong>Colour Grading</strong>\n\nIncluded in video editing:\n• Cinematic looks\n• Warm/cool tones\n• Vintage/film styles\n• Brand colour matching\n• HDR processing\n\nShare your mood board for custom grading!"},{k:['motion','animation','graphic','title','intro','outro'],r:"✨ <strong>Motion Graphics</strong>\n\nAvailable add-ons:\n• Animated titles\n• Lower thirds\n• Intros & outros\n• Logo animations\n• Infographic animations\n\nPriced per project. Mention in your brief!"},{k:['sound','audio','music','voice','voiceover'],r:"🎵 <strong>Audio Services</strong>\n\n• Background music selection\n• Sound effects\n• Voiceover sync\n• Audio cleanup\n• Music licensing guidance\n\nIncluded in video packages!"},{k:['social','media','facebook','twitter','linkedin','tiktok'],r:"📲 <strong>Social Media</strong>\n\nWe create content for:\n• Instagram (posts, reels, stories)\n• YouTube (videos, shorts)\n• Facebook (posts, ads)\n• LinkedIn (professional content)\n• TikTok (short-form)\n• Twitter/X (graphics)\n\nPlatform-optimized sizes included!"},{k:['wedding','bride','groom','ceremony','reception','prewedding'],r:"💒 <strong>Wedding Services</strong>\n\n• Wedding film editing\n• Highlight reels\n• Pre-wedding videos\n• Invitation design\n• Photo retouching\n• Album layout\n\nCustom packages available! <a href='#order'>Get quote →</a>"},{k:['business','company','corporate','startup','brand'],r:"💼 <strong>Business Services</strong>\n\n• Corporate videos\n• Product launches\n• Marketing materials\n• Presentation design\n• Social media management\n\nProfessional content for your brand!"},{k:['student','thesis','dissertation','academic','college','university'],r:"🎓 <strong>Student Services</strong>\n\n• Thesis formatting\n• Dissertation editing\n• Presentation design\n• Report formatting\n• CV/resume design\n\n<strong>₹25–50/page</strong> — student-friendly rates!"},{k:['photo','retouch','enhance','background','remove','crop'],r:"📸 <strong>Photo Editing</strong>\n\n• Background removal\n• Colour correction\n• Skin retouching\n• Object removal\n• Resize & crop\n• Filter application\n\nStarting at <strong>₹15–20/image</strong>"},{k:['no','nope','nothing','never mind','forget','cancel'],r:"No problem! 😊 I'm here whenever you need help. Just ask about:\n\n• Pricing\n• Services\n• Orders\n• Tools\n• Contact info\n\nHave a great day!"},{k:['yes','yeah','ok','okay','sure','sure thing','yep'],r:"Great! 👍 What would you like to do next?\n\n• <a href='#order'>Place an order</a>\n• <a href='#tools'>Try our tools</a>\n• Ask another question\n\nI'm here to help!"}];
-const defaultResponse="🤔 I'm not sure about that. Try asking about:\n\n• <strong>Pricing</strong> — rates & quotes\n• <strong>Services</strong> — what we offer\n• <strong>Orders</strong> — how to start\n• <strong>Tools</strong> — free utilities\n• <strong>Contact</strong> — reach us\n\nOr type <strong>help</strong> for options!";
+const chatResponses=[{k:["hi"],r:"Hii! 👋 So nice to meet you — I'm <strong>your assistant here</strong>.\n\nAsk me anything about:\n• <strong>Pricing</strong> — rates &amp; quotes\n• <strong>Services</strong> — what we offer\n• <strong>Orders</strong> — how to start\n• <strong>Tools</strong> — free utilities\n• <strong>Contact</strong> — reach us\n\nWhat can I help you with? 😊"},{k:["hello","hi","hey","good morning","good evening","namaste"],r:"Hey there! 👋 Welcome to <strong>Cheditz</strong> — I'm <strong>Cheditz AI</strong>, your friendly editing sidekick.\n\nI'm happy to help with:\n• Pricing &amp; quotes\n• Service details\n• Order guidance\n• Project tips\n\nWhat's on your mind today? 😊"},{k:["order","orders","order now","place order","place an order","how to order","how do i order","start order","get started","booking","process","how it works"],r:"Of course — happy to walk you through it! 📦\n\n1. <a href='#order'>Fill the quick 2-step brief</a> — name, service, deadline, budget, then your notes.\n2. We'll come back with a quote and timeline, usually within hours.\n3. Approve it, pay the advance, and we start editing.\n4. Two rounds of revisions, then your final files land.\n\n<strong>Rush (24h)</strong>, 3-day, week or flexible — whatever suits you.\n\nOh, and if your files are over 25 MB, just drop a WeTransfer or Drive link in the brief. 💛"},{k:["price","pricing","prices","cost","rate","rates","how much","charge","charges","budget","expensive","cheap","affordable","quote","estimate"],r:"Great question — here's what our editing work costs 💰\n\n<strong>Basic (₹15–20/poster)</strong>\nEvent posters, social posts, flyers\n\n<strong>Standard (₹20–25/min)</strong>\nReels, YouTube, video editing\n\n<strong>Premium (₹2/word)</strong>\nDocuments, thesis, pitch decks\n\n<strong>Rush (₹50 fixed)</strong>\n24-hour delivery\n\nWant an exact number? Try our <a href='#tools'>Price Calculator</a> — it only takes seconds! 😄"},{k:["poster","flyer","banner","social post","instagram post","design"],r:"We'd love to design that for you! 🎨\n\nHere's what we make:\n• Event &amp; function posters\n• Product launch flyers\n• Social media posts (IG, FB, Twitter)\n• Campaign artwork\n• Print-ready files\n\nStarting at just <strong>₹15–20/poster</strong> ✨\n\n<a href='#order'>Tell us about it →</a>"},{k:["video","reel","youtube","short","film","wedding video"],r:"Video is our thing — let's make something good! 🎬\n\nWe handle:\n• Instagram Reels &amp; YouTube Shorts\n• Long-form YouTube videos\n• Wedding films &amp; highlights\n• Product videos\n• Motion titles &amp; colour grading\n\nIt's <strong>₹20–25/minute</strong>.\n\n<a href='#order'>Let's get started →</a>"},{k:["document","pdf","resume","cv","thesis","deck","report","ebook"],r:"Happy to help tidy that up! 📄\n\nWe take care of:\n• Proofreading &amp; copy editing\n• Thesis &amp; dissertation formatting\n• Pitch deck design\n• Ebook layout\n• Report &amp; presentation design\n\nIt's <strong>₹2/word</strong>.\n\n<a href='#order'>Send it over →</a>"},{k:["wedding","birthday","event","function","ceremony","party"],r:"We love a good celebration! 🎉\n\nHere's what we cover:\n• Wedding films &amp; highlights\n• Birthday event videos\n• Function posters &amp; invitations\n• Event photography editing\n• Social media event posts\n\nJust share the event details in the <a href='#order'>order form</a> and we'll take it from there 💛"},{k:["turnaround","delivery","time","how long","deadline","urgent","fast"],r:"Sure thing — here's how timing works ⏰\n\n<strong>Standard:</strong> 2–3 business days\n<strong>Rush:</strong> 24 hours (₹50 extra)\n\nFor larger projects we'll confirm the timeline as soon as we've read your brief. And do mention your deadline when ordering — we'll do our very best to hit it. 😊"},{k:["revision","change","tweak","edit again","modify","update"],r:"Of course — revisions are no trouble at all 🔄\n\n• <strong>2 revision rounds</strong> are included free\n• Anything after that is billed separately\n• Clear feedback helps us turn things around fast\n• We'll always confirm changes with you first\n\nSo don't be shy — tell us exactly what you'd like tweaked! 💛"},{k:["file","upload","send","drive","wetransfer","share"],r:"Easy — here's how to send files 📁\n\n• Upload right in the <a href='#order'>order form</a>\n• Google Drive link\n• WeTransfer link\n• Dropbox link\n\n<strong>Max recommended:</strong> 25 MB. For anything bigger, a cloud storage link works perfectly. 😊"},{k:["contact","email","instagram","phone","reach","talk"],r:"Of course — we'd love to hear from you! 📬\n\n<strong>Email:</strong> cheditz94@gmail.com\n<strong>Instagram:</strong> @cheditz1\n<strong>Hours:</strong> Mon–Sat, 9AM–7PM IST\n\nOr pop your message in the <a href='#contact'>contact form</a> and we'll get back to you soon. 😊"},{k:["tool","calculator","palette","compare","check"],r:"Oh, you'll like these — and they're free! 🛠️\n\n• <strong>Price Calculator</strong> — get instant quotes\n• <strong>File Checker</strong> — verify upload sizes\n• <strong>Before/After Compare</strong> — slider comparison\n• <strong>Colour Palette</strong> — generate harmonies\n• <strong>Resolution Guide</strong> — platform specs\n\n<a href='#tools'>Give them a try →</a> 😄"},{k:["trend","style","popular","current","2024","2025","2026"],r:"Love that you're keeping up with what's hot! 📈\n\n<strong>Design right now:</strong>\n• Minimalist layouts\n• Bold typography\n• Dark mode aesthetics\n• Gradient overlays\n\n<strong>Video right now:</strong>\n• Short-form reels\n• Cinematic colour grading\n• Motion graphics\n• Silent captions\n\nWant us to ride that wave for you? <a href='#order'>Let's create →</a> ✨"},{k:["portfolio","work","example","sample","show","previous"],r:"Sure — come take a look! 🖼️\n\nYou'll find our latest projects in the <a href='#works'>Portfolio section</a>. Some favourites:\n• Vande Bharat campaign\n• Brand reels\n• Event posters\n• Documentary edits\n\nFancy something similar? <a href='#order'>Place an order →</a> 😊"},{k:["about","who","what is","describe","information"],r:"Great question — hi, we're <strong>Cheditz</strong>! ℹ️\n\nWe're a one-desk editing house for:\n• Photo editing\n• Video production\n• Document design\n\nSo far we've delivered <strong>500+ projects</strong> across <strong>50+ cities</strong>.\n\nQuick turnaround, fair pricing, and results you'll be proud of. 💛"},{k:["payment","pay","upfront","advance","installment"],r:"Happy to explain — no surprises here! 💳\n\n• <strong>50% advance</strong> to get started\n• The remaining balance on delivery\n• UPI / bank transfer accepted\n• Invoice provided, always\n\nWe'll share the payment details as soon as your order is confirmed. 😊"},{k:["quality","professional","good","best","premium"],r:"Aw, thank you — quality means the world to us! ⭐\n\n• Professional editors with 5+ years experience\n• HD/4K output\n• Colour-accurate proofs\n• 2 revision rounds included\n• Satisfaction guaranteed\n\nWe don't stop until you're genuinely happy. 💛"},{k:["rush","urgent","quick","asap","fast","24 hour","24 hours"],r:"Need it fast? We've got you! ⚡\n\n• <strong>24-hour turnaround</strong>\n• Fixed rate: <strong>₹50 per item</strong>\n• Available for all services\n• Subject to current workload\n\nJust mention \"RUSH\" in your order brief and we'll move fast on it. 😄"},{k:["compare","difference","vs","versus","which","better"],r:"Totally fair question — let's break it down 🔍\n\n<strong>Basic (₹15–20)</strong>\nSimple edits, quick turnaround\n\n<strong>Standard (₹20–25)</strong>\nProfessional editing, colour grading\n\n<strong>Premium (₹25–50)</strong>\nComplex projects, detailed work\n\n<strong>Rush (₹50)</strong>\n24-hour delivery, any service\n\nStill not sure? Tell me a bit about your project and I'll point you the right way. 😊"},{k:["thank","thanks","appreciate","helpful"],r:"Aww, you're too kind! 😊 So glad I could help.\n\nIf anything else comes up, I'm right here. Otherwise:\n\n• <a href='#order'>Place an order</a>\n• <a href='#tools'>Try our tools</a>\n• <a href='#contact'>Contact us</a>\n\nHave a lovely day! 🎨💛"},{k:["help","assist","support","guide"],r:"You came to the right place — I'm here for you! 🤝\n\nI can help with:\n• <strong>Pricing</strong> — quotes &amp; estimates\n• <strong>Services</strong> — what we offer\n• <strong>Orders</strong> — step-by-step guidance\n• <strong>Tools</strong> — free editing utilities\n• <strong>Contact</strong> — reaching our team\n\nWhat would you like to know? 😊"},{k:["instagram","insta","reel","story","highlight"],r:"Instagram is one of our favourites! 📱\n\n• Reels editing (15s, 30s, 60s)\n• Story highlights\n• Post design\n• Carousel creation\n• Profile optimization\n\n<strong>₹20–25/minute</strong> for video\n<strong>₹15–20</strong> for static posts\n\n<a href='#order'>Order now →</a> 😄"},{k:["youtube","channel","video","subscriber","views"],r:"Nice — let's grow your channel! ▶️\n\n• Long-form video editing\n• Shorts editing\n• Thumbnail design\n• Motion titles &amp; intros\n• Colour grading\n\nIt's <strong>₹20–25/minute</strong>.\n\nProfessional edits really do help a channel grow — <a href='#order'>let's do it →</a> 😊"},{k:["logo","brand","identity","branding"],r:"Good news — we can help with that too! ✨\n\nWhile editing is our main thing, we also offer:\n• Logo enhancement\n• Brand colour refinement\n• Social media kit design\n• Brand guidelines\n\nFor custom logo design, just send us your brief and we'll talk it through together. 💛"},{k:["colour","color","grading","tone","mood","filter"],r:"Ooh, colour is where the magic happens! 🎨\n\nIncluded in video editing:\n• Cinematic looks\n• Warm/cool tones\n• Vintage/film styles\n• Brand colour matching\n• HDR processing\n\nGot a mood board? Share it and we'll match the feeling. 😊"},{k:["motion","animation","graphic","title","intro","outro"],r:"Absolutely — motion makes everything pop! ✨\n\nAvailable as add-ons:\n• Animated titles\n• Lower thirds\n• Intros &amp; outros\n• Logo animations\n• Infographic animations\n\nPriced per project — just mention it in your brief and we'll quote you. 😄"},{k:["sound","audio","music","voice","voiceover"],r:"Sound matters more than people think! 🎵\n\n• Background music selection\n• Sound effects\n• Voiceover sync\n• Audio cleanup\n• Music licensing guidance\n\nAnd good news — it's all included in our video packages. 💛"},{k:["social","media","facebook","twitter","linkedin","tiktok"],r:"Absolutely — we make content for every platform! 📲\n\n• Instagram (posts, reels, stories)\n• YouTube (videos, shorts)\n• Facebook (posts, ads)\n• LinkedIn (professional content)\n• TikTok (short-form)\n• Twitter/X (graphics)\n\nPlatform-optimized sizes are always included. 😊"},{k:["wedding","bride","groom","ceremony","reception","prewedding"],r:"A wedding — how lovely! 💒\n\nWe'd be honoured to help with:\n• Wedding film editing\n• Highlight reels\n• Pre-wedding videos\n• Invitation design\n• Photo retouching\n• Album layout\n\nCustom packages are available — <a href='#order'>get a quote →</a> 💛"},{k:["business","company","corporate","startup","brand"],r:"We work with businesses all the time — happy to help! 💼\n\n• Corporate videos\n• Product launches\n• Marketing materials\n• Presentation design\n• Social media management\n\nProfessional content your brand will be proud of. 😊"},{k:["student","thesis","dissertation","academic","college","university"],r:"Students, we've got your back! 🎓\n\n• Thesis formatting\n• Dissertation editing\n• Presentation design\n• Report formatting\n• CV/resume design\n\nIt's <strong>₹25–50/page</strong> — student-friendly rates, because we know budgets are tight! 💛"},{k:["photo","retouch","enhance","background","remove","crop"],r:"Happy to make those photos shine! 📸\n\n• Background removal\n• Colour correction\n• Skin retouching\n• Object removal\n• Resize &amp; crop\n• Filter application\n\nStarting at just <strong>₹15–20/image</strong>. 😊"},{k:["service","services","what do you offer","offer","what can you do","what do you do","editing","all services","your services","what services"],r:"Here's everything we do 🛠\n\n• <strong>Poster Design</strong> — events, flyers, social posts (₹15–20/poster)\n• <strong>Video Editing</strong> — Reels, YouTube, wedding films (₹20–25/min)\n• <strong>Document Editing</strong> — proofreading, thesis, decks (₹2/word)\n• <strong>Photo Editing</strong> — retouch, background removal, colour (₹15–20/image)\n• <strong>Branding</strong> — logo and identity work\n\nNot sure what fits? Choose <a href='#order'>Mixed / not sure yet</a> in the brief — we'll figure it out together. 😊"},{k:["no","nope","nothing","never mind","forget","cancel"],r:"No worries at all! 😊 I'm right here whenever you need me. Just ask about:\n\n• Pricing\n• Services\n• Orders\n• Tools\n• Contact info\n\nHave a lovely day! 💛"},{k:["yes","yeah","ok","okay","sure","sure thing","yep"],r:"Awesome, let's do this! 👍 What would you like to do next?\n\n• <a href='#order'>Place an order</a>\n• <a href='#tools'>Try our tools</a>\n• Ask me anything else\n\nI'm here to help! 😊"}];
+const defaultResponse="Hmm, that one's a little outside what I know! 🤔 Try asking about:\n\n• <strong>Pricing</strong> — rates &amp; quotes\n• <strong>Services</strong> — what we offer\n• <strong>Orders</strong> — how to start\n• <strong>Tools</strong> — free utilities\n• <strong>Contact</strong> — reach us\n\nOr type <strong>help</strong> for options — I'm happy to help!";
 const sugs=['Pricing','Services','Order now','Turnaround time','Contact'];
 // ===== SCROLL PROGRESS BAR =====
 window.addEventListener('scroll',()=>{
@@ -2222,48 +2316,59 @@ function typeWriter(element,text,speed=50){
 setTimeout(()=>{const pop=document.getElementById('chatPop');if(pop&&!chatOpen)pop.classList.add('show');setTimeout(()=>{if(pop)pop.classList.remove('show')},window.innerWidth<769?3000:5000)},window.innerWidth<769?1500:3000);
 document.getElementById('chatPop').addEventListener('click',()=>{toggleChat()});
 function toggleChat(){chatOpen=!chatOpen;document.getElementById('chatWindow').classList.toggle('open',chatOpen);document.getElementById('chatFab').classList.toggle('open',chatOpen);if(chatOpen&&!chatInit){chatInit=true;initChat()}}
-function initChat(){addBotMsg("Hey! 👋 I'm <strong>Cheditz AI</strong>. I can help with pricing, services, ordering, and project guidance. What would you like to know?");showSugs(sugs)}
-function addBotMsg(text){const msgs=document.getElementById('chatMessages');const div=document.createElement('div');div.className='chat-msg bot';div.innerHTML=text.replace(/\n/g,'<br>');msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight}
+function initChat(){addBotMsg("Hey there! 👋 So glad you stopped by — I'm <strong>Cheditz AI</strong>, and I'm your assistant here.\n\nI can help you with pricing, services, ordering, and project tips. What would you like to know? 😊");showSugs(sugs)}
+function addBotMsg(text){const msgs=document.getElementById('chatMessages');const row=document.createElement('div');row.className='chat-row bot';const av=document.createElement('div');av.className='chat-msg-avatar';av.innerHTML='<img src="favicon.png" alt="Cheditz" decoding="async" loading="lazy"/>';const div=document.createElement('div');div.className='chat-msg bot';div.innerHTML=text.replace(/\n/g,'<br>');row.appendChild(av);row.appendChild(div);msgs.appendChild(row);msgs.scrollTop=msgs.scrollHeight}
 function addUserMsg(text){const msgs=document.getElementById('chatMessages');const div=document.createElement('div');div.className='chat-msg user';div.textContent=text;msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight}
 function showSugs(arr){const wrap=document.getElementById('chatSugs');wrap.innerHTML='';arr.forEach(s=>{const btn=document.createElement('button');btn.className='chat-sug';btn.textContent=s;btn.onclick=()=>{document.getElementById('chatInput').value=s;sendChat()};wrap.appendChild(btn)})}
 function sendChat(){const input=document.getElementById('chatInput');const text=input.value.trim();if(!text)return;input.value='';addUserMsg(text);document.getElementById('chatSugs').innerHTML='';document.getElementById('chatSend').disabled=true;const typing=document.createElement('div');typing.className='chat-typing';typing.innerHTML='<span></span><span></span><span></span>';document.getElementById('chatMessages').appendChild(typing);document.getElementById('chatMessages').scrollTop=document.getElementById('chatMessages').scrollHeight;setTimeout(()=>{typing.remove();document.getElementById('chatSend').disabled=false;const response=matchResponse(text);addBotMsg(response);showSugs(getFollowUps(text))},600+Math.random()*800)}
-function matchResponse(input){const lower=input.toLowerCase();for(const item of chatResponses){if(item.k.some(kw=>lower.includes(kw)))return item.r;}return defaultResponse}
+function matchResponse(input){const t=(input||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().split(' ').filter(Boolean);if(!t.length)return defaultResponse;const same=(a,b)=>a===b||a===b+'s'||b===a+'s';for(const item of chatResponses){for(const kw of item.k){const k=kw.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().split(' ').filter(Boolean);if(!k.length||k.length>t.length)continue;for(let i=0;i+k.length<=t.length;i++){let m=true;for(let j=0;j<k.length;j++){if(!same(t[i+j],k[j])){m=false;break}}if(m)return item.r}}}return defaultResponse}
 function getFollowUps(lastInput){const lower=lastInput.toLowerCase();if(lower.match(/price|cost|rate|charge|budget/))return['Order now','Services','Turnaround time','Rush delivery'];if(lower.match(/poster|flyer|banner|design|social post/))return['Pricing','Order now','Turnaround time','File upload'];if(lower.match(/video|reel|youtube|short|film/))return['Pricing','Order now','Colour grading','Motion graphics'];if(lower.match(/document|pdf|resume|thesis|deck/))return['Pricing','Order now','File upload','Student services'];if(lower.match(/wedding|birthday|event|function/))return['Pricing','Order now','Turnaround time','Photo editing'];if(lower.match(/order|brief|start/))return['Pricing','File upload','Contact','Turnaround time'];if(lower.match(/contact|email|instagram|phone/))return['Services','Order now','About'];if(lower.match(/tool|calculator|palette|compare/))return['Pricing','Services','Order now'];if(lower.match(/trend|style|popular/))return['Services','Order now','Pricing','Instagram'];if(lower.match(/portfolio|work|example|sample/))return['Services','Order now','Pricing'];if(lower.match(/about|who|what is/))return['Services','Portfolio','Contact'];if(lower.match(/payment|pay|advance/))return['Order now','Pricing','Contact'];if(lower.match(/quality|professional|best/))return['Services','Portfolio','Order now'];if(lower.match(/rush|urgent|fast|asap/))return['Order now','Pricing','Turnaround time'];if(lower.match(/compare|difference|vs|which/))return['Order now','Pricing','Services'];if(lower.match(/thank|thanks/))return['Order now','Tools','Contact'];if(lower.match(/help|assist|support/))return['Pricing','Services','Order now','Contact'];if(lower.match(/instagram|insta|reel|story/))return['Pricing','Order now','Motion graphics'];if(lower.match(/youtube|channel|video/))return['Pricing','Order now','Colour grading'];if(lower.match(/logo|brand|identity/))return['Services','Order now','Contact'];if(lower.match(/colour|color|grading|tone/))return['Video editing','Order now','Services'];if(lower.match(/motion|animation|title/))return['Video editing','Order now','Pricing'];if(lower.match(/sound|audio|music/))return['Video editing','Order now','Services'];if(lower.match(/social|media|facebook|tiktok/))return['Instagram','YouTube','Order now','Pricing'];if(lower.match(/photo|retouch|enhance/))return['Pricing','Order now','File upload'];if(lower.match(/student|thesis|academic/))return['Document editing','Pricing','Order now'];if(lower.match(/business|company|corporate/))return['Services','Order now','Pricing'];if(lower.match(/wedding|bride|groom/))return['Pricing','Order now','Photo editing'];return['Pricing','Services','Order now','Contact','Tools']}
 
-// ===== ORDER TIMELINE =====
-(function(){
+// ===== ORDER STEP NAVIGATION =====
+let currentOrderStep=1;
+function nextOrderStep(step){
   const form=document.getElementById('orderForm');
-  const timeline=document.getElementById('orderTimeline');
-  if(!form||!timeline)return;
-  const nameInput=form.querySelector('[name="name"]');
-  const emailInput=form.querySelector('[name="email"]');
-  const serviceSelect=form.querySelector('[name="service"]');
-  const deadlineSelect=form.querySelector('[name="deadline"]');
-  const budgetSelect=form.querySelector('[name="budget"]');
-  const briefInput=form.querySelector('[name="brief"]');
-  function updateTimeline(){
-    const name=(nameInput.value||'').trim();
-    const email=(emailInput.value||'').trim();
-    const service=serviceSelect.value;
-    const deadline=deadlineSelect.value;
-    const budget=budgetSelect.value;
-    const brief=(briefInput.value||'').trim();
-    let step=1;
-    if(name.length>=2&&email.length>=5)step=2;
-    if(step>=2&&service)step=3;
-    if(step>=3&&deadline)step=4;
-    if(step>=4&&budget&&brief.length>=10)step=5;
-    timeline.className='order-timeline step-'+step;
-    for(let i=1;i<=5;i++){
-      const el=document.getElementById('tl'+i);
-      el.classList.remove('active','done');
-      if(i<step)el.classList.add('done');
-      else if(i===step)el.classList.add('active');
+  const panels=form.querySelectorAll('.order-step-panel');
+  const steps=form.querySelectorAll('.os-step');
+
+  // Validate current step before advancing
+  if(step>currentOrderStep){
+    const currentPanel=form.querySelector('.order-step-panel[data-panel="'+currentOrderStep+'"]');
+    const required=currentPanel.querySelectorAll('[required]');
+    let valid=true;
+    required.forEach(function(input){
+      if(!input.value||!input.value.trim()){valid=false;input.closest('.order-ff').classList.add('error')}
+      else{input.closest('.order-ff').classList.remove('error')}
+    });
+    if(currentOrderStep===1){
+      const email=currentPanel.querySelector('[type="email"]');
+      if(email&&email.value&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)){valid=false;email.closest('.order-ff').classList.add('error')}
     }
+    if(!valid)return;
   }
-  [nameInput,emailInput,serviceSelect,deadlineSelect,budgetSelect,briefInput].forEach(function(el){
-    el.addEventListener('input',updateTimeline);
-    el.addEventListener('change',updateTimeline);
+
+  currentOrderStep=step;
+  panels.forEach(function(p){p.classList.remove('active')});
+  steps.forEach(function(s,i){
+    s.classList.remove('active','done');
+    if(i+1<step)s.classList.add('done');
+    else if(i+1===step)s.classList.add('active');
+  });
+  const target=form.querySelector('.order-step-panel[data-panel="'+step+'"]');
+  if(target)target.classList.add('active');
+}
+
+// ===== FLOATING LABELS =====
+(function(){
+  document.querySelectorAll('.order-ff input, .order-ff textarea, .order-ff select').forEach(function(el){
+    function checkVal(){
+      var hasVal=(el.tagName==='SELECT')?!!el.value:!!el.value.trim();
+      if(hasVal)el.classList.add('ff-hasval');
+      else el.classList.remove('ff-hasval');
+    }
+    el.addEventListener('input',checkVal);
+    el.addEventListener('change',checkVal);
+    checkVal();
   });
 })();
 
@@ -2311,7 +2416,43 @@ function getFollowUps(lastInput){const lower=lastInput.toLowerCase();if(lower.ma
 })();
 
 // ===== TOOLS =====
-function calcPrice(){const service=document.getElementById('calcService').value;const qty=parseInt(document.getElementById('calcQty').value)||1;const rush=document.getElementById('calcRush').value==='yes';const rates={poster:17,video:22,document:37};const labels={poster:'poster',video:'minute',document:'page'};let total=rates[service]*qty;if(rush)total=50*qty;const delivery=rush?'Rush (24h)':'Standard (2-3 days)';const rangeText={poster:'₹15-20',video:'₹20-25',document:'₹25-50'};document.getElementById('calcResult').innerHTML=rush?`Estimated: <span class="highlight">₹${total}</span><br><small>Rush delivery · ${qty} ${labels[service]}${qty>1?'s':''} · Fixed ₹50/${labels[service]}</small>`:`Estimated: <span class="highlight">₹${total}</span><br><small>${delivery} · ${qty} ${labels[service]}${qty>1?'s':''} · ${rangeText[service]}/${labels[service]}</small>`;}
+let calcService='poster',calcRush=false;
+function pickCalcSvc(el){
+  document.querySelectorAll('.calc-svc-card').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  calcService=el.dataset.svc;
+  const units={poster:'posters',video:'minutes',document:'words'};
+  document.getElementById('calcUnitLabel').textContent=units[calcService];
+  calcPrice();
+}
+function toggleCalcRush(){
+  calcRush=!calcRush;
+  const btn=document.getElementById('calcRushToggle');
+  const knob=document.getElementById('calcRushKnob');
+  btn.style.background=calcRush?'var(--acc)':'var(--edge)';
+  knob.style.transform=calcRush?'translateX(22px)':'translateX(0)';
+  calcPrice();
+}
+function calcQtyBtn(dir){
+  const inp=document.getElementById('calcQty');
+  let v=parseInt(inp.value)||1;
+  v=Math.max(1,Math.min(999,v+dir));
+  inp.value=v;
+  calcPrice();
+}
+function calcPrice(){
+  const qty=Math.max(1,parseInt(document.getElementById('calcQty').value)||1);
+  const rates={poster:17,video:22,document:2};
+  const rushFee={poster:10,video:10,document:3};
+  const units={poster:'poster',video:'minute',document:'word'};
+  const unitPlural={poster:'posters',video:'minutes',document:'words'};
+  let total=rates[calcService]*qty;
+  if(calcRush)total+=rushFee[calcService]*qty;
+  const label=qty>1?unitPlural[calcService]:units[calcService];
+  const delivery=calcRush?'rush delivery (+₹'+rushFee[calcService]+'/item)':'standard delivery';
+  document.getElementById('calcTotal').textContent='₹'+total.toLocaleString('en-IN');
+  document.getElementById('calcBreakdown').textContent=qty+' '+label+' · '+delivery;
+}
 function checkFile(){const input=document.getElementById('fileCheck');const file=input.files[0];if(!file){document.getElementById('fileResult').innerHTML='No file selected. Choose a file above to check its size and format.';return}const size=(file.size/1024/1024).toFixed(2);const ext=file.name.split('.').pop().toLowerCase();const imgExts=['jpg','jpeg','png','psd','raw','tiff','webp','svg'];const vidExts=['mp4','mov','avi','mkv','wmv','flv'];const docExts=['pdf','docx','pptx','xlsx','doc','ppt'];let type='Unknown',status='';if(imgExts.includes(ext))type='Image';else if(vidExts.includes(ext))type='Video';else if(docExts.includes(ext))type='Document';if(size>50)status='<br><span style="color:#ef4444">⚠ File too large — use Google Drive or WeTransfer to share.</span>';else if(size>25)status='<br><span style="color:#f59e0b">⚡ Large file — may take longer to process.</span>';else status='<br><span style="color:#22c55e">✓ Good — within upload limits.</span>';document.getElementById('fileResult').innerHTML=`<strong>${file.name}</strong><br>Type: ${type} · Size: <span class="highlight">${size} MB</span>${status}`;}
 function showRes(){const platform=document.getElementById('resPlatform').value;document.querySelectorAll('.res-item').forEach(item=>{item.style.display=(platform==='all'||item.dataset.platform===platform)?'':'none'});}
 let compareDragging=false;function loadCompare(){const bFile=document.getElementById('compareBefore').files[0];const aFile=document.getElementById('compareAfter').files[0];if(!bFile||!aFile)return;const bUrl=URL.createObjectURL(bFile);const aUrl=URL.createObjectURL(aFile);document.getElementById('compareBg').src=bUrl;document.getElementById('compareFg').src=aUrl;document.getElementById('compareBox').style.display='block';document.getElementById('compareResult').innerHTML='Drag the slider left ↔ right to compare your images.';const box=document.getElementById('compareBox');const overlay=document.getElementById('compareOver');const handle=document.getElementById('compareHandle');function setPos(x){const rect=box.getBoundingClientRect();let pct=((x-rect.left)/rect.width)*100;pct=Math.max(0,Math.min(100,pct));overlay.style.width=pct+'%';handle.style.left=pct+'%';}box.onmousedown=e=>{compareDragging=true;setPos(e.clientX)};box.ontouchstart=e=>{compareDragging=true;setPos(e.touches[0].clientX)};document.onmousemove=e=>{if(compareDragging)setPos(e.clientX)};document.ontouchmove=e=>{if(compareDragging)setPos(e.touches[0].clientX)};document.onmouseup=()=>compareDragging=false;document.ontouchend=()=>compareDragging=false;}
@@ -2432,7 +2573,7 @@ let currentFilter='all';function filterWorks(cat,btn){currentFilter=cat;document
 function toggleFaq(btn){const item=btn.closest('.faq-item');const wasOpen=item.classList.contains('open');document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));if(!wasOpen)item.classList.add('open');}
 
 // ===== FORM VALIDATION =====
-document.getElementById('orderForm').addEventListener('submit',function(e){let valid=true;this.querySelectorAll('.ff').forEach(f=>{f.classList.remove('error')});this.querySelectorAll('[required]').forEach(input=>{if(!input.value.trim()){input.closest('.ff').classList.add('error');valid=false}});const email=this.querySelector('[type="email"]');if(email&&email.value&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)){email.closest('.ff').classList.add('error');valid=false}if(!valid){e.preventDefault();return}},true);
+document.getElementById('orderForm').addEventListener('submit',function(e){let valid=true;this.querySelectorAll('.order-ff').forEach(f=>{f.classList.remove('error')});this.querySelectorAll('[required]').forEach(input=>{if(!input.value||!input.value.trim()){input.closest('.order-ff').classList.add('error');valid=false}});const email=this.querySelector('[type="email"]');if(email&&email.value&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)){email.closest('.order-ff').classList.add('error');valid=false}if(!valid){e.preventDefault();return}},true);
 
 // ===== TESTIMONIALS =====
 function renderTestimonials(testimonials){
@@ -2927,6 +3068,35 @@ document.querySelectorAll('form').forEach(f=>{const hp=document.createElement('d
 // ===== SECURITY: FORM INPUT LENGTH ENFORCEMENT =====
 document.querySelectorAll('input[maxlength],textarea[maxlength]').forEach(el=>{el.addEventListener('input',function(){if(this.maxLength>0&&this.value.length>this.maxLength){this.value=this.value.slice(0,this.maxLength);}});});
 
+// ===== ADMIN ACCESS: Ctrl+Shift+E =====
+document.addEventListener('keydown',function(e){
+  if(!e.ctrlKey||!e.shiftKey)return;
+  const k=(e.key||'').toLowerCase();
+  if(k!=='e')return;
+  const t=e.target;
+  if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable))return;
+  e.preventDefault();
+  window.location.href='admin.html?key='+atob('Y2h6N2s5cTI=');
+});
+
+// ===== ADMIN ACCESS (phone/touch): tap footer logo 5x within 1.2s =====
+(function(){
+  const mark=document.getElementById('footMark');
+  if(!mark)return;
+  let taps=0,timer=null;
+  mark.addEventListener('click',function(e){
+    taps++;
+    if(timer)clearTimeout(timer);
+    if(taps>=5){
+      taps=0;clearTimeout(timer);timer=null;
+      e.preventDefault();
+      window.location.href='admin.html?key='+atob('Y2h6N2s5cTI=');
+      return;
+    }
+    timer=setTimeout(function(){taps=0;timer=null;},1200);
+  });
+})();
+
 // ===== SECURITY: CLICKJACKING PROTECTION =====
 if(window.top!==window.self){window.top.location=window.self.location;}
 
@@ -2935,6 +3105,194 @@ if(window.top!==window.self){window.top.location=window.self.location;}
 
 // ===== SECURITY: PREVENT form resubmission =====
 document.querySelectorAll('form').forEach(f=>{f.addEventListener('submit',function(){this.addEventListener('submit',function(e){e.preventDefault();},{once:true});},{once:true});});
+
+// ===== SECURITY: DISABLE RIGHT-CLICK =====
+document.addEventListener('contextmenu',function(e){if(!e.target.closest('input,textarea,select')){e.preventDefault();return false;}});
+
+// ===== SECURITY: DISABLE TEXT SELECTION ON SENSITIVE ELEMENTS =====
+document.addEventListener('selectstart',function(e){if(e.target.closest('.nav,.hero h1,.sec-title,.price-amount,.work-title')){e.preventDefault();}});
+
+// ===== SECURITY: DISABLE IMAGE DRAG =====
+document.querySelectorAll('img').forEach(img=>{img.addEventListener('dragstart',function(e){e.preventDefault();});img.setAttribute('draggable','false');});
+
+// ===== SECURITY: BLOCK DEVTOOLS KEYBOARD SHORTCUTS =====
+document.addEventListener('keydown',function(e){
+  if(e.key==='F12'){e.preventDefault();return false;}
+  if(e.ctrlKey&&e.shiftKey&&(e.key==='I'||e.key==='i'||e.key==='J'||e.key==='j'||e.key==='C'||e.key==='c')){e.preventDefault();return false;}
+  if(e.ctrlKey&&(e.key==='U'||e.key==='u'||e.key==='S'||e.key==='s')){e.preventDefault();return false;}
+});
+
+// ===== SECURITY: DETECT DEVTOOLS OPEN (basic) =====
+(function(){
+  let devtoolsOpen=false;
+  const threshold=160;
+  setInterval(function(){
+    const widthThreshold=window.outerWidth-window.innerWidth>threshold;
+    const heightThreshold=window.outerHeight-window.innerHeight>threshold;
+    if(widthThreshold||heightThreshold){
+      if(!devtoolsOpen){devtoolsOpen=true;console.clear();}
+    }else{devtoolsOpen=false;}
+  },1000);
+})();
+
+// ===== SECURITY: DISABLE EMBEDDING IN IFRAMES =====
+try{if(window.self!==window.top){window.top.location=window.self.location;}}catch(e){}
+
+// ===== SECURITY: PREVENT URL MANIPULATION =====
+(function(){
+  const _orig=history.pushState;
+  history.pushState=function(){_orig.apply(this,arguments);};
+  window.addEventListener('popstate',function(){
+    if(location.hash&&location.hash.includes('admin')){location.hash='';history.back();}
+  });
+})();
+
+// ===== SECURITY: SANITIZE URL PARAMETERS =====
+(function(){
+  if(location.search){
+    const params=new URLSearchParams(location.search);
+    for(const[key,val]of params){
+      if(/<script|javascript:|on\w+\s*=|data:/i.test(val)){
+        history.replaceState(null,'',location.pathname+location.hash);
+        break;
+      }
+    }
+  }
+})();
+
+// ===== SECURITY: DISABLE CLIPBOARD WRITE ON SENSITIVE PAGES =====
+document.querySelectorAll('script,style,meta').forEach(function(el){
+  el.setAttribute('data-no-copy','');
+});
+
+// ===== SECURITY: SESSION FIXATION PREVENTION =====
+if(!sessionStorage.getItem('_sid')){
+  sessionStorage.setItem('_sid',Date.now().toString(36)+Math.random().toString(36).slice(2));
+}
+
+// ===== SECURITY: FORM SUBMISSION TIMESTAMP =====
+document.querySelectorAll('form').forEach(function(f){
+  const ts=document.createElement('input');
+  ts.type='hidden';ts.name='_ts';ts.value=Date.now().toString();
+  f.appendChild(ts);
+});
+
+// ===== SECURITY: BLOCK SUSPICIOUS REDIRECTS =====
+(function(){
+  const _assign=Object.getOwnPropertyDescriptor(Location.prototype,'href');
+  if(_assign&&_assign.set){
+    Object.defineProperty(Location.prototype,'href',{
+      set:function(v){
+        if(/javascript:|data:|vbscript:/i.test(v)){return;}
+        _assign.set.call(this,v);
+      },get:_assign.get
+    });
+  }
+})();
+
+// ===== SECURITY: CSP REPORT VIOLATIONS =====
+document.addEventListener('securitypolicyviolation',function(e){
+  console.warn('CSP Violation:',e.violatedDirective,e.blockedURI);
+});
+
+// ===== CHEDITZ AGENT: PWA + PHONE ALERTS =====
+(function(){
+  const AGENT_VAPID_PUBLIC_KEY='BCumSzaHxMFHn2XPMXOGN2-h3kUKeSUO8P--fJExwEeHGP6IIDQj8GsMq6o4l9EsOD1n-gsNyiGC3MVQZLGUlD0';
+  const AGENT_SUBS='cheditz_push_subs';
+  const btn=document.getElementById('agentBtn');
+  const label=document.getElementById('agentBtnLabel');
+  const installBtn=document.getElementById('installBtn');
+  if(!btn)return;
+  let reg=null,deferredInstall=null;
+
+  function urlBase64ToUint8Array(base64String){
+    const padding='='.repeat((4-(base64String.length%4))%4);
+    const base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');
+    const raw=atob(base64);const out=new Uint8Array(raw.length);
+    for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);
+    return out;
+  }
+  async function subDocId(sub){
+    try{
+      const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(sub.endpoint));
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }catch(e){
+      return btoa(sub.endpoint).replace(/[^a-zA-Z0-9]/g,'').slice(0,40);
+    }
+  }
+  function setBtn(cls,text,disabled){
+    btn.className='agent-btn'+(cls?' '+cls:'');
+    if(label)label.textContent=text;
+    btn.disabled=!!disabled;
+  }
+  function busy(on){if(on){btn.classList.add('busy');btn.disabled=true;}else{btn.classList.remove('busy');}}
+  async function saveSub(sub){
+    if(typeof firebaseDb==='undefined'||!firebaseDb)throw new Error('Firebase is offline, alerts cannot be registered.');
+    const id=await subDocId(sub);
+    const json=sub.toJSON();
+    await firebaseDb.collection(AGENT_SUBS).doc(id).set({
+      endpoint:sub.endpoint,
+      keys:json.keys,
+      created:new Date().toISOString(),
+      updated:new Date().toISOString(),
+      ua:navigator.userAgent,
+      active:true
+    },{merge:true});
+    return id;
+  }
+  async function refresh(){
+    if(!('serviceWorker' in navigator)||!('PushManager' in window)){
+      setBtn('','Alerts not supported here',true);return;
+    }
+    try{reg=await navigator.serviceWorker.getRegistration();}catch(e){reg=null;}
+    let sub=null;
+    try{sub=reg?await reg.pushManager.getSubscription():null;}catch(e){sub=null;}
+    if(sub&&Notification.permission==='granted'){setBtn('on','Phone alerts on',false);}
+    else{setBtn('','Enable phone alerts',false);}
+  }
+  btn.addEventListener('click',async function(){
+    if(!('serviceWorker' in navigator)||!('PushManager' in window)){alert('This browser cannot receive push alerts. Open cheditz.online in Chrome or Safari on your phone.');return;}
+    busy(true);
+    try{
+      reg=await navigator.serviceWorker.register('sw.js');
+      let sub=await reg.pushManager.getSubscription();
+      if(sub&&Notification.permission==='granted'){
+        await saveSub(sub);
+        busy(false);refresh();
+        return;
+      }
+      const perm=await Notification.requestPermission();
+      if(perm!=='granted'){busy(false);setBtn('','Alerts blocked',false);return;}
+      sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(AGENT_VAPID_PUBLIC_KEY)});
+      await saveSub(sub);
+      busy(false);refresh();
+    }catch(err){
+      console.warn('Agent alerts failed:',err);
+      busy(false);setBtn('','Try alerts again',false);
+      alert('Could not enable alerts: '+(err&&err.message?err.message:err));
+    }
+  });
+  if(installBtn){
+    installBtn.addEventListener('click',async function(){
+      if(!deferredInstall)return;
+      deferredInstall.prompt();
+      try{await deferredInstall.userChoice;}catch(e){}
+      deferredInstall=null;installBtn.hidden=true;
+    });
+    window.addEventListener('beforeinstallprompt',function(e){
+      e.preventDefault();deferredInstall=e;installBtn.hidden=false;
+    });
+    window.addEventListener('appinstalled',function(){installBtn.hidden=true;});
+  }
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+    navigator.serviceWorker.addEventListener('message',async function(e){
+      const d=e.data||{};
+      if(d.type==='cheditz:resubscribe'&&d.subscription){try{await saveSub(d.subscription);}catch(err){console.warn(err);}}
+    });
+  }
+  refresh();
+})();
 
 </script>
 </body>

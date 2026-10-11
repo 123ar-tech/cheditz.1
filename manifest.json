@@ -1,0 +1,29 @@
+{
+  "name": "Cheditz — Photo, Video & Document Editing",
+  "short_name": "Cheditz",
+  "description": "Cinematic photo, video, and document editing on demand — plus a live agent that sends order, review and site alerts to your phone.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["productivity", "graphics", "business"],
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "484x515",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "favicon.png",
+      "sizes": "484x515",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
