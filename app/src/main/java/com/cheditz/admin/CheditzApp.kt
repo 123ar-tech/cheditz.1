@@ -53,7 +53,7 @@ class CheditzApp : Application() {
             .setConstraints(constraints)
             .build()
         WorkManager.getInstance(this).enqueueUniqueWork(
-            "cheditz_order_poll_once", ExistingWorkPolicy.KEEP, immediate
+            "cheditz_order_poll_once", ExistingWorkPolicy.REPLACE, immediate
         )
     }
 

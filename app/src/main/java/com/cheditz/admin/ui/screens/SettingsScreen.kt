@@ -42,11 +42,16 @@ fun SettingsScreen(onBack: () -> Unit, vm: ConfigViewModel = viewModel()) {
             else true
         )
     }
+    var status by remember { mutableStateOf<String?>(null) }
+    var deniedOnce by remember { mutableStateOf(false) }
     val notifLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         notifPermission = granted
+        if (!granted) deniedOnce = true
     }
-
-    var status by remember { mutableStateOf<String?>(null) }
+    val pm = remember(context) { context.getSystemService(android.os.PowerManager::class.java) }
+    val batteryExempt = remember(context, status) {
+        try { pm.isIgnoringBatteryOptimizations(context.packageName) } catch (_: Exception) { false }
+    }
     var showImport by remember { mutableStateOf(false) }
     var showReset by remember { mutableStateOf(false) }
 
@@ -70,24 +75,40 @@ fun SettingsScreen(onBack: () -> Unit, vm: ConfigViewModel = viewModel()) {
             if (status != null) Snackbar { Text(status!!) }
 
             Card(shape = MaterialTheme.shapes.medium, colors = CardDefaults.cardColors(containerColor = DarkCard)) {
-                Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.Notifications, "Notifications", tint = VioletPrimary)
-                    Spacer(Modifier.width(16.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text("Order Notifications", style = MaterialTheme.typography.titleMedium)
-                        Text(
-                            if (notifPermission) "Enabled — new orders will push a notification" else "Disabled — enable to receive new order alerts",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = TextSecondary
-                        )
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.Notifications, "Notifications", tint = VioletPrimary)
+                        Spacer(Modifier.width(16.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text("Order Notifications", style = MaterialTheme.typography.titleMedium)
+                            Text(
+                                when {
+                                    !notifPermission && deniedOnce -> "Blocked — Android is hiding notifications for this app"
+                                    !notifPermission -> "Permission needed to show order alerts"
+                                    !batteryExempt -> "Active, but background checks may be stopped by your phone's battery saver"
+                                    else -> "Active — instant alerts while the app is open, every 15 min in background"
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = TextSecondary
+                            )
+                        }
                     }
-                    if (!notifPermission) {
-                        Button(onClick = {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                notifLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                            }
-                        }) { Text("Enable") }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        if (!notifPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            OutlinedButton(onClick = {
+                                if (deniedOnce) openAppNotificationSettings(context)
+                                else notifLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            }) { Text(if (deniedOnce) "Open Settings" else "Grant Permission") }
+                        }
+                        if (!batteryExempt) {
+                            OutlinedButton(onClick = { requestBatteryExemption(context) }) { Text("Allow Background") }
+                        }
                     }
+                    Text(
+                        "The app alerts you the moment a new order arrives while it's open, and checks every 15 minutes when closed. \"Allow Background\" stops phones (Xiaomi, Realme, Vivo…) from killing that check when the screen is off.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = TextSecondary
+                    )
                 }
             }
 
@@ -143,7 +164,7 @@ fun SettingsScreen(onBack: () -> Unit, vm: ConfigViewModel = viewModel()) {
                 Column(Modifier.padding(16.dp)) {
                     Text("About", style = MaterialTheme.typography.titleMedium)
                     Spacer(Modifier.height(8.dp))
-                    InfoRow("App", "Cheditz Admin v1.0.2")
+                    InfoRow("App", "Cheditz Admin v1.0.3")
                     InfoRow("Website", "cheditz.online")
                     InfoRow("Min SDK", "Android 8.0 (API 26)")
                 }
@@ -215,5 +236,42 @@ fun InfoRow(label: String, value: String) {
     Row(Modifier.padding(vertical = 3.dp)) {
         Text("$label: ", style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
         Text(value, style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+private fun openAppNotificationSettings(context: android.content.Context) {
+    try {
+        context.startActivity(
+            android.content.Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, context.packageName)
+        )
+    } catch (_: Exception) {
+        try {
+            context.startActivity(
+                android.content.Intent(
+                    android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    android.net.Uri.parse("package:${context.packageName}")
+                )
+            )
+        } catch (_: Exception) {
+        }
+    }
+}
+
+private fun requestBatteryExemption(context: android.content.Context) {
+    try {
+        context.startActivity(
+            android.content.Intent(
+                android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                android.net.Uri.parse("package:${context.packageName}")
+            )
+        )
+    } catch (_: Exception) {
+        try {
+            context.startActivity(
+                android.content.Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+            )
+        } catch (_: Exception) {
+        }
     }
 }

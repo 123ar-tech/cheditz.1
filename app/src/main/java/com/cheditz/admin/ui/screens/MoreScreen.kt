@@ -42,7 +42,7 @@ fun MoreScreen(
 
             Spacer(Modifier.weight(1f))
             Text(
-                "Cheditz Admin v1.0.2\nFirebase project: cheditz-dee25",
+                "Cheditz Admin v1.0.3\nFirebase project: cheditz-dee25",
                 style = MaterialTheme.typography.labelSmall,
                 color = TextSecondary,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
