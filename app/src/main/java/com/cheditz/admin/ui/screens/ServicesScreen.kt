@@ -81,9 +81,9 @@ fun ServiceCard(service: Service) {
             }
             Spacer(Modifier.height(8.dp))
             Text(service.desc, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
-            if (service.feats.isNotEmpty()) {
+            if (service.featureList.isNotEmpty()) {
                 Spacer(Modifier.height(8.dp))
-                service.feats.forEach { feat ->
+                service.featureList.forEach { feat ->
                     Row(Modifier.padding(vertical = 2.dp)) {
                         Icon(Icons.Filled.CheckCircle, "Feature", tint = SuccessGreen, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(8.dp))

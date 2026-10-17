@@ -7,7 +7,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:79278126031:android:87a596a8894ccf4a20d8ba",
+        "mobilesdk_app_id": "1:79278126031:android:51c9e9917c48537220d8ba",
         "android_client_info": {
           "package_name": "com.cheditz.admin"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC2VDKVLXSEOtyuxOeJJhibQ2x08okdwK"
+          "current_key": "AIzaSyCNuVdbM1OPSIzL1xSdaPp0whIL8_ctsiE"
         }
       ],
       "services": {

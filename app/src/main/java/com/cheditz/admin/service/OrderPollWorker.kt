@@ -3,6 +3,7 @@ package com.cheditz.admin.service
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
@@ -27,7 +28,7 @@ class OrderPollWorker(appContext: Context, params: WorkerParameters) :
 
             val snap = FirebaseFirestore.getInstance()
                 .collection("cheditz_orders")
-                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .orderBy("date", Query.Direction.DESCENDING)
                 .limit(20)
                 .get()
                 .await()
@@ -35,7 +36,12 @@ class OrderPollWorker(appContext: Context, params: WorkerParameters) :
             for (doc in snap.documents) {
                 val id = doc.id
                 if (id in seen) continue
-                val order = doc.toObject(Order::class.java)
+                val order = try {
+                    doc.toObject(Order::class.java)
+                } catch (e: Exception) {
+                    Log.w(TAG, "Skipping order $id: ${e.message}")
+                    null
+                }
                 if (!firstRun && order != null && order.isPending) {
                     showNewOrderNotification(order)
                 }
@@ -49,7 +55,8 @@ class OrderPollWorker(appContext: Context, params: WorkerParameters) :
             }
             prefs.edit().putStringSet("seen_orders", seen).apply()
             Result.success()
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
+            Log.w(TAG, "Order poll failed: ${e.message}")
             if (runAttemptCount < 2) Result.retry() else Result.success()
         }
     }
@@ -81,5 +88,9 @@ class OrderPollWorker(appContext: Context, params: WorkerParameters) :
             NotificationManagerCompat.from(applicationContext).notify(Random.nextInt(), notification)
         } catch (_: SecurityException) {
         }
+    }
+
+    companion object {
+        private const val TAG = "OrderPollWorker"
     }
 }

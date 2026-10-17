@@ -1,42 +1,61 @@
 package com.cheditz.admin.data.repository
 
+import android.util.Log
 import com.cheditz.admin.data.model.*
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.TimeZone
+
+private const val TAG = "CheditzRepo"
+
+private inline fun <reified T> DocumentSnapshot.safeParse(): T? = try {
+    toObject(T::class.java)
+} catch (e: Exception) {
+    Log.w(TAG, "Skipping document $id (type mismatch): ${e.message}")
+    null
+}
+
+private fun isoTime(s: String?): Long {
+    if (s == null || s.length < 19) return 0L
+    return try {
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
+            .apply { timeZone = TimeZone.getTimeZone("UTC") }
+            .parse(s.substring(0, 19))?.time ?: 0L
+    } catch (_: Exception) {
+        0L
+    }
+}
+
+private fun orderTime(o: Order): Long =
+    o.createdAt?.toDate()?.time ?: isoTime(o.date)
 
 class OrderRepository(private val db: FirebaseFirestore = FirebaseFirestore.getInstance()) {
 
     private val ordersRef = db.collection("cheditz_orders")
 
     fun observeOrders(): Flow<List<Order>> = callbackFlow {
-        val reg = ordersRef
-            .orderBy("createdAt", Query.Direction.DESCENDING)
-            .addSnapshotListener { snap, error ->
-                if (error != null) { close(error); return@addSnapshotListener }
-                val orders = snap?.documents?.mapNotNull { it.toObject(Order::class.java)?.copy(id = it.id) } ?: emptyList()
-                trySend(orders)
+        val reg = ordersRef.addSnapshotListener { snap, error ->
+            if (error != null) {
+                Log.w(TAG, "Orders listener error (kept last state): ${error.message}")
+                return@addSnapshotListener
             }
-        awaitClose { reg.remove() }
-    }
-
-    fun observePendingOrders(): Flow<List<Order>> = callbackFlow {
-        val reg = ordersRef
-            .whereEqualTo("status", "pending")
-            .orderBy("createdAt", Query.Direction.DESCENDING)
-            .addSnapshotListener { snap, error ->
-                if (error != null) { close(error); return@addSnapshotListener }
-                val orders = snap?.documents?.mapNotNull { it.toObject(Order::class.java)?.copy(id = it.id) } ?: emptyList()
-                trySend(orders)
-            }
+            val docs = snap?.documents ?: return@addSnapshotListener
+            val orders = docs
+                .mapNotNull { d -> d.safeParse<Order>()?.copy(id = d.id) }
+                .sortedByDescending { orderTime(it) }
+            trySend(orders)
+        }
         awaitClose { reg.remove() }
     }
 
     suspend fun getOrder(id: String): Order? =
-        ordersRef.document(id).get().await().toObject(Order::class.java)?.copy(id = id)
+        ordersRef.document(id).get().await().safeParse<Order>()?.copy(id = id)
 
     suspend fun updateStatus(id: String, status: String) {
         ordersRef.document(id).update("status", status).await()
@@ -53,14 +72,18 @@ class ConfigRepository(private val db: FirebaseFirestore = FirebaseFirestore.get
 
     fun observeConfig(): Flow<SiteConfig?> = callbackFlow {
         val reg = configRef.addSnapshotListener { snap, error ->
-            if (error != null) { close(error); return@addSnapshotListener }
-            trySend(snap?.toObject(SiteConfig::class.java))
+            if (error != null) {
+                Log.w(TAG, "Config listener error (kept last state): ${error.message}")
+                return@addSnapshotListener
+            }
+            if (snap == null || !snap.exists()) return@addSnapshotListener
+            trySend(snap.safeParse())
         }
         awaitClose { reg.remove() }
     }
 
     suspend fun getConfig(): SiteConfig? =
-        configRef.get().await().toObject(SiteConfig::class.java)
+        configRef.get().await().safeParse()
 
     suspend fun updateAccent(accent: String) {
         configRef.update("accent", accent).await()
@@ -103,12 +126,17 @@ class TestimonialRepository(private val db: FirebaseFirestore = FirebaseFirestor
     private val ref = db.collection("cheditz_testimonials")
 
     fun observeTestimonials(): Flow<List<Testimonial>> = callbackFlow {
-        val reg = ref.orderBy("date", Query.Direction.DESCENDING)
-            .addSnapshotListener { snap, error ->
-                if (error != null) { close(error); return@addSnapshotListener }
-                val list = snap?.documents?.mapNotNull { it.toObject(Testimonial::class.java)?.copy(id = it.id) } ?: emptyList()
-                trySend(list)
+        val reg = ref.addSnapshotListener { snap, error ->
+            if (error != null) {
+                Log.w(TAG, "Testimonials listener error (kept last state): ${error.message}")
+                return@addSnapshotListener
             }
+            val docs = snap?.documents ?: return@addSnapshotListener
+            val list = docs
+                .mapNotNull { d -> d.safeParse<Testimonial>()?.copy(id = d.id) }
+                .sortedByDescending { isoTime(it.date) }
+            trySend(list)
+        }
         awaitClose { reg.remove() }
     }
 

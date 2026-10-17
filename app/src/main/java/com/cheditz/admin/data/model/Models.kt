@@ -48,9 +48,12 @@ data class WorkItem(
 data class Service(
     val name: String = "",
     val desc: String = "",
-    val feats: List<String> = emptyList(),
+    val feats: String = "",
     val price: String = ""
-)
+) {
+    val featureList: List<String>
+        get() = feats.split("\n").map { it.trim() }.filter { it.isNotEmpty() }
+}
 
 data class Contact(
     val email: String = "",
