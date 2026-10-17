@@ -12,3 +12,6 @@ local.properties
 node_modules/
 functions/node_modules/
 firebase-debug.log
+release.keystore
+keystore.properties
+app/release*.apk

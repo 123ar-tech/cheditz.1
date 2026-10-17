@@ -4,6 +4,11 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+// Release signing: presence of ../release.keystore enables real signing;
+// without it, release falls back to debug signing (still installable).
+val releaseKeystore = rootProject.file("release.keystore")
+val hasReleaseKeystore = releaseKeystore.exists()
+
 android {
     namespace = "com.cheditz.admin"
     compileSdk = 34
@@ -19,10 +24,23 @@ android {
         vectorDrawables { useSupportLibrary = true }
     }
 
+    signingConfigs {
+        if (hasReleaseKeystore) {
+            create("release") {
+                storeFile = releaseKeystore
+                storePassword = "Cheditz@2026"
+                keyAlias = "cheditz"
+                keyPassword = "Cheditz@2026"
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfig = if (hasReleaseKeystore) signingConfigs.getByName("release")
+                            else signingConfigs.getByName("debug")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
         debug {
