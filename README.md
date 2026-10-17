@@ -27,13 +27,18 @@ pricing, contact info, and Firebase Auth sign-in.
 Requires JDK 17 + Android SDK 34. `app/google-services.json` is already configured for
 project `cheditz-dee25`.
 
-## Push notifications
+## Push notifications (works on the free plan — no Blaze needed)
 
-1. Customer submits an order → document created in `cheditz_orders`
-2. `functions/index.js` (`onNewOrder`) fires → sends FCM to topic `cheditz_orders`
-3. The Android app shows a high-priority notification; tap opens the order detail screen
+The app checks for new orders itself:
 
-Deploy:
+1. **While the app is open** — real-time Firestore listener, instant
+2. **Background** — WorkManager syncs every 15 minutes and shows a local
+   notification for each new pending order (survives app closed/reboot;
+   tap opens the order detail screen)
+
+`functions/index.js` contains an optional Cloud Function (`onNewOrder`) that pushes
+the same notification through FCM within seconds — deploying it requires Firebase's
+**Blaze plan** (free tier covers it), so it's ready whenever you want it:
 
 ```bash
 firebase deploy --only functions
