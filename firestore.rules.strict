@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: authenticated admin only
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    // Orders: public can create (customer order form), only admin can read/update/delete
+    match /cheditz_orders/{orderId} {
+      allow create: if request.resource.data.keys().hasAll(['name', 'email', 'service', 'budget', 'deadline', 'description'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() < 100
+        && request.resource.data.email is string
+        && request.resource.data.email.size() < 200
+        && request.resource.data.description is string
+        && request.resource.data.description.size() < 5000
+        && request.resource.data.status == 'pending';
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Testimonials: public can create (review form), admin can read/delete; anyone can read published ones if desired
+    match /cheditz_testimonials/{tid} {
+      allow create: if request.resource.data.keys().hasAll(['name', 'text', 'rating', 'date'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() < 100
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() < 2000
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5;
+      allow read: if true;
+      allow update, delete: if isAdmin();
+    }
+
+    // Site config: public read (needed for website theming/content), admin-only write
+    match /cheditz/config {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // FCM token store: any signed-in admin can write, admin can read
+    match /cheditz_fcm_tokens/{tokenId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Notification log: admin only
+    match /cheditz_notification_log/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

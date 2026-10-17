@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="deep_black">#0A0A0F</color>
+    <color name="dark_surface">#12121A</color>
+    <color name="dark_card">#1A1A26</color>
+    <color name="violet_primary">#9C6BFF</color>
+    <color name="violet_secondary">#7C4DFF</color>
+    <color name="cyan_accent">#00E5FF</color>
+    <color name="orange_accent">#FF9100</color>
+    <color name="white">#EAEAF0</color>
+</resources>
