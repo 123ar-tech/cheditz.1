@@ -64,6 +64,9 @@ class ConfigViewModel : ViewModel() {
     fun updateContact(contact: Contact) = viewModelScope.launch { try { repo.updateContact(contact) } catch (_: Exception) {} }
     fun removeWork(workId: String) = viewModelScope.launch { try { repo.removeWork(workId) } catch (_: Exception) {} }
     fun toggleWorkVisibility(workId: String, visible: Boolean) = viewModelScope.launch { try { repo.toggleWorkVisibility(workId, visible) } catch (_: Exception) {} }
+    fun addWork(work: WorkItem) = viewModelScope.launch { try { repo.addWork(work) } catch (_: Exception) {} }
+    fun updateWorks(works: List<WorkItem>) = viewModelScope.launch { try { repo.updateWorks(works) } catch (_: Exception) {} }
+    fun saveWholeConfig(cfg: SiteConfig) = viewModelScope.launch { try { repo.saveWholeConfig(cfg) } catch (_: Exception) {} }
 }
 
 class TestimonialViewModel : ViewModel() {

@@ -85,6 +85,10 @@ class ConfigRepository(private val db: FirebaseFirestore = FirebaseFirestore.get
     suspend fun getConfig(): SiteConfig? =
         configRef.get().await().safeParse()
 
+    suspend fun saveWholeConfig(cfg: SiteConfig) {
+        configRef.set(cfg, com.google.firebase.firestore.SetOptions.merge()).await()
+    }
+
     suspend fun updateAccent(accent: String) {
         configRef.update("accent", accent).await()
     }

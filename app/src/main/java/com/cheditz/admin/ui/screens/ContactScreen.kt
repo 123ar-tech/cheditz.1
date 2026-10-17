@@ -32,6 +32,7 @@ fun ContactScreen(onBack: () -> Unit, vm: ConfigViewModel = viewModel()) {
     var instaUrl by remember(contact.instaUrl) { mutableStateOf(contact.instaUrl) }
     var whatsapp by remember(contact.whatsapp) { mutableStateOf(contact.whatsapp) }
     var whatsappLabel by remember(contact.whatsappLabel) { mutableStateOf(contact.whatsappLabel) }
+    var whatsappText by remember(contact.whatsappText) { mutableStateOf(contact.whatsappText) }
     var hours by remember(contact.hours) { mutableStateOf(contact.hours) }
     var reply by remember(contact.reply) { mutableStateOf(contact.reply) }
     var saved by remember { mutableStateOf(false) }
@@ -43,7 +44,18 @@ fun ContactScreen(onBack: () -> Unit, vm: ConfigViewModel = viewModel()) {
                 navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, "Back") } },
                 actions = {
                     TextButton(onClick = {
-                        vm.updateContact(Contact(email, insta, instaUrl, whatsapp, whatsappLabel, contact.whatsappText, hours, reply))
+                        vm.updateContact(
+                            Contact(
+                                email = email,
+                                insta = insta,
+                                instaUrl = instaUrl,
+                                whatsapp = whatsapp,
+                                whatsappLabel = whatsappLabel,
+                                whatsappText = whatsappText,
+                                hours = hours,
+                                reply = reply
+                            )
+                        )
                         saved = true
                     }) { Text("Save", color = VioletPrimary) }
                 },
@@ -65,7 +77,8 @@ fun ContactScreen(onBack: () -> Unit, vm: ConfigViewModel = viewModel()) {
             ContactField("Instagram Handle", insta) { insta = it }
             ContactField("Instagram URL", instaUrl) { instaUrl = it }
             ContactField("WhatsApp Number", whatsapp) { whatsapp = it }
-            ContactField("WhatsApp Label", whatsappLabel) { whatsappLabel = it }
+            ContactField("WhatsApp Button Label", whatsappLabel) { whatsappLabel = it }
+            ContactField("WhatsApp Greeting Text", whatsappText) { whatsappText = it }
             ContactField("Working Hours", hours) { hours = it }
             ContactField("Reply Time", reply) { reply = it }
 

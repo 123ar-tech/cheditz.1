@@ -4,10 +4,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -22,12 +21,20 @@ import com.cheditz.admin.ui.viewmodel.ConfigViewModel
 fun ServicesScreen(onBack: () -> Unit, vm: ConfigViewModel = viewModel()) {
     val config by vm.config.collectAsStateWithLifecycle()
     val services = config?.services ?: emptyList()
+    var edits by remember(services) { mutableStateOf(services) }
+    var saved by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Services & Pricing", fontWeight = FontWeight.Bold) },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, "Back") } },
+                actions = {
+                    TextButton(onClick = {
+                        vm.updateServices(edits)
+                        saved = true
+                    }) { Text("Save", color = VioletPrimary) }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         }
@@ -40,19 +47,23 @@ fun ServicesScreen(onBack: () -> Unit, vm: ConfigViewModel = viewModel()) {
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            if (services.isEmpty()) {
-                Box(Modifier.fillMaxWidth().padding(48.dp), contentAlignment = Alignment.Center) {
+            if (saved) Snackbar { Text("Services saved to Firestore") }
+
+            if (edits.isEmpty()) {
+                Box(Modifier.fillMaxWidth().padding(48.dp), contentAlignment = androidx.compose.ui.Alignment.Center) {
                     Text("No services configured", color = TextSecondary)
                 }
             } else {
-                services.forEach { service ->
-                    ServiceCard(service)
+                edits.forEachIndexed { i, service ->
+                    ServiceEditCard(service) { new ->
+                        edits = edits.toMutableList().also { l -> l[i] = new }
+                        saved = false
+                    }
                 }
             }
 
-            Spacer(Modifier.height(8.dp))
             Text(
-                "Edit prices/descriptions on the website admin panel, or extend this screen with Firestore write support for services[].",
+                "Changes update cheditz/config.services — the website shows them live.",
                 style = MaterialTheme.typography.bodySmall,
                 color = TextSecondary
             )
@@ -61,36 +72,50 @@ fun ServicesScreen(onBack: () -> Unit, vm: ConfigViewModel = viewModel()) {
 }
 
 @Composable
-fun ServiceCard(service: Service) {
+fun ServiceEditCard(service: Service, onChange: (Service) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(containerColor = DarkCard)
     ) {
-        Column(Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(service.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-                Surface(color = CyanAccent.copy(alpha = 0.15f), shape = MaterialTheme.shapes.small) {
-                    Text(
-                        service.price,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = CyanAccent
-                    )
-                }
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text("Service", style = MaterialTheme.typography.labelLarge, color = CyanAccent)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = service.name,
+                    onValueChange = { onChange(service.copy(name = it)) },
+                    label = { Text("Name") },
+                    singleLine = true,
+                    modifier = Modifier.weight(1f),
+                    shape = MaterialTheme.shapes.small
+                )
+                OutlinedTextField(
+                    value = service.price,
+                    onValueChange = { onChange(service.copy(price = it)) },
+                    label = { Text("Price") },
+                    singleLine = true,
+                    modifier = Modifier.width(140.dp),
+                    shape = MaterialTheme.shapes.small
+                )
             }
-            Spacer(Modifier.height(8.dp))
-            Text(service.desc, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
-            if (service.featureList.isNotEmpty()) {
-                Spacer(Modifier.height(8.dp))
-                service.featureList.forEach { feat ->
-                    Row(Modifier.padding(vertical = 2.dp)) {
-                        Icon(Icons.Filled.CheckCircle, "Feature", tint = SuccessGreen, modifier = Modifier.size(16.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text(feat, style = MaterialTheme.typography.bodyMedium)
-                    }
-                }
-            }
+            OutlinedTextField(
+                value = service.desc,
+                onValueChange = { onChange(service.copy(desc = it)) },
+                label = { Text("Description") },
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 2,
+                maxLines = 5,
+                shape = MaterialTheme.shapes.small
+            )
+            OutlinedTextField(
+                value = service.feats,
+                onValueChange = { onChange(service.copy(feats = it)) },
+                label = { Text("Features (one per line)") },
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 3,
+                maxLines = 7,
+                shape = MaterialTheme.shapes.small
+            )
         }
     }
 }

@@ -1,11 +1,17 @@
 package com.cheditz.admin.ui.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -13,6 +19,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cheditz.admin.data.model.ContentBlock
 import com.cheditz.admin.ui.theme.*
 import com.cheditz.admin.ui.viewmodel.ConfigViewModel
+
+private val ACCENT_SWATCHES = listOf(
+    "#dc2626", "#9333ea", "#1d4ed8", "#c026d3", "#ef4444", "#3b82f6",
+    "#f97316", "#0d9488", "#16a34a", "#0891b2", "#000000", "#111111"
+)
+
+private fun parseHex(hex: String): Color = try {
+    Color(android.graphics.Color.parseColor(hex))
+} catch (_: Exception) {
+    VioletPrimary
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,6 +46,7 @@ fun ContentScreen(vm: ConfigViewModel = viewModel()) {
     var orderDesc by remember(content.orderDesc) { mutableStateOf(content.orderDesc) }
     var contactHead by remember(content.contactHead) { mutableStateOf(content.contactHead) }
     var contactDesc by remember(content.contactDesc) { mutableStateOf(content.contactDesc) }
+    var accent by remember(config?.accent) { mutableStateOf(config?.accent ?: "#9333ea") }
     var saved by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -56,9 +74,47 @@ fun ContentScreen(vm: ConfigViewModel = viewModel()) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             if (saved) {
-                Snackbar { Text("Content saved to Firestore") }
+                Snackbar { Text("Saved to Firestore — website updates live") }
             }
 
+            SectionLabel("Accent Color")
+            Text(
+                "Tap a swatch — applies to the website theme instantly after Save.",
+                style = MaterialTheme.typography.bodySmall,
+                color = TextSecondary
+            )
+            ACCENT_SWATCHES.chunked(6).forEach { rowColors ->
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    rowColors.forEach { c ->
+                        val swatchColor = remember(c) { parseHex(c) }
+                        val selected = accent.equals(c, ignoreCase = true)
+                        Box(
+                            Modifier
+                                .size(46.dp)
+                                .clip(CircleShape)
+                                .background(swatchColor)
+                                .border(
+                                    width = if (selected) 3.dp else 1.dp,
+                                    color = if (selected) VioletPrimary else TextSecondary.copy(alpha = 0.3f),
+                                    shape = CircleShape
+                                )
+                                .clickable { accent = c }
+                        )
+                    }
+                }
+            }
+            OutlinedTextField(
+                value = accent,
+                onValueChange = { accent = it },
+                label = { Text("Hex Accent (e.g. #9333ea)") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+            Button(onClick = { vm.updateAccent(accent); saved = true }) {
+                Text("Save Accent Color")
+            }
+
+            Spacer(Modifier.height(4.dp))
             SectionLabel("Hero Section")
             ContentField("Hero Badge", heroBadge) { heroBadge = it }
             ContentField("Hero Headline", heroHead) { heroHead = it }
@@ -77,26 +133,6 @@ fun ContentScreen(vm: ConfigViewModel = viewModel()) {
             ContentField("Contact Description", contactDesc, multiline = true) { contactDesc = it }
 
             Spacer(Modifier.height(16.dp))
-
-            // Accent color
-            SectionLabel("Accent Color")
-            var accent by remember(config?.accent) { mutableStateOf(config?.accent ?: "#bc6bff") }
-            OutlinedTextField(
-                value = accent,
-                onValueChange = { accent = it },
-                label = { Text("Hex Accent (e.g. #bc6bff)") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-            Spacer(Modifier.height(8.dp))
-            Button(onClick = { vm.updateAccent(accent); saved = true }) {
-                Text("Save Accent Color")
-            }
-            Text(
-                "This updates cheditz/config.accent so the website theme changes live.",
-                style = MaterialTheme.typography.bodySmall,
-                color = TextSecondary
-            )
         }
     }
 }
